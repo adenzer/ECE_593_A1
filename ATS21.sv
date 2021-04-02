@@ -97,19 +97,21 @@ ControlRegisters cr_bits;
 task Reset();
 	// Reset Clocks
 	for(int i=0; i<num_clocks; i++)
-	begin
+	 begin
 		base_clocks[i].enable = 0;
 		base_clocks[i].count = '0;
-	end
+	 end
+	 
 	// Reset Alarms
 	for(int i=0; i<num_alarms; i++)
-	begin
+	 begin
 		alarms[i].enable = 0;
 		alarms[i].loop = 0;
 		alarms[i].assigned_clock = '0;
 		alarms[i].value = '0;
-		alarms[i].finished = '0;
-	end
+		alarms[i].finished = 0;
+	 end
+
 	// Reset Control Bits
 	cr_bits.active = 0;
 	cr_bits.clientA_clock = 0;
@@ -130,9 +132,9 @@ endtask
 genvar i;
 generate
 	for (i = 0; i < num_alarms; i++)
-	begin
+	 begin
 		assign data[i] = alarms[i].finished;
-	end
+	 end
 endgenerate
 
 endmodule
