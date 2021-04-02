@@ -36,6 +36,9 @@ typedef struct packed {
 	logic [clock_width-1:0] count;
 } Clock;
 
+// Array of Clocks
+Clock [num_clocks-1:0] base_clocks;
+
 // Each alarm is a packed struct with 1 bit for enabling / disbaling
 // the alarm and 'clock_width' bits for the value to be compared to the
 // clocks. There is another bit 'loop' that indicates if the alarm should
@@ -50,14 +53,22 @@ typedef struct packed {
 	logic finished;
 } Alarm;
 
-// Array of Clocks
-Clock [num_clocks-1:0] base_clocks;
-
 // Array of Alarms.
 Alarm [num_alarms-1:0] alarms; 
 
 // Control Registers
-logic [7:0] cr_bits;
+typedef struct packed {
+	logic active;
+	logic clientA_clock;
+	logic clientB_clock;
+	logic clientA_alarm;
+	logic clientB_alarm;
+	logic unused_5;
+	logic unused_6;
+	logic unused_7;
+} ControlRegisters
+
+ControlRegisters cr_bits;
 
 ////////// Reference Design Behavior //////////
 
