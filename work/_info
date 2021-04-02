@@ -1,0 +1,61 @@
+m255
+K4
+z2
+!s11f vlog 2019.2_1 2019.05, May 13 2019
+13
+!s112 1.1
+!i10d 8192
+!i10e 25
+!i10f 100
+cModel Technology
+Z0 d/home/zfravel/common/Documents/ece593/assignment1
+vATS21
+Z1 DXx6 sv_std 3 std 0 22 9oUSJO;AeEaW`l:M@^WG92
+!s110 1617328930
+!i10b 1
+!s100 dB<iVNiT^@5XkgOOKG3On0
+!s11b ^zi0o@YRzcCD6H>[]NTiY2
+IE0@O5Alg0njIU95XCH:UI3
+Z2 VDg1SIo80bB@j0V0VzS_@n1
+S1
+R0
+w1617327938
+8ATS21.sv
+FATS21.sv
+Z3 L0 14
+Z4 OL;L;2019.2_1;69
+r1
+!s85 0
+31
+!s108 1617328930.000000
+!s107 ATS21.sv|
+!s90 ATS21.sv|
+!i113 0
+Z5 o-L mtiAvm -L mtiRnm -L mtiOvm -L mtiUvm -L mtiUPF -L infact
+Z6 tCvgOpt 0
+n@a@t@s21
+vATS21_tb
+R1
+!s110 1617328931
+!i10b 1
+!s100 AmEgoeZL5d9BF7@[k4aen3
+!s11b T=Uf^`Pg32T]jJ8<]SlK@3
+I9O`=fYMm_JYT6YCW::TbG1
+R2
+S1
+R0
+w1617328895
+8ATS21_tb.sv
+FATS21_tb.sv
+R3
+R4
+r1
+!s85 0
+31
+!s108 1617328931.000000
+!s107 ATS21_tb.sv|
+!s90 ATS21_tb.sv|
+!i113 0
+R5
+R6
+n@a@t@s21_tb

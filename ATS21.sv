@@ -57,7 +57,7 @@ Clock [num_clocks-1:0] base_clocks;
 Alarm [num_alarms-1:0] alarms; 
 
 // Control Registers
-logic [7:0] CR_bits;
+logic [7:0] cr_bits;
 
 ////////// Reference Design Behavior //////////
 

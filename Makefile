@@ -9,15 +9,12 @@ compile:
 	vlib work
 	vmap work work
 	vlog ATS21.sv
+	vlog ATS21_tb.sv
 
 simulate_c:
-	make compile
-	vlog ATS21_tb.sv
 	vsim -c ATS21_tb -do "run -all;quit"
 
 simulate_gui:
-	make compile
-	vlog ATS21_tb.sv
 	vsim -voptargs="+acc" ATS21_tb -do "run -all;"
 
 clean:
