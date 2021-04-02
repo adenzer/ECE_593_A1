@@ -94,12 +94,12 @@ ControlRegisters cr_bits;
 
 ////////// Reference Design Behaviorial Implementation //////////
 
-// Reset Detection
-always_ff @(posedge clk or posedge reset) begin : reset_detection
+always_ff @(posedge clk or posedge reset) begin : module_behavior
+	// Reset Detection
 	if(reset)
 		Reset();
+	// Normal Operation 
 	//else
-		// Do Normal Operation 
 		// Incriment_Counters();
 		// Check_Alarms();
 		// If req -> Check_Inputs();
