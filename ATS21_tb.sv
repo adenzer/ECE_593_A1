@@ -34,6 +34,9 @@ initial begin
 	// Initialize Variables and Reset for 4 cycles
 	clk = 0;
 	reset = 1;
+	req = 0;
+	ctrlA = '0;
+	ctrlB = '0;
 	repeat(4) @(posedge(clk));
 	reset = 0;
 	// Stop Simulation after 20 cycles

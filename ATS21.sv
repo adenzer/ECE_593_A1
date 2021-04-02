@@ -127,7 +127,7 @@ endtask
 task Alarm_Finished (int alarm_id);
 	alarms[alarm_id].finished = 1;
 	repeat(2) @(posedge(clk));
-	alarms[alarm_id].finished = 0;	
+	alarms[alarm_id].finished = 0;
 endtask
 
 // Assume 2X Clock is 4ns Period
