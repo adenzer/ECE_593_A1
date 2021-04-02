@@ -30,6 +30,7 @@ module ATS21 (
 
 ////////// Design Clocks, Parameters, and Data Structures //////////
 
+// Parameters
 parameter clock_width = 16;
 parameter num_alarms = 24;
 parameter num_clocks = 16;
@@ -39,16 +40,18 @@ parameter num_clocks_bits = $clog2(num_clocks);
 logic clk_1x, clk_2x, clk_4x;
 
 // Internal 1x Clock Generation
-assign clk_1x = clk;
+always_ff @(clk) begin : clock1x_generation
+	clk_1x <= ~clk_1x;
+end
 
 // Internal 2x Clock Generation 
 always_ff @(posedge clk_1x) begin : clock2x_generation
-	clk_2x = ~clk_2x;
+	clk_2x <= ~clk_2x;
 end
 
 // Internal 4x Clock Generation 
 always_ff @(posedge clk_2x) begin : clock4x_generation
-	clk_4x = ~clk_4x;
+	clk_4x <= ~clk_4x;
 end
 
 // Each clock is a packed struct with 1 bit for enabling / disabling
