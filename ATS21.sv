@@ -15,6 +15,12 @@ of the 16 clocks. The clocks can run at 1x, 2x, or 4x the reference clock speed.
 
 ** add more here later (design assumptions, etc.) ***
 
+Assumptions: 
+	- Active High Signals
+		- Reset
+		- Req
+		- Outputs (Ready, Data)
+
 */
 
 module ATS21 (
@@ -28,7 +34,9 @@ module ATS21 (
   output logic [23:0] data
 );
 
+////////////////////////////////////////////////////////////////////
 ////////// Design Clocks, Parameters, and Data Structures //////////
+////////////////////////////////////////////////////////////////////
 
 // Parameters
 parameter clock_width = 16;
@@ -38,21 +46,6 @@ parameter num_clocks_bits = $clog2(num_clocks);
 
 // Internal Clock Signals
 logic clk_1x, clk_2x, clk_4x;
-
-// Internal 1x Clock Generation
-always_ff @(clk) begin : clock1x_generation
-	clk_1x <= ~clk_1x;
-end
-
-// Internal 2x Clock Generation 
-always_ff @(posedge clk_1x) begin : clock2x_generation
-	clk_2x <= ~clk_2x;
-end
-
-// Internal 4x Clock Generation 
-always_ff @(posedge clk_2x) begin : clock4x_generation
-	clk_4x <= ~clk_4x;
-end
 
 // Each clock is a packed struct with 1 bit for enabling / disabling
 // the clock and 'clock_width' bits for the counter. 
@@ -92,18 +85,9 @@ typedef struct packed {
 
 ControlRegisters cr_bits;
 
-////////// Reference Design Behaviorial Implementation //////////
-
-always_ff @(posedge clk or posedge reset) begin : module_behavior
-	// Reset Detection
-	if(reset)
-		Reset();
-	// Normal Operation 
-	//else
-		// Incriment_Counters();
-		// Check_Alarms();
-		// If req -> Check_Inputs();
-end
+/////////////////////////////////////////
+////////// Tasks and Functions //////////
+/////////////////////////////////////////
 
 // Task that resets the controller (all clocks, and alarms/timers)
 task Reset();
@@ -138,6 +122,37 @@ task Alarm_Finished (int alarm_id);
 	repeat(2) @(posedge(clk));
 	alarms[alarm_id].finished = 0;	
 endtask
+
+/////////////////////////////////////////////////////////////////
+////////// Reference Design Behaviorial Implementation //////////
+/////////////////////////////////////////////////////////////////
+
+// Internal 1x Clock Generation
+always_ff @(clk) begin : clock1x_generation
+	clk_1x <= ~clk_1x;
+end
+
+// Internal 2x Clock Generation 
+always_ff @(posedge clk_1x) begin : clock2x_generation
+	clk_2x <= ~clk_2x;
+end
+
+// Internal 4x Clock Generation 
+always_ff @(posedge clk_2x) begin : clock4x_generation
+	clk_4x <= ~clk_4x;
+end
+
+// Behaviorial Block
+always_ff @(posedge clk or posedge reset) begin : module_behavior
+	// Reset Detection
+	if(reset)
+		Reset();
+	// Normal Operation 
+	//else
+		// Incriment_Counters();
+		// Check_Alarms();
+		// If req -> Check_Inputs();
+end
 
 // Continuous assignment of all alarm 'finished' signals with the corrosponding 
 // data output bit. (i.e. alarms[0].finished = data[0], and so on . . .) 
