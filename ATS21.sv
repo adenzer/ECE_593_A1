@@ -94,7 +94,16 @@ ControlRegisters cr_bits;
 
 ////////// Reference Design Behaviorial Implementation //////////
 
-
+// Reset Detection
+always_ff @(posedge clk or posedge reset) begin : reset_detection
+	if(reset)
+		Reset();
+	//else
+		// Do Normal Operation 
+		// Incriment_Counters();
+		// Check_Alarms();
+		// If req -> Check_Inputs();
+end
 
 // Task that resets the controller (all clocks, and alarms/timers)
 task Reset();
