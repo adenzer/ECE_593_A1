@@ -20,7 +20,7 @@ Assumptions:
 		- Reset
 		- Req
 		- Outputs (Ready, Data)
-		- Clk 1x is 8ns period
+		- Clk 1x is 8ns period (Reference Clock)
 		- Clk 2x is 4ns period
 		- Clk 4x is 2ns period
 

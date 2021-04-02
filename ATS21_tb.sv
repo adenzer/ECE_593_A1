@@ -24,18 +24,20 @@ logic [23:0] data;
 ATS21 dut(.clk(clk), .reset(reset), .req(req), .ctrlA(ctrlA), .ctrlB(ctrlB), 
 			.ready(ready), .stat(stat), .data(data));
 
-// Clock Generator (8ns Clock Period)
+// Reference Clock Generator (8ns Period)
 always begin
 	#4 clk = ~clk;
 end
 
 // Initial Block
 initial begin
+	// Initialize Variables and Reset for 4 cycles
 	clk = 0;
 	reset = 1;
-	#32; 
+	repeat(4) @(posedge(clk));
 	reset = 0;
-	#160;
+	// Stop Simulation after 20 cycles
+	repeat(20) @(posedge(clk));
 	$stop;
 end
 
