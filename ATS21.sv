@@ -66,7 +66,7 @@ typedef struct packed {
 	logic unused_5;
 	logic unused_6;
 	logic unused_7;
-} ControlRegisters
+} ControlRegisters;
 
 ControlRegisters cr_bits;
 
