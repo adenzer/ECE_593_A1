@@ -20,8 +20,13 @@ Assumptions:
 		- Reset
 		- Req
 		- Outputs (Ready, Data)
+		- Clk 1x is 8ns period
+		- Clk 2x is 4ns period
+		- Clk 4x is 2ns period
 
 */
+
+timeunit 1ns/1ns;
 
 module ATS21 (
   input logic         clk,
@@ -45,7 +50,9 @@ parameter num_clocks = 16;
 parameter num_clocks_bits = $clog2(num_clocks);
 
 // Internal Clock Signals
-logic clk_1x, clk_2x, clk_4x;
+logic clk_1x;  
+logic clk_2x = 0; 
+logic clk_4x = 0;
 
 // Each clock is a packed struct with 1 bit for enabling / disabling
 // the clock and 'clock_width' bits for the counter. 
@@ -123,23 +130,31 @@ task Alarm_Finished (int alarm_id);
 	alarms[alarm_id].finished = 0;	
 endtask
 
+// Assume 2X Clock is 4ns Period
+task Generate_2x_Clock();
+	repeat(2) #2 clk_2x <= ~clk_2x;
+endtask
+
+// Assume 4X Clock is 2ns Period
+task Generate_4x_Clock();
+	repeat(4) #1 clk_4x <= ~clk_4x;
+endtask
+
 /////////////////////////////////////////////////////////////////
 ////////// Reference Design Behaviorial Implementation //////////
 /////////////////////////////////////////////////////////////////
 
-// Internal 1x Clock Generation
-always_ff @(clk) begin : clock1x_generation
-	clk_1x <= ~clk_1x;
+// Clock 1X Generation
+assign clk_1x = clk;
+
+// Clock 2X Generation
+always @(clk_1x) begin : clk2x_generation
+	Generate_2x_Clock();
 end
 
-// Internal 2x Clock Generation 
-always_ff @(posedge clk_1x) begin : clock2x_generation
-	clk_2x <= ~clk_2x;
-end
-
-// Internal 4x Clock Generation 
-always_ff @(posedge clk_2x) begin : clock4x_generation
-	clk_4x <= ~clk_4x;
+// Clock 4X Generation
+always @(clk_1x) begin : clk4x_generation
+	Generate_4x_Clock();
 end
 
 // Behaviorial Block

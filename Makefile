@@ -2,7 +2,7 @@ help:
 	@echo " "
 	@echo "Welcome to Assignment 1 for ECE593 (Zack Fravel and Andrew Denzer)"
 	@echo " "
-	@echo "Targets: compile  clean"
+	@echo "Targets: compile  simulate_c  simulate_gui  clean"
 	@echo " "
 
 compile: 
