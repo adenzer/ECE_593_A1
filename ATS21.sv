@@ -89,6 +89,12 @@ ControlRegisters cr_bits;
 ////////// Reference Design Behaviorial Implementation //////////
 
 
+// Task that is called when an alarm or countdownt timer goes off.
+task Alarm_Finished (int alarm_id);
+	alarms[alarm_id].finished = 1;
+	repeat(2) @(posedge(clk));
+	alarms[alarm_id].finished = 0;	
+endtask
 
 // Continuous assignment of all alarm 'finished' signals with the corrosponding 
 // data output bit. (i.e. alarms[0].finished = data[0], and so on . . .) 
