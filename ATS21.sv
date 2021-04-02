@@ -85,15 +85,38 @@ typedef struct packed {
 	logic clientB_clock;
 	logic clientA_alarm;
 	logic clientB_alarm;
-	logic unused_5;
-	logic unused_6;
-	logic unused_7;
 } ControlRegisters;
 
 ControlRegisters cr_bits;
 
 ////////// Reference Design Behaviorial Implementation //////////
 
+
+
+// Task that resets the controller (all clocks, and alarms/timers)
+task Reset();
+	// Reset Clocks
+	for(int i=0; i<num_clocks; i++)
+	begin
+		base_clocks[i].enable = 0;
+		base_clocks[i].count = '0;
+	end
+	// Reset Alarms
+	for(int i=0; i<num_alarms; i++)
+	begin
+		alarms[i].enable = 0;
+		alarms[i].loop = 0;
+		alarms[i].assigned_clock = '0;
+		alarms[i].value = '0;
+		alarms[i].finished = '0;
+	end
+	// Reset Control Bits
+	cr_bits.active = 0;
+	cr_bits.clientA_clock = 0;
+	cr_bits.clientB_clock = 0;
+	cr_bits.clientA_alarm = 0;
+	cr_bits.clientB_alarm = 0;
+endtask
 
 // Task that is called when an alarm or countdownt timer goes off.
 task Alarm_Finished (int alarm_id);
