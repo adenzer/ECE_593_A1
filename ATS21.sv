@@ -8,8 +8,6 @@ ATS21.sv
 --------------------
 Description:
 
-Testing password saving in github.
-
 
 */
 
@@ -23,5 +21,56 @@ module ATS21 (
   output logic [ 1:0] stat,
   output logic [23:0] data
 );
+
+////////// Design Parameters and Data Structures //////////
+
+parameter clock_width = 16;
+parameter num_alarms = 24;
+parameter num_clocks = 16;
+parameter num_clocks_bits = $clog2(num_clocks);
+
+// Each clock is a packed struct with 1 bit for enabling / disabling
+// the clock and 'clock_width' bits for the counter. 
+typedef struct packed {
+	logic enable;
+	logic [clock_width-1:0] count;
+} Clock;
+
+// Each alarm is a packed struct with 1 bit for enabling / disbaling
+// the alarm and 'clock_width' bits for the value to be compared to the
+// clocks. There is another bit 'loop' that indicates if the alarm should
+// restart after asserting the 'finished' bit for 2 cycles once the value
+// has been reached by the clock. Finally the 'assigned_clock' field is used
+// so the design knows which clock to compare the alarm against. 
+typedef struct packed {
+	logic enable;
+	logic loop;
+	logic [num_clocks_bits-1:0] assigned_clock;
+	logic [clock_width-1:0] value;
+	logic finished;
+} Alarm;
+
+// Array of Clocks
+Clock [num_clocks-1:0] base_clocks;
+
+// Array of Alarms.
+Alarm [num_alarms-1:0] alarms; 
+
+// Control Registers
+logic [7:0] CR_bits;
+
+////////// Reference Design Behavior //////////
+
+
+
+// Continuous assignment of all alarm 'finished' signals with the corrosponding 
+// data output bit. (i.e. alarms[0].finished = data[0], and so on . . .) 
+genvar i;
+generate
+	for (i = 0; i < num_alarms; i++)
+	begin
+		assign data[i] = alarms[i].finished;
+	end
+endgenerate
 
 endmodule
