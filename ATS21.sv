@@ -22,12 +22,28 @@ module ATS21 (
   output logic [23:0] data
 );
 
-////////// Design Parameters and Data Structures //////////
+////////// Design Clocks, Parameters, and Data Structures //////////
 
 parameter clock_width = 16;
 parameter num_alarms = 24;
 parameter num_clocks = 16;
 parameter num_clocks_bits = $clog2(num_clocks);
+
+// Internal Clock Signals
+logic clk_1x, clk_2x, clk_4x;
+
+// Internal 1x Clock Generation
+assign clk_1x = clk;
+
+// Internal 2x Clock Generation 
+always_ff @(posedge clk_1x) begin : clock2x_generation
+	clk_2x = ~clk_2x;
+end
+
+// Internal 4x Clock Generation 
+always_ff @(posedge clk_2x) begin : clock4x_generation
+	clk_4x = ~clk_4x;
+end
 
 // Each clock is a packed struct with 1 bit for enabling / disabling
 // the clock and 'clock_width' bits for the counter. 
@@ -70,7 +86,7 @@ typedef struct packed {
 
 ControlRegisters cr_bits;
 
-////////// Reference Design Behavior //////////
+////////// Reference Design Behaviorial Implementation //////////
 
 
 
