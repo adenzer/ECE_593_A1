@@ -8,6 +8,12 @@ ATS21.sv
 --------------------
 Description:
 
+Implements the ATS21, a programmable multi-clock/timer/alarm component described
+in the high level spec document provided by our instructor Tom Schubert. The 
+component contains 16 different clocks and 24 alarms that can be set against any
+of the 16 clocks. The clocks can run at 1x, 2x, or 4x the reference clock speed.
+
+** add more here later (design assumptions, etc.) ***
 
 */
 
