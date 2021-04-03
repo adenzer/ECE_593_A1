@@ -35,7 +35,8 @@ module ATS21 (
   input logic  [15:0] ctrlA,
   input logic  [15:0] ctrlB,
   output logic        ready,
-  output logic [ 1:0] stat,
+  output logic [ 1:0] statA,
+  output logic [ 1:0] statB,
   output logic [23:0] data
 );
 
@@ -50,8 +51,9 @@ parameter num_clocks = 16;
 parameter num_clocks_bits = $clog2(num_clocks);
 
 // Status States
-enum {Ack, ErrorA, ErrorB, Nack} status;
-assign stat = status;
+enum logic [1:0] {Ack, Error, Nack} statusA, statusB;
+assign statA = statusA;
+assign statB = statusB;
 
 // temp regs for entire 32-bit input instruction
 logic [31:0] ctrlA_inst, ctrlB_inst;
@@ -118,7 +120,8 @@ ControlRegisters cr_bits;
 task Reset();
   // Reset Status Signals
   ready = 1'b0;
-  status = Nack;
+  statusA = Nack;
+  statusB = Nack;
 
 	// Reset Clocks
 	for(int i=0; i<num_clocks; i++)
@@ -174,7 +177,8 @@ task checkInst(input logic [31:0] ctrlA, input logic [31:0] ctrlB);
       001:
         begin
           if (ctrlA[28:25] == ctrlB[28:25]) begin
-            status <= Nack;
+            statusA <= Nack;
+            statusB <= Nack;
           end
           else begin
             processInst(ctrlA, ctrlB);
@@ -183,7 +187,8 @@ task checkInst(input logic [31:0] ctrlA, input logic [31:0] ctrlB);
       010:
         begin
           if (ctrlA[28:25] == ctrlB[28:25]) begin
-            status <= Nack;
+            statusA <= Nack;
+            statusB <= Nack;
           end
           else begin
             processInst(ctrlA, ctrlB);
@@ -201,7 +206,8 @@ task checkInst(input logic [31:0] ctrlA, input logic [31:0] ctrlB);
       110:
         begin
           if (ctrlA[20:16] == ctrlB[20:16]) begin
-            status <= Nack;
+            statusA <= Nack;
+            statusB <= Nack;
           end
           else begin
             processInst(ctrlA, ctrlB);
@@ -210,20 +216,29 @@ task checkInst(input logic [31:0] ctrlA, input logic [31:0] ctrlB);
       111:
         begin
           if (ctrlA[28:24] == ctrlB[28:24]) begin
-            status <= Nack;
+            statusA <= Nack;
+            statusB <= Nack;
           end
           else begin
             processInst(ctrlA, ctrlB);
           end
         end
-      011:
-        begin
-          status <= Nack;
-        end
       default:
         begin
-          status <= Nack;
+          statusA <= Nack;
+          statusB <= Nack;
         end
+    endcase
+  end
+  else if (((ctrlA[31:29] == 3'b101) && (ctrlB[31:29] == 3'b110)) ||
+      ((ctrlA[31:29] == 3'b110) && (ctrlB[31:29] == 3'b101))) begin
+    if (ctrlA[20:16] == ctrlB[20:16]) begin
+      statusA <= Nack;
+      statusB <= Nack;
+    end
+    else begin
+      processInst(ctrlA, ctrlB);
+    end
   end
   else begin
     processInst(ctrlA, ctrlB);
@@ -237,20 +252,20 @@ task checkInst(input logic [31:0] ctrlA, input logic [31:0] ctrlB);
           if (cr_bits.clientA_clock) begin
             base_clocks[ctrlA[28:25]].rate <= ctrlA[23:22];
             base_clocks[ctrlA[28:25]].count <= ctrlA[15:0];
-            status <= Ack;
+            statusA <= Ack;
           end
           else begin
-            status <= ErrorA;
+            statusA <= Error;
           end
         end
       3'b010:   // enable/disable clock
         begin
           if (cr_bits.clientA_clock) begin
             base_clocks[ctrlA[28:25]].enable <= ctrlA[23];
-            status <= Ack;
+            statusA <= Ack;
           end
           else begin
-            status <= ErrorA;
+            statusA <= Error;
           end
         end
       3'b101:   // set alarm
@@ -259,10 +274,12 @@ task checkInst(input logic [31:0] ctrlA, input logic [31:0] ctrlB);
             alarms[ctrlA[20:16]].assigned_clock <= ctrlA[28:25];
             alarms[ctrlA[20:16]].loop <= ctrlA[23];
             alarms[ctrlA[20:16]].value <= ctrlA[15:0];
-            status <= Ack;
+            alarms[ctrlA[20:16]].enable <= 1'b1;    // enable alarm when set
+            timers[ctrlA[20:16]].enable <= 1'b0;    // disable timer at same location as alarm
+            statusA <= Ack;
           end
           else begin
-            status <= ErrorA;
+            statusA <= Error;
           end
         end
       3'b110:   // set countdown timer
@@ -270,10 +287,12 @@ task checkInst(input logic [31:0] ctrlA, input logic [31:0] ctrlB);
           if (cr_bits.clientA_alarm) begin
             timers[ctrlA[20:16]].assigned_clock <= ctrlA[28:25];
             timers[ctrlA[20:16]].value <= ctrlA[15:0];
-            status <= Ack;
+            timers[ctrlA[20:16]].enable <= 1'b1;    // enable timer when set
+            alarms[ctrlA[20:16]].enable <= 1'b0;    // disable alarm at same location as timer
+            statusA <= Ack;
           end
           else begin
-            status <= ErrorA;
+            statusA <= Error;
           end
         end
       3'b111:   // enable/disable alarm/timer
@@ -283,7 +302,7 @@ task checkInst(input logic [31:0] ctrlA, input logic [31:0] ctrlB);
             timers[ctrlA[28:24]].enable <= ctrlA[23];
           end
           else begin
-            status <= ErrorA;
+            statusA <= Error;
           end
         end
       3'b011:   // set ATS21 mode
@@ -292,7 +311,7 @@ task checkInst(input logic [31:0] ctrlA, input logic [31:0] ctrlB);
           cr_bits.clientA_clock <= ctrlA[27:26];
           cr_bits.clientA_alarm <= ctrlA[25:24];
         end
-      default:  status <= Nack;
+      default:  statusA <= Nack;
     endcase
 
     // process ctrlB instruction
@@ -302,20 +321,20 @@ task checkInst(input logic [31:0] ctrlA, input logic [31:0] ctrlB);
           if (cr_bits.clientB_clock) begin
             base_clocks[ctrlB[28:25]].rate <= ctrlB[23:22];
             base_clocks[ctrlB[28:25]].count <= ctrlB[15:0];
-            status <= Ack;
+            statusB <= Ack;
           end
           else begin
-            status <= ErrorB;
+            statusB <= Error;
           end
         end
       3'b010:   // enable/disable clock
         begin
           if (cr_bits.clientB_clock) begin
             base_clocks[ctrlB[28:25]].enable <= ctrlB[23];
-            status <= Ack;
+            statusB <= Ack;
           end
           else begin
-            status <= ErrorB;
+            statusB <= Error;
           end
         end
       3'b101:   // set alarm
@@ -324,10 +343,10 @@ task checkInst(input logic [31:0] ctrlA, input logic [31:0] ctrlB);
             alarms[ctrlB[20:16]].assigned_clock <= ctrlB[28:25];
             alarms[ctrlB[20:16]].loop <= ctrlB[23];
             alarms[ctrlB[20:16]].value <= ctrlB[15:0];
-            status <= Ack;
+            statusB <= Ack;
           end
           else begin
-            status <= ErrorB;
+            statusB <= Error;
           end
         end
       3'b110:   // set countdown timer
@@ -335,10 +354,10 @@ task checkInst(input logic [31:0] ctrlA, input logic [31:0] ctrlB);
           if (cr_bits.clientB_alarm) begin
             timers[ctrlB[20:16]].assigned_clock <= ctrlB[28:25];
             timers[ctrlB[20:16]].value <= ctrlB[15:0];
-            status <= Ack;
+            statusB <= Ack;
           end
           else begin
-            status <= ErrorB;
+            statusB <= Error;
           end
         end
       3'b111:   // enable/disable alarm/timer
@@ -348,7 +367,7 @@ task checkInst(input logic [31:0] ctrlA, input logic [31:0] ctrlB);
             timers[ctrlB[28:24]].enable <= ctrlB[23];
           end
           else begin
-            status <= ErrorB;
+            statusB <= Error;
           end
         end
       3'b011:   // set ATS21 mode
@@ -357,7 +376,7 @@ task checkInst(input logic [31:0] ctrlA, input logic [31:0] ctrlB);
           cr_bits.clientB_clock <= ctrlB[27:26];
           cr_bits.clientB_alarm <= ctrlB[25:24];
         end
-      default:  status <= Ack;
+      default:  statusB <= Ack;
     endcase
   end
 endtask
@@ -414,7 +433,7 @@ always_ff @(posedge clk or posedge reset) begin : module_behavior
     end
     if (readComplete) begin
       readComplete <= 1'b0;
-      processInst(ctrlA_inst, ctrlB_inst);    // process ctrl instructions
+      checkInst(ctrlA_inst, ctrlB_inst);    // process ctrl instructions
     end
 end
 
