@@ -68,7 +68,7 @@ logic clk_4x = 0;
 typedef struct packed {
 	logic enable;
 	logic [clock_width-1:0] count;
-  logic [1:0] rate;
+	logic [1:0] rate;
 } Clock;
 
 // Array of Clocks
@@ -91,6 +91,8 @@ typedef struct packed {
 // Array of Alarms.
 Alarm [num_alarms-1:0] alarms;
 
+// Note : I think instead of a seperate array of timers we can just use the 'loop' bit 
+// to distinguish between alarms and countdown timers. Should make things easier.
 typedef struct packed {
 	logic enable;
 	logic [num_clocks_bits-1:0] assigned_clock;
@@ -128,7 +130,7 @@ task Reset();
 	 begin
 		base_clocks[i].enable = 0;
 		base_clocks[i].count = '0;
-    base_clocks[i].rate = '0;
+    	base_clocks[i].rate = '0;
 	 end
 
 	// Reset Alarms
@@ -172,7 +174,7 @@ endtask
 // also, if both are trying to write to control register, disregard instruction (Nack)
 // if all is in order, call processInst task
 task checkInst(input logic [31:0] ctrlA, input logic [31:0] ctrlB);
-  if (ctrA[31:29] == ctrlB[31:29]) begin
+  if (ctrlA[31:29] == ctrlB[31:29]) begin
     case (ctrlA[31:29])
       001:
         begin
@@ -197,7 +199,8 @@ task checkInst(input logic [31:0] ctrlA, input logic [31:0] ctrlB);
       101:
         begin
           if (ctrlA[20:16] == ctrlB[20:16]) begin
-            status <= Nack;
+            statusA <= Nack;
+            statusB <= Nack;
           end
           else begin
             processInst(ctrlA, ctrlB);
@@ -243,8 +246,9 @@ task checkInst(input logic [31:0] ctrlA, input logic [31:0] ctrlB);
   else begin
     processInst(ctrlA, ctrlB);
   end
+endtask
 
-  task processInst(input logic [31:0] ctrlA, input logic [31:0] ctrlB);
+task processInst(input logic [31:0] ctrlA, input logic [31:0] ctrlB);
     // process ctrlA instruction
     case (ctrlA[31:29])   // opcode
       3'b001:   // set clock
@@ -378,9 +382,7 @@ task checkInst(input logic [31:0] ctrlA, input logic [31:0] ctrlB);
         end
       default:  statusB <= Ack;
     endcase
-  end
 endtask
-
 
 /////////////////////////////////////////////////////////////////
 ////////// Reference Design Behaviorial Implementation //////////
@@ -409,28 +411,29 @@ always_ff @(posedge clk or posedge reset) begin : module_behavior
 	if(reset)
 		Reset();
 	// Normal Operation
-	else
-		// Increment_Counters();
-		// Check_Alarms();
-    if (readFlag) begin
+	// Increment_Counters();
+	// Check_Alarms();
+	else if (readFlag) begin
       ready <= 1'b0;
       if (byteCount == 0) begin         // read first 16-bit input
         ctrlA_inst[31:16] <= ctrlA;     // read ctrlA
         ctrlB_inst[31:16] <= ctrlB;     // read ctrlB
         byteCount <= 1'b1;              // increment byte count
-      end
+       end
       else if (byteCount == 1) begin    // read second 16-bit input
         ctrlA_inst[15:0] <= ctrlA;      // read ctrlA
         ctrlB_inst[15:0] <= ctrlB;      // read ctrlB
         byteCount <= 1'b0;              // reset byte count
         readFlag <= 1'b0;               // stop reading
         readComplete <= 1'b1;           // full 32-bit instruction received
+       end
       end
-    end
-		else if (req) begin
+
+	if (req) begin
       ready <= 1'b1;      // ready to receive input
       readFlag <= 1'b1;   // begin read cycle
-    end
+      end
+
     if (readComplete) begin
       readComplete <= 1'b0;
       checkInst(ctrlA_inst, ctrlB_inst);    // process ctrl instructions
