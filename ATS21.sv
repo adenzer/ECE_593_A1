@@ -280,9 +280,8 @@ task processInst(input logic [31:0] ctrlA, input logic [31:0] ctrlB);
             alarms[ctrlA[28:24]].assigned_clock <= ctrlA[19:16];
             alarms[ctrlA[28:24]].countdown <= 1'b1;
             alarms[ctrlA[28:24]].loop <= 1'b0;
-            alarms[ctrlA[28:24]].value <= ctrlA[15:0] + base_clocks[ctrlA[19:16]].count;
+            alarms[ctrlA[28:24]].value <= ctrlA[15:0] + base_clocks[ctrlA[19:16]].count; // timer expires at current base clock plus duration of timer
             alarms[ctrlA[28:24]].enable <= 1'b1;    // enable timer when set
-            alarms[ctrlA[28:24]].enable <= 1'b0;    // disable alarm at same location as timer
             statusA <= Ack;
           end
           else begin
@@ -337,6 +336,7 @@ task processInst(input logic [31:0] ctrlA, input logic [31:0] ctrlB);
             alarms[ctrlB[28:24]].countdown <= 1'b0;
             alarms[ctrlB[28:24]].loop <= ctrlB[23];
             alarms[ctrlB[28:24]].value <= ctrlB[15:0];
+            alarms[ctrlB[28:24]].enable <= 1'b1;    // enable alarm when set
             statusB <= Ack;
           end
           else begin
@@ -349,7 +349,8 @@ task processInst(input logic [31:0] ctrlA, input logic [31:0] ctrlB);
             alarms[ctrlB[28:24]].assigned_clock <= ctrlB[19:16];
             alarms[ctrlB[28:24]].countdown <= 1'b1;
             alarms[ctrlB[28:24]].loop <= ctrlB[23];
-            alarms[ctrlB[28:24]].value <= ctrlB[15:0] + base_clocks[ctrlB[19:16]].count;
+            alarms[ctrlB[28:24]].value <= ctrlB[15:0] + base_clocks[ctrlB[19:16]].count;  // timer expires at current base clock plus duration of timer
+            alarms[ctrlB[28:24]].enable <= 1'b1;    // enable timer when set
             statusB <= Ack;
           end
           else begin
@@ -382,7 +383,7 @@ task Check_Alarms();
       repeat(2) @(posedge clk) alarms[i].finished <= 1'b1;
       alarms[i].finished <= 1'b0;
       if (~alarms[i].loop) begin
-        alarms[i].enable <= 1'b0;
+        alarms[i].enable <= 1'b0;   // disable alarm if not set to repeat
       end
     end
     else
