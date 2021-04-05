@@ -66,7 +66,7 @@ logic clk_4x = 0;
 // the clock and 'clock_width' bits for the counter.
 typedef struct packed {
 	logic enable;
-	logic [clock_width-1:0] Time;
+	logic [clock_width-1:0] count;
 	logic [1:0] rate;
 } Clock;
 
@@ -117,7 +117,7 @@ task Reset();
 	for(int i=0; i<num_clocks; i++)
 	 begin
 		base_clocks[i].enable = 0;
-		base_clocks[i].Time = '0;
+		base_clocks[i].count = '0;
     base_clocks[i].rate = '0;
 	 end
 
@@ -243,7 +243,7 @@ task processInst(input logic [31:0] ctrlA, input logic [31:0] ctrlB);
         begin
           if (cr_bits.clientA_clock) begin
             base_clocks[ctrlA[28:25]].rate <= ctrlA[23:22];
-            base_clocks[ctrlA[28:25]].Time <= ctrlA[15:0];
+            base_clocks[ctrlA[28:25]].count <= ctrlA[15:0];
             statusA <= Ack;
           end
           else begin
@@ -280,7 +280,7 @@ task processInst(input logic [31:0] ctrlA, input logic [31:0] ctrlB);
             alarms[ctrlA[28:24]].assigned_clock <= ctrlA[19:16];
             alarms[ctrlA[28:24]].countdown <= 1'b1;
             alarms[ctrlA[28:24]].loop <= 1'b0;
-            alarms[ctrlA[28:24]].value <= ctrlA[15:0];
+            alarms[ctrlA[28:24]].value <= ctrlA[15:0] + base_clocks[ctrlA[19:16]].count;
             alarms[ctrlA[28:24]].enable <= 1'b1;    // enable timer when set
             alarms[ctrlA[28:24]].enable <= 1'b0;    // disable alarm at same location as timer
             statusA <= Ack;
@@ -313,7 +313,7 @@ task processInst(input logic [31:0] ctrlA, input logic [31:0] ctrlB);
         begin
           if (cr_bits.clientB_clock) begin
             base_clocks[ctrlB[28:25]].rate <= ctrlB[23:22];
-            base_clocks[ctrlB[28:25]].Time <= ctrlB[15:0];
+            base_clocks[ctrlB[28:25]].count <= ctrlB[15:0];
             statusB <= Ack;
           end
           else begin
@@ -349,7 +349,7 @@ task processInst(input logic [31:0] ctrlA, input logic [31:0] ctrlB);
             alarms[ctrlB[28:24]].assigned_clock <= ctrlB[19:16];
             alarms[ctrlB[28:24]].countdown <= 1'b1;
             alarms[ctrlB[28:24]].loop <= ctrlB[23];
-            alarms[ctrlB[28:24]].value <= ctrlB[15:0];
+            alarms[ctrlB[28:24]].value <= ctrlB[15:0] + base_clocks[ctrlB[19:16]].count;
             statusB <= Ack;
           end
           else begin
@@ -373,6 +373,21 @@ task processInst(input logic [31:0] ctrlA, input logic [31:0] ctrlB);
         end
       default:  statusB <= Ack;
     endcase
+endtask
+
+task Check_Alarms();
+  int i;
+  for (i = 0; i < num_alarms; i = i + 1) begin
+    if ((base_clocks[i].count == alarms[i].value) && alarms[i].enable) begin
+      repeat(2) @(posedge clk) alarms[i].finished <= 1'b1;
+      alarms[i].finished <= 1'b0;
+      if (~alarms[i].loop) begin
+        alarms[i].enable <= 1'b0;
+      end
+    end
+    else
+      alarms[i].finished <= 1'b0;
+  end
 endtask
 
 /////////////////////////////////////////////////////////////////
@@ -402,8 +417,6 @@ always_ff @(posedge clk or posedge reset) begin : module_behavior
 	if(reset)
 		Reset();
 	// Normal Operation
-	// Increment_Counters();
-	// Check_Alarms();
 	else if (readFlag) begin
       ready <= 1'b0;
       if (byteCount == 0) begin         // read first 16-bit input
@@ -429,6 +442,44 @@ always_ff @(posedge clk or posedge reset) begin : module_behavior
       readComplete <= 1'b0;
       checkInst(ctrlA_inst, ctrlB_inst);    // process ctrl instructions
     end
+
+    Check_Alarms();
+end
+
+int i, j, k;  // loop incrementers for base clocks
+
+// increment 1x base clocks
+always_ff @(posedge clk) begin
+  int i;
+  for (i = 0; i < num_clocks; i = i + 1) begin
+    if (base_clocks[i].enable) begin
+      if (base_clocks[i].rate = 2'b00)
+        base_clocks[i].value <= base_clocks[i].value + 1;
+      end
+    end
+  end
+end
+
+// increment 2x base clocks
+always_ff @(posedge clk_2x) begin
+  for (j = 0; j < num_clocks; j = j + 1) begin
+    if (base_clocks[j].enable) begin
+      if (base_clocks[j].rate = 2'b01)
+        base_clocks[j].value <= base_clocks[j].value + 1;
+      end
+    end
+  end
+end
+
+// increment 4x base clocks
+always_ff @(posedge clk_4x) begin
+  for (k = 0; k < num_clocks; k = i + 1) begin
+    if (base_clocks[k].enable) begin
+      if (base_clocks[k].rate = 2'b10)
+        base_clocks[k].value <= base_clocks[k].value + 1;
+      end
+    end
+  end
 end
 
 // Continuous assignment of all alarm 'finished' signals with the corrosponding
