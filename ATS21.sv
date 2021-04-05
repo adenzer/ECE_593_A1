@@ -51,9 +51,8 @@ parameter num_clocks = 16;
 parameter num_clocks_bits = $clog2(num_clocks);
 
 // Status States
-enum logic [1:0] {Ack, Error, Nack} statusA, statusB;
-assign statA = statusA;
-assign statB = statusB;
+enum logic {Nack = 1'b0, Ack = 1'b1} statusA, statusB;
+assign stat = {statusB, statusA};
 
 // temp regs for entire 32-bit input instruction
 logic [31:0] ctrlA_inst, ctrlB_inst;
@@ -67,7 +66,7 @@ logic clk_4x = 0;
 // the clock and 'clock_width' bits for the counter.
 typedef struct packed {
 	logic enable;
-	logic [clock_width-1:0] count;
+	logic [clock_width-1:0] Time;
 	logic [1:0] rate;
 } Clock;
 
@@ -82,6 +81,7 @@ Clock [num_clocks-1:0] base_clocks;
 // so the design knows which clock to compare the alarm against.
 typedef struct packed {
 	logic enable;
+  logic countdown;
 	logic loop;
 	logic [num_clocks_bits-1:0] assigned_clock;
 	logic [clock_width-1:0] value;
@@ -90,18 +90,6 @@ typedef struct packed {
 
 // Array of Alarms.
 Alarm [num_alarms-1:0] alarms;
-
-// Note : I think instead of a seperate array of timers we can just use the 'loop' bit 
-// to distinguish between alarms and countdown timers. Should make things easier.
-typedef struct packed {
-	logic enable;
-	logic [num_clocks_bits-1:0] assigned_clock;
-	logic [clock_width-1:0] value;
-	logic finished;
-} Timer;
-
-// Array of Alarms.
-Timer [num_alarms-1:0] timers;
 
 // Control Registers
 typedef struct packed {
@@ -129,8 +117,8 @@ task Reset();
 	for(int i=0; i<num_clocks; i++)
 	 begin
 		base_clocks[i].enable = 0;
-		base_clocks[i].count = '0;
-    	base_clocks[i].rate = '0;
+		base_clocks[i].Time = '0;
+    base_clocks[i].rate = '0;
 	 end
 
 	// Reset Alarms
@@ -198,7 +186,7 @@ task checkInst(input logic [31:0] ctrlA, input logic [31:0] ctrlB);
         end
       101:
         begin
-          if (ctrlA[20:16] == ctrlB[20:16]) begin
+          if (ctrlA[28:24] == ctrlB[28:24]) begin
             statusA <= Nack;
             statusB <= Nack;
           end
@@ -208,7 +196,7 @@ task checkInst(input logic [31:0] ctrlA, input logic [31:0] ctrlB);
         end
       110:
         begin
-          if (ctrlA[20:16] == ctrlB[20:16]) begin
+          if (ctrlA[28:24] == ctrlB[28:24]) begin
             statusA <= Nack;
             statusB <= Nack;
           end
@@ -235,7 +223,7 @@ task checkInst(input logic [31:0] ctrlA, input logic [31:0] ctrlB);
   end
   else if (((ctrlA[31:29] == 3'b101) && (ctrlB[31:29] == 3'b110)) ||
       ((ctrlA[31:29] == 3'b110) && (ctrlB[31:29] == 3'b101))) begin
-    if (ctrlA[20:16] == ctrlB[20:16]) begin
+    if (ctrlA[28:24] == ctrlB[28:24]) begin
       statusA <= Nack;
       statusB <= Nack;
     end
@@ -255,11 +243,11 @@ task processInst(input logic [31:0] ctrlA, input logic [31:0] ctrlB);
         begin
           if (cr_bits.clientA_clock) begin
             base_clocks[ctrlA[28:25]].rate <= ctrlA[23:22];
-            base_clocks[ctrlA[28:25]].count <= ctrlA[15:0];
+            base_clocks[ctrlA[28:25]].Time <= ctrlA[15:0];
             statusA <= Ack;
           end
           else begin
-            statusA <= Error;
+            statusA <= Nack;
           end
         end
       3'b010:   // enable/disable clock
@@ -269,44 +257,45 @@ task processInst(input logic [31:0] ctrlA, input logic [31:0] ctrlB);
             statusA <= Ack;
           end
           else begin
-            statusA <= Error;
+            statusA <= Nack;
           end
         end
       3'b101:   // set alarm
         begin
           if (cr_bits.clientA_alarm) begin
-            alarms[ctrlA[20:16]].assigned_clock <= ctrlA[28:25];
-            alarms[ctrlA[20:16]].loop <= ctrlA[23];
-            alarms[ctrlA[20:16]].value <= ctrlA[15:0];
-            alarms[ctrlA[20:16]].enable <= 1'b1;    // enable alarm when set
-            timers[ctrlA[20:16]].enable <= 1'b0;    // disable timer at same location as alarm
+            alarms[ctrlA[28:24]].assigned_clock <= ctrlA[19:16];
+            alarms[ctrlA[28:24]].countdown <= 1'b0;
+            alarms[ctrlA[28:24]].loop <= ctrlA[23];
+            alarms[ctrlA[28:24]].value <= ctrlA[15:0];
+            alarms[ctrlA[28:24]].enable <= 1'b1;    // enable alarm when set
             statusA <= Ack;
           end
           else begin
-            statusA <= Error;
+            statusA <= Nack;
           end
         end
       3'b110:   // set countdown timer
         begin
           if (cr_bits.clientA_alarm) begin
-            timers[ctrlA[20:16]].assigned_clock <= ctrlA[28:25];
-            timers[ctrlA[20:16]].value <= ctrlA[15:0];
-            timers[ctrlA[20:16]].enable <= 1'b1;    // enable timer when set
-            alarms[ctrlA[20:16]].enable <= 1'b0;    // disable alarm at same location as timer
+            alarms[ctrlA[28:24]].assigned_clock <= ctrlA[19:16];
+            alarms[ctrlA[28:24]].countdown <= 1'b1;
+            alarms[ctrlA[28:24]].loop <= 1'b0;
+            alarms[ctrlA[28:24]].value <= ctrlA[15:0];
+            alarms[ctrlA[28:24]].enable <= 1'b1;    // enable timer when set
+            alarms[ctrlA[28:24]].enable <= 1'b0;    // disable alarm at same location as timer
             statusA <= Ack;
           end
           else begin
-            statusA <= Error;
+            statusA <= Nack;
           end
         end
       3'b111:   // enable/disable alarm/timer
         begin
           if (cr_bits.clientA_alarm) begin
             alarms[ctrlA[28:24]].enable <= ctrlA[23];
-            timers[ctrlA[28:24]].enable <= ctrlA[23];
           end
           else begin
-            statusA <= Error;
+            statusA <= Nack;
           end
         end
       3'b011:   // set ATS21 mode
@@ -324,11 +313,11 @@ task processInst(input logic [31:0] ctrlA, input logic [31:0] ctrlB);
         begin
           if (cr_bits.clientB_clock) begin
             base_clocks[ctrlB[28:25]].rate <= ctrlB[23:22];
-            base_clocks[ctrlB[28:25]].count <= ctrlB[15:0];
+            base_clocks[ctrlB[28:25]].Time <= ctrlB[15:0];
             statusB <= Ack;
           end
           else begin
-            statusB <= Error;
+            statusB <= Nack;
           end
         end
       3'b010:   // enable/disable clock
@@ -338,40 +327,42 @@ task processInst(input logic [31:0] ctrlA, input logic [31:0] ctrlB);
             statusB <= Ack;
           end
           else begin
-            statusB <= Error;
+            statusB <= Nack;
           end
         end
       3'b101:   // set alarm
         begin
           if (cr_bits.clientB_alarm) begin
-            alarms[ctrlB[20:16]].assigned_clock <= ctrlB[28:25];
-            alarms[ctrlB[20:16]].loop <= ctrlB[23];
-            alarms[ctrlB[20:16]].value <= ctrlB[15:0];
+            alarms[ctrlB[28:24]].assigned_clock <= ctrlB[19:16];
+            alarms[ctrlB[28:24]].countdown <= 1'b0;
+            alarms[ctrlB[28:24]].loop <= ctrlB[23];
+            alarms[ctrlB[28:24]].value <= ctrlB[15:0];
             statusB <= Ack;
           end
           else begin
-            statusB <= Error;
+            statusB <= Nack;
           end
         end
       3'b110:   // set countdown timer
         begin
           if (cr_bits.clientB_alarm) begin
-            timers[ctrlB[20:16]].assigned_clock <= ctrlB[28:25];
-            timers[ctrlB[20:16]].value <= ctrlB[15:0];
+            alarms[ctrlB[28:24]].assigned_clock <= ctrlB[19:16];
+            alarms[ctrlB[28:24]].countdown <= 1'b1;
+            alarms[ctrlB[28:24]].loop <= ctrlB[23];
+            alarms[ctrlB[28:24]].value <= ctrlB[15:0];
             statusB <= Ack;
           end
           else begin
-            statusB <= Error;
+            statusB <= Nack;
           end
         end
       3'b111:   // enable/disable alarm/timer
         begin
           if (cr_bits.clientB_alarm) begin
             alarms[ctrlB[28:24]].enable <= ctrlB[23];
-            timers[ctrlB[28:24]].enable <= ctrlB[23];
           end
           else begin
-            statusB <= Error;
+            statusB <= Nack;
           end
         end
       3'b011:   // set ATS21 mode
@@ -446,7 +437,7 @@ genvar i;
 generate
 	for (i = 0; i < num_alarms; i++)
 	 begin
-		assign data[i] = alarms[i].finished | timers[i].finished;
+		assign data[i] = alarms[i].finished;
 	 end
 endgenerate
 
