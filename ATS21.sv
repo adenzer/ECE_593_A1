@@ -266,7 +266,7 @@ task checkInst(input logic [31:0] ctrlA, input logic [31:0] ctrlB);
     endcase
   end
   else if (((ctrlA[31:29] == 3'b101) && (ctrlB[31:29] == 3'b110)) ||
-      ((ctrlA[31:29] == 3'b110) && (ctrlB[31:29] == 3'b101))) begin
+           ((ctrlA[31:29] == 3'b110) && (ctrlB[31:29] == 3'b101))) begin
     if (ctrlA[28:24] == ctrlB[28:24]) begin
       statusA <= Nack;
       statusB <= Nack;
@@ -464,20 +464,22 @@ always_ff @(posedge clk or posedge reset) begin : module_behavior
 		Reset();
 	// Normal Operation
 	else if (readFlag) begin
-      ready <= 1'b0;
-      if (byteCount == 0) begin         // read first 16-bit input
-        ctrlA_inst[31:16] <= ctrlA;     // read ctrlA
-        ctrlB_inst[31:16] <= ctrlB;     // read ctrlB
-        byteCount <= 1'b1;              // increment byte count
-       end
-      else if (byteCount == 1) begin    // read second 16-bit input
-        ctrlA_inst[15:0] <= ctrlA;      // read ctrlA
-        ctrlB_inst[15:0] <= ctrlB;      // read ctrlB
-        byteCount <= 1'b0;              // reset byte count
-        readFlag <= 1'b0;               // stop reading
-        readComplete <= 1'b1;           // full 32-bit instruction received
-       end
-      end
+    ready <= 1'b0;
+    if (byteCount == 0) begin         // read first 16-bit input
+      ctrlA_inst[31:16] <= ctrlA;     // read ctrlA
+      ctrlB_inst[31:16] <= ctrlB;     // read ctrlB
+      byteCount <= 1'b1;              // increment byte count
+      readFlag <= 1'b1;               // keep reading
+      readComplete <= 1'b0;           // read not complete
+     end
+    else if (byteCount == 1) begin    // read second 16-bit input
+      ctrlA_inst[15:0] <= ctrlA;      // read ctrlA
+      ctrlB_inst[15:0] <= ctrlB;      // read ctrlB
+      byteCount <= 1'b0;              // reset byte count
+      readFlag <= 1'b0;               // stop reading
+      readComplete <= 1'b1;           // full 32-bit instruction received
+     end
+  end
 
 	if (req) begin
       ready <= 1'b1;      // ready to receive input
@@ -487,6 +489,9 @@ always_ff @(posedge clk or posedge reset) begin : module_behavior
     if (readComplete) begin
       readComplete <= 1'b0;
       checkInst(ctrlA_inst, ctrlB_inst);    // process ctrl instructions
+    end
+    else begin
+      checkInst(32'h00000000, 32'h00000000);  // nop
     end
 
     Check_Alarms();
