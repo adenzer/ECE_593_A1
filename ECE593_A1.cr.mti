@@ -1,8 +1,0 @@
-C:/Users/andre/Documents/GitHub/ECE_593_A1/ATS21_tb.sv {1 {vlog -work work -sv -stats=none {C:\Users\andre\Documents\GitHub\ECE_593_A1\ATS21_tb.sv}
-Model Technology ModelSim PE Student Edition vlog 10.4a Compiler 2015.03 Apr  7 2015
--- Compiling module ATS21_tb
-
-Top level modules:
-	ATS21_tb
-
-} {} {}}
