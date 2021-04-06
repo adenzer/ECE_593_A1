@@ -336,7 +336,7 @@ task processInst(input logic [31:0] ctrlA, input logic [31:0] ctrlB);
             alarms[ctrlB[28:24]].countdown <= 1'b0;
             alarms[ctrlB[28:24]].loop <= ctrlB[23];
             alarms[ctrlB[28:24]].value <= ctrlB[15:0];
-            #1 alarms[ctrlB[28:24]].enable <= 1'b1;    // enable alarm when set
+            #0 alarms[ctrlB[28:24]].enable <= 1'b1;    // enable alarm when set
             statusB <= Ack;
           end
           else begin
@@ -348,9 +348,9 @@ task processInst(input logic [31:0] ctrlA, input logic [31:0] ctrlB);
           if (cr_bits.clientB_alarm) begin
             alarms[ctrlB[28:24]].assigned_clock <= ctrlB[19:16];
             alarms[ctrlB[28:24]].countdown <= 1'b1;
-            alarms[ctrlB[28:24]].loop <= ctrlB[23];
+            alarms[ctrlB[28:24]].loop <= 1'b0;
             alarms[ctrlB[28:24]].value <= ctrlB[15:0] + base_clocks[ctrlB[19:16]].count;  // timer expires at current base clock plus duration of timer
-            #1 alarms[ctrlB[28:24]].enable <= 1'b1;    // enable timer when set
+            #0 alarms[ctrlB[28:24]].enable <= 1'b1;    // enable timer when set
             statusB <= Ack;
           end
           else begin
@@ -372,7 +372,7 @@ task processInst(input logic [31:0] ctrlA, input logic [31:0] ctrlB);
           cr_bits.clientB_clock <= ctrlB[27:26];
           cr_bits.clientB_alarm <= ctrlB[25:24];
         end
-      default:  statusB <= Ack;
+      default:  statusB <= Nack;
     endcase
 endtask
 
