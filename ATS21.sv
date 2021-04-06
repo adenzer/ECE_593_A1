@@ -24,6 +24,51 @@ Assumptions:
 		- Clk 2x is 4ns period
 		- Clk 4x is 2ns period
 
+Instructions
+  opcode is bits [31:29]
+
+  nop -
+    opcode 000
+    fields:
+      none
+  set clock -
+    opcode 001
+    fields:
+      clock # - bits [28:25]
+      rate - bits [23:22]
+
+  enable/disable clock -
+    opcode 010
+    fields:
+      clock # - bits [28:25]
+      enable/disable - bit [23]
+
+  set alarm -
+    opcode 101
+    fields:
+      alarm # - bits [28:24]
+      repeat - bit [23]
+      clock # - bits [19:16]
+
+  set countdown timer -
+    opcode 110
+    fields:
+      alarm # - bits [28:24]
+      clock # - bits [19:16]
+
+  enable/disable alarm/timer -
+    opcode 111
+    fields:
+      alarm/timer # - bits [28:24]
+      enable/disable - bit [23]
+
+  set ATS21 mode -
+    opcode 011
+    fields:
+      device active - [28]
+      allow timer/alarm change - bits [27:26]
+      allow clock change - bits [25:24]
+
 */
 
 timeunit 1ns/1ns;
