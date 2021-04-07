@@ -17,19 +17,19 @@ add wave -noupdate -expand -group DUT -expand -group {DUT - Inputs} /ATS21_tb/du
 add wave -noupdate -expand -group DUT -expand -group {DUT - Inputs} /ATS21_tb/dut/ctrlA
 add wave -noupdate -expand -group DUT -expand -group {DUT - Inputs} /ATS21_tb/dut/ctrlB
 add wave -noupdate -expand -group DUT -divider {Internal Signals}
-add wave -noupdate -expand -group DUT -expand -group {DUT - Internal} /ATS21_tb/dut/statusA
-add wave -noupdate -expand -group DUT -expand -group {DUT - Internal} /ATS21_tb/dut/statusB
-add wave -noupdate -expand -group DUT -expand -group {DUT - Internal} /ATS21_tb/dut/ctrlA_inst
-add wave -noupdate -expand -group DUT -expand -group {DUT - Internal} /ATS21_tb/dut/ctrlB_inst
 add wave -noupdate -expand -group DUT -expand -group {DUT - Internal} /ATS21_tb/dut/clk_1x
 add wave -noupdate -expand -group DUT -expand -group {DUT - Internal} /ATS21_tb/dut/clk_2x
 add wave -noupdate -expand -group DUT -expand -group {DUT - Internal} /ATS21_tb/dut/clk_4x
-add wave -noupdate -expand -group DUT -expand -group {DUT - Internal} /ATS21_tb/dut/base_clocks
-add wave -noupdate -expand -group DUT -expand -group {DUT - Internal} /ATS21_tb/dut/alarms
-add wave -noupdate -expand -group DUT -expand -group {DUT - Internal} /ATS21_tb/dut/cr_bits
-add wave -noupdate -expand -group DUT -expand -group {DUT - Internal} /ATS21_tb/dut/readFlag
-add wave -noupdate -expand -group DUT -expand -group {DUT - Internal} /ATS21_tb/dut/readComplete
-add wave -noupdate -expand -group DUT -expand -group {DUT - Internal} /ATS21_tb/dut/byteCount
+add wave -noupdate -expand -group DUT -expand -group {DUT - Internal} -expand -group {Instruction Registers} /ATS21_tb/dut/ctrlA_inst
+add wave -noupdate -expand -group DUT -expand -group {DUT - Internal} -expand -group {Instruction Registers} /ATS21_tb/dut/ctrlB_inst
+add wave -noupdate -expand -group DUT -expand -group {DUT - Internal} -expand -group {Base Clocks} /ATS21_tb/dut/base_clocks
+add wave -noupdate -expand -group DUT -expand -group {DUT - Internal} -expand -group Alarms/Timers /ATS21_tb/dut/alarms
+add wave -noupdate -expand -group DUT -expand -group {DUT - Internal} -expand -group {Control Registers} /ATS21_tb/dut/cr_bits
+add wave -noupdate -expand -group DUT -expand -group {DUT - Internal} -expand -group {Output Signals} /ATS21_tb/dut/readFlag
+add wave -noupdate -expand -group DUT -expand -group {DUT - Internal} -expand -group {Output Signals} /ATS21_tb/dut/byteCount
+add wave -noupdate -expand -group DUT -expand -group {DUT - Internal} -expand -group {Output Signals} /ATS21_tb/dut/readComplete
+add wave -noupdate -expand -group DUT -expand -group {DUT - Internal} -expand -group {Output Signals} /ATS21_tb/dut/statusA
+add wave -noupdate -expand -group DUT -expand -group {DUT - Internal} -expand -group {Output Signals} /ATS21_tb/dut/statusB
 add wave -noupdate -expand -group DUT -divider Outputs
 add wave -noupdate -expand -group DUT -expand -group {DUT - Outputs} /ATS21_tb/dut/ready
 add wave -noupdate -expand -group DUT -expand -group {DUT - Outputs} -radix binary /ATS21_tb/dut/stat
@@ -38,7 +38,7 @@ TreeUpdate [SetDefaultTree]
 WaveRestoreCursors {{Cursor 1} {0 ns} 0}
 quietly wave cursor active 1
 configure wave -namecolwidth 254
-configure wave -valuecolwidth 100
+configure wave -valuecolwidth 122
 configure wave -justifyvalue left
 configure wave -signalnamewidth 0
 configure wave -snapdistance 10
@@ -51,4 +51,4 @@ configure wave -griddelta 40
 configure wave -timeline 0
 configure wave -timelineunits ns
 update
-WaveRestoreZoom {0 ns} {284 ns}
+WaveRestoreZoom {0 ns} {280 ns}
