@@ -78,16 +78,16 @@ always begin
 	#4 clk = ~clk;
 end
 
-// Initial Block
+// Simulation Stimulus
 initial begin
-	// Initialize Variables and Reset for 4 cycles
 	initialize();
+
+	// Testing latching of instructions into DUT (Two 16-bit words)
 	a = 32'h11114444;
 	b = 32'h22223333;
 	send_instruction(a, b);
-	// Stop Simulation after 20 cycles
-	repeat(20) @(posedge(clk));
-	$stop;
+
+	exit_simulation();
 end
 
 task wait_cycles(int t);
@@ -95,11 +95,9 @@ task wait_cycles(int t);
 endtask 
 
 task initialize();
-	clk = 0;
-	reset = 1;
-	req = 0;
-	ctrlA = '0;
-	ctrlB = '0;
+	// Initialize Variables and Reset for 4 cycles
+	clk = 0; reset = 1; req = 0;
+	ctrlA = '0; ctrlB = '0;
 	wait_cycles(4);
 	reset = 0;
 	wait_cycles(1);
@@ -116,5 +114,11 @@ task send_instruction(logic[31:0] a, logic[31:0] b);
 	ctrlB = b[15:0];
 	wait_cycles(1);
 endtask
+
+task exit_simulation();
+	// Stop Simulation after 20 cycles
+	repeat(20) @(posedge(clk));
+	$stop;
+endtask 
 
 endmodule
