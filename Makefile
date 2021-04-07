@@ -15,7 +15,7 @@ sim_c:
 	vsim -c ATS21_tb -do "run -all;quit"
 
 sim_gui:
-	vsim -voptargs="+acc" ATS21_tb -do "run -all;"
+	vsim -voptargs="+acc" ATS21_tb -do "wave_simple.do" -do "run -all;"
 
 clean:
 	rm -rf work modelsim.ini *.wlf *.log replay* transcript *.db

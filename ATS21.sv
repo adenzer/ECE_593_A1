@@ -24,13 +24,13 @@ Assumptions:
 		- Clk 2x is 4ns period
 		- Clk 4x is 2ns period
 
-Instructions
-  opcode is bits [31:29]
+Instructions (opcode is bits [31:29]):
 
   nop -
     opcode 000
     fields:
       none
+
   set clock -
     opcode 001
     fields:
@@ -146,6 +146,10 @@ typedef struct packed {
 
 ControlRegisters cr_bits;
 
+logic readFlag;     // read input while flag is high
+logic readComplete; // full 32-bit instruction has been read
+logic byteCount;    // keep track of input bytes
+
 /////////////////////////////////////////
 ////////// Tasks and Functions //////////
 /////////////////////////////////////////
@@ -169,6 +173,7 @@ task Reset();
 	for(int i=0; i<num_alarms; i++)
 	 begin
 		alarms[i].enable = 0;
+    alarms[i].countdown = 0;
 		alarms[i].loop = 0;
 		alarms[i].assigned_clock = '0;
 		alarms[i].value = '0;
@@ -181,6 +186,13 @@ task Reset();
 	cr_bits.clientB_clock = 0;
 	cr_bits.clientA_alarm = 0;
 	cr_bits.clientB_alarm = 0;
+
+  // Reset Internal Signals
+  readFlag = 0;
+  readComplete = 0;
+  byteCount = 0;
+  ctrlA_inst = 'z;
+  ctrlB_inst = 'z;
 endtask
 
 // Task that is called when an alarm or countdownt timer goes off.
@@ -453,16 +465,16 @@ always @(clk_1x) begin : clk4x_generation
 	Generate_4x_Clock();
 end
 
-logic readFlag;     // read input while flag is high
-logic readComplete; // full 32-bit instruction has been read
-logic byteCount;    // keep track of input bytes
-
 // Behaviorial Block
 always_ff @(posedge clk or posedge reset) begin : module_behavior
 	// Reset Detection
 	if(reset)
 		Reset();
 	// Normal Operation
+  else if (req) begin
+    ready <= 1'b1;      // ready to receive input
+    readFlag <= 1'b1;   // begin read cycle
+    end
 	else if (readFlag) begin
     ready <= 1'b0;
     if (byteCount == 0) begin         // read first 16-bit input
@@ -471,30 +483,38 @@ always_ff @(posedge clk or posedge reset) begin : module_behavior
       byteCount <= 1'b1;              // increment byte count
       readFlag <= 1'b1;               // keep reading
       readComplete <= 1'b0;           // read not complete
-     end
+      end
     else if (byteCount == 1) begin    // read second 16-bit input
       ctrlA_inst[15:0] <= ctrlA;      // read ctrlA
       ctrlB_inst[15:0] <= ctrlB;      // read ctrlB
       byteCount <= 1'b0;              // reset byte count
       readFlag <= 1'b0;               // stop reading
       readComplete <= 1'b1;           // full 32-bit instruction received
-     end
-  end
+      end
+    end
+  else if (readComplete) begin
+      readComplete <= 1'b0;
+      checkInst(ctrlA_inst, ctrlB_inst);    // process ctrl instructions
+    end
+  else
+      checkInst(32'h00000000, 32'h00000000);  // nop
 
-	if (req) begin
+/*	if (req) begin
       ready <= 1'b1;      // ready to receive input
       readFlag <= 1'b1;   // begin read cycle
-      end
+      end*/
 
-    if (readComplete) begin
+ /*   if (readComplete) begin
       readComplete <= 1'b0;
       checkInst(ctrlA_inst, ctrlB_inst);    // process ctrl instructions
     end
     else begin
       checkInst(32'h00000000, 32'h00000000);  // nop
     end
+*/
 
     Check_Alarms();
+
 end
 
 //int n, j, k;  // loop incrementers for base clocks
