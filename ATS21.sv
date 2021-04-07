@@ -181,11 +181,11 @@ task Reset();
 	 end
 
 	// Reset Control Bits
-	cr_bits.active = 0;
-	cr_bits.clientA_clock = 0;
-	cr_bits.clientB_clock = 0;
-	cr_bits.clientA_alarm = 0;
-	cr_bits.clientB_alarm = 0;
+	cr_bits.active = 1;
+	cr_bits.clientA_clock = 1;
+	cr_bits.clientB_clock = 1;
+	cr_bits.clientA_alarm = 1;
+	cr_bits.clientB_alarm = 1;
 
   // Reset Internal Signals
   readFlag = 0;
@@ -298,6 +298,7 @@ task processInst(input logic [31:0] ctrlA, input logic [31:0] ctrlB);
       3'b001:   // set clock
         begin
           if (cr_bits.clientA_clock) begin
+            base_clocks[ctrlA[28:25]].enable <= 1;
             base_clocks[ctrlA[28:25]].rate <= ctrlA[23:22];
             base_clocks[ctrlA[28:25]].count <= ctrlA[15:0];
             statusA <= Ack;
@@ -367,6 +368,7 @@ task processInst(input logic [31:0] ctrlA, input logic [31:0] ctrlB);
       3'b001:   // set clock
         begin
           if (cr_bits.clientB_clock) begin
+            base_clocks[ctrlB[28:25]].enable <= 1;
             base_clocks[ctrlB[28:25]].rate <= ctrlB[23:22];
             base_clocks[ctrlB[28:25]].count <= ctrlB[15:0];
             statusB <= Ack;
@@ -424,7 +426,7 @@ task processInst(input logic [31:0] ctrlA, input logic [31:0] ctrlB);
         end
       3'b011:   // set ATS21 mode
         begin
-          cr_bits.active <= ctrlA[28];
+          cr_bits.active <= ctrlB[28];
           cr_bits.clientB_clock <= ctrlB[27:26];
           cr_bits.clientB_alarm <= ctrlB[25:24];
         end

@@ -8,7 +8,7 @@ add wave -noupdate -expand -group {Testbench Interface} /ATS21_tb/ctrlA
 add wave -noupdate -expand -group {Testbench Interface} /ATS21_tb/ctrlB
 add wave -noupdate -expand -group {Testbench Interface} -divider Ouputs
 add wave -noupdate -expand -group {Testbench Interface} /ATS21_tb/ready
-add wave -noupdate -expand -group {Testbench Interface} /ATS21_tb/stat
+add wave -noupdate -expand -group {Testbench Interface} -radix binary /ATS21_tb/stat
 add wave -noupdate -expand -group {Testbench Interface} /ATS21_tb/data
 add wave -noupdate -expand -group DUT -divider Inputs
 add wave -noupdate -expand -group DUT -expand -group {DUT - Inputs} /ATS21_tb/dut/clk
@@ -24,7 +24,7 @@ add wave -noupdate -expand -group DUT -expand -group {DUT - Internal} /ATS21_tb/
 add wave -noupdate -expand -group DUT -expand -group {DUT - Internal} /ATS21_tb/dut/clk_1x
 add wave -noupdate -expand -group DUT -expand -group {DUT - Internal} /ATS21_tb/dut/clk_2x
 add wave -noupdate -expand -group DUT -expand -group {DUT - Internal} /ATS21_tb/dut/clk_4x
-add wave -noupdate -expand -group DUT -expand -group {DUT - Internal} /ATS21_tb/dut/base_clocks
+add wave -noupdate -expand -group DUT -expand -group {DUT - Internal} -expand /ATS21_tb/dut/base_clocks
 add wave -noupdate -expand -group DUT -expand -group {DUT - Internal} /ATS21_tb/dut/alarms
 add wave -noupdate -expand -group DUT -expand -group {DUT - Internal} /ATS21_tb/dut/cr_bits
 add wave -noupdate -expand -group DUT -expand -group {DUT - Internal} /ATS21_tb/dut/readFlag
@@ -35,8 +35,8 @@ add wave -noupdate -expand -group DUT -expand -group {DUT - Outputs} /ATS21_tb/d
 add wave -noupdate -expand -group DUT -expand -group {DUT - Outputs} /ATS21_tb/dut/stat
 add wave -noupdate -expand -group DUT -expand -group {DUT - Outputs} /ATS21_tb/dut/data
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 1} {0 ns} 0}
-quietly wave cursor active 0
+WaveRestoreCursors {{Cursor 1} {84 ns} 0}
+quietly wave cursor active 1
 configure wave -namecolwidth 254
 configure wave -valuecolwidth 100
 configure wave -justifyvalue left

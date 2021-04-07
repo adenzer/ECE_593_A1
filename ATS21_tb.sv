@@ -68,6 +68,7 @@ logic [23:0] data;
 
 // Testbench Input Signals
 logic[31:0] a, b;
+logic[15:0] a_first, a_second, b_first, b_second;
 
 // Instantiate DUT
 ATS21 dut(.clk(clk), .reset(reset), .req(req), .ctrlA(ctrlA), .ctrlB(ctrlB), 
@@ -86,6 +87,22 @@ initial begin
 	a = 32'h11114444;
 	b = 32'h22223333;
 	send_instruction(a, b);
+
+	// A - Set Clock (Clock 0 to Clock 1X)
+	a_first = '0;
+	a_second = '0;
+	a_first[15:13] = 001;
+	a_first[12:9] = 4'b0000;
+	a_first[7:6] = 2'b00;
+	a = {a_first, a_second};
+	// B - Set Clock (Clock 1 to Clock 2X)
+	b_first = '0;
+	b_second = '0;
+	b_first[15:13] = 001;
+	b_first[12:9] = 4'b0001;
+	b_first[7:6] = 2'b01;
+	b = {b_first, b_second};
+	send_instruction(a,b);
 
 	exit_simulation();
 end
