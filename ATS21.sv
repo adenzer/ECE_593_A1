@@ -499,25 +499,9 @@ always_ff @(posedge clk or posedge reset) begin : module_behavior
   else
       checkInst(32'h00000000, 32'h00000000);  // nop
 
-/*	if (req) begin
-      ready <= 1'b1;      // ready to receive input
-      readFlag <= 1'b1;   // begin read cycle
-      end*/
-
- /*   if (readComplete) begin
-      readComplete <= 1'b0;
-      checkInst(ctrlA_inst, ctrlB_inst);    // process ctrl instructions
-    end
-    else begin
-      checkInst(32'h00000000, 32'h00000000);  // nop
-    end
-*/
-
     Check_Alarms();
 
 end
-
-//int n, j, k;  // loop incrementers for base clocks
 
 // increment 1x base clocks
 always_ff @(posedge clk) begin
