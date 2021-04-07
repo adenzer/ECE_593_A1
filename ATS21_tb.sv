@@ -16,6 +16,10 @@ task is called, the tool exits after 20 clock cycles.
 
 */
 
+////////////////////////////////////////////////////
+////////// Module and Signal Declarations //////////
+////////////////////////////////////////////////////
+
 timeunit 1ns/1ns;
 
 module ATS21_tb ();
@@ -39,11 +43,11 @@ always begin
 	#4 clk = ~clk;
 end
 
-///////////////////////////////
-////////// Testbench //////////
-///////////////////////////////
+///////////////////////////////////////
+////////// Testbench Simulus //////////
+///////////////////////////////////////
 
-// Simulation Stimulus
+// Simulation
 initial begin
 	// Initialize Design
 	initialize();
@@ -111,24 +115,20 @@ task set_clock(logic[3:0] clock_id, logic[1:0] rate, string client);
 		// Clear Buffers
 		a_first = '0;
 		a_second = '0;
-
 		// Set Fields
 		a_first[15:13] = 3'b001;
 		a_first[12:9] = clock_id;
 		a_first[7:6] = rate;
-
 		// Assign Output
 		a = {a_first, a_second};
 	end else begin
 		// Clear Buffers
 		b_first = '0;
 		b_second = '0;
-
 		// Set Fields 
 		b_first[15:13] = 3'b001;
 		b_first[12:9] = clock_id;
 		b_first[7:6] = rate;
-
 		// Assign Output
 		b = {b_first, b_second};
 	end
@@ -145,24 +145,20 @@ task toggle_BCs(logic[3:0] clock_id, logic toggle, string client);
 		// Clear Buffers
 		a_first = '0;
 		a_second = '0;
-
 		// Set Fields
 		a_first[15:13] = 3'b010;
 		a_first[12:9] = clock_id;
 		a_first[7] = toggle;
-
 		// Assign Output
 		a = {a_first, a_second};
 	end else begin
 		// Clear Buffers
 		b_first = '0;
 		b_second = '0;
-
 		// Set Fields
 		b_first[15:13] = 3'b010;
 		b_first[12:9] = clock_id;
 		b_first[7] = toggle;
-
 		// Assign Output
 		b = {b_first, b_second};
 	end
@@ -180,28 +176,24 @@ task set_alarm(logic[4:0] alarm_id, logic loop, logic[3:0] clock_id, logic[15:0]
 		// Clear Buffers
 		a_first = '0;
 		a_second = '0;
-
 		// Set Fields
 		a_first[15:13] = 3'b101;
 		a_first[12:8] = alarm_id;
 		a_first[7] = loop;
 		a_first[3:0] = clock_id;
 		a_second = alarm_time;
-
 		// Assign Output
 		a = {a_first, a_second};
 	end else begin
 		// Clear Buffers
 		b_first = '0;
 		b_second = '0;
-
 		// Set Fields
 		b_first[15:13] = 3'b101;
 		b_first[12:8] = alarm_id;
 		b_first[7] = loop;
 		b_first[3:0] = clock_id;
 		b_second = alarm_time;
-
 		// Assign Output
 		b = {b_first, b_second};		
 	end
@@ -218,26 +210,22 @@ task set_countdown(logic[4:0] alarm_id, logic[3:0] clock_id, logic[15:0] interva
 		// Clear Buffers
 		a_first = '0;
 		a_second = '0;
-
 		// Set Fields
 		a_first[15:13] = 3'b110;
 		a_first[12:8] = alarm_id;
 		a_first[3:0] = clock_id;
 		a_second = interval;
-
 		// Assign Output
 		a = {a_first, a_second};
 	end else begin
 		// Clear Buffers
 		b_first = '0;
 		b_second = '0;
-
 		// Set Fields
 		b_first[15:13] = 3'b110;
 		b_first[12:8] = alarm_id;
 		b_first[3:0] = clock_id;
 		b_second = interval;
-
 		// Assign Output
 		b = {b_first, b_second};		
 	end
@@ -254,24 +242,20 @@ task toggle_ATs(logic[4:0] alarm_id, logic toggle, string client);
 		// Clear Buffers
 		a_first = '0;
 		a_second = '0;
-
 		// Set Fields
 		a_first[15:13] = 3'b111;
 		a_first[12:8] = alarm_id;
 		a_first[7] = toggle;
-
 		// Assign Output
 		a = {a_first, a_second};
 	end else begin
 		// Clear Buffers
 		b_first = '0;
 		b_second = '0;
-
 		// Set Fields
 		b_first[15:13] = 3'b111;
 		b_first[12:8] = alarm_id;
 		b_first[7] = toggle;
-
 		// Assign Output
 		b = {b_first, b_second};		
 	end
@@ -289,26 +273,22 @@ task set_ATS21_Mode(logic active, logic[1:0] AT_permissions, logic[1:0] BC_permi
 		// Clear Buffers
 		a_first = '0;
 		a_second = '0;
-
 		// Set Fields
 		a_first[15:13] = 3'b011;
 		a_first[12] = active;
 		a_first[11:10] = AT_permissions;
 		a_first[9:8] = BC_permissions;
-
 		// Assign Output
 		a = {a_first, a_second};
 	end else begin
 		// Clear Buffers
 		b_first = '0;
 		b_second = '0;
-
 		// Set Fields
 		b_first[15:13] = 3'b011;
 		b_first[12] = active;
 		b_first[11:10] = AT_permissions;
 		b_first[9:8] = BC_permissions;
-
 		// Assign Output
 		b = {b_first, b_second};		
 	end
