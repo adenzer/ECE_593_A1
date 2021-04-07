@@ -81,6 +81,7 @@ end
 
 // Simulation Stimulus
 initial begin
+	// Initialize Design
 	initialize();
 
 	// Set clock 0 to 1X from A
@@ -95,10 +96,29 @@ initial begin
 	set_clock(4'b0010, 2'b00, "b");
 	send_instruction(a,b);
 
+	// End Simulation
 	exit_simulation();
 end
 
+// Wait Cycles Task
+task wait_cycles(int t);
+	repeat(t) @(posedge(clk));
+endtask 
+
+// Init Task
+task initialize();
+	// Initialize Variables and Reset for 4 cycles
+	clk = 0; reset = 1; req = 0;
+	ctrlA = '0; ctrlB = '0;
+	wait_cycles(4);
+	reset = 0;
+	wait_cycles(1);
+endtask
+
+// Set Clock Instruction Task
 task set_clock(logic[3:0] clock_id, logic[1:0] rate, string client);
+	// Check for which client is setting the clock and
+	// set fields accordingly
 	if (client == "a") begin
 		a_first = '0;
 		a_second = '0;
@@ -116,20 +136,11 @@ task set_clock(logic[3:0] clock_id, logic[1:0] rate, string client);
 	end
 endtask
 
-task wait_cycles(int t);
-	repeat(t) @(posedge(clk));
-endtask 
-
-task initialize();
-	// Initialize Variables and Reset for 4 cycles
-	clk = 0; reset = 1; req = 0;
-	ctrlA = '0; ctrlB = '0;
-	wait_cycles(4);
-	reset = 0;
-	wait_cycles(1);
-endtask
-
+// Send Instruction Task
 task send_instruction(logic[31:0] a, logic[31:0] b);
+	// Assert 'req' for 1 clock cycle and then send ctrlA and ctrlB
+	// words one cycle after another. Then finally wait two cycles for 
+	// the second word to latch and DUT to respond before sending anything more. 
 	req = 1;
 	wait_cycles(1);
 	req = 0;
@@ -141,6 +152,7 @@ task send_instruction(logic[31:0] a, logic[31:0] b);
 	wait_cycles(2);
 endtask
 
+// End Simulation task
 task exit_simulation();
 	// Stop Simulation after 20 cycles
 	repeat(20) @(posedge(clk));
