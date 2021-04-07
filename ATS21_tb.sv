@@ -60,11 +60,16 @@ timeunit 1ns/1ns;
 
 module ATS21_tb ();
 
+// DUT Signals
 logic clk, reset, req, ready;
 logic [1:0] stat;
 logic [15:0] ctrlA, ctrlB;
 logic [23:0] data;
 
+// Testbench Input Signals
+logic[31:0] a, b;
+
+// Instantiate DUT
 ATS21 dut(.clk(clk), .reset(reset), .req(req), .ctrlA(ctrlA), .ctrlB(ctrlB), 
 			.ready(ready), .stat(stat), .data(data));
 
@@ -76,17 +81,10 @@ end
 // Initial Block
 initial begin
 	// Initialize Variables and Reset for 4 cycles
-	clk = 0;
-	reset = 1;
-	req = 0;
-	ctrlA = '0;
-	ctrlB = '0;
-	wait_cycles(4);
-	reset = 0;
-	wait_cycles(1);
-	req = 1;
-	wait_cycles(2);
-	req = 0;
+	initialize();
+	a = 32'h11114444;
+	b = 32'h22223333;
+	send_instruction(a, b);
 	// Stop Simulation after 20 cycles
 	repeat(20) @(posedge(clk));
 	$stop;
@@ -95,5 +93,28 @@ end
 task wait_cycles(int t);
 	repeat(t) @(posedge(clk));
 endtask 
+
+task initialize();
+	clk = 0;
+	reset = 1;
+	req = 0;
+	ctrlA = '0;
+	ctrlB = '0;
+	wait_cycles(4);
+	reset = 0;
+	wait_cycles(1);
+endtask
+
+task send_instruction(logic[31:0] a, logic[31:0] b);
+	req = 1;
+	wait_cycles(1);
+	req = 0;
+	ctrlA = a[31:16];
+	ctrlB = b[31:16];
+	wait_cycles(1);
+	ctrlA = a[15:0];
+	ctrlB = b[15:0];
+	wait_cycles(1);
+endtask
 
 endmodule
