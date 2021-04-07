@@ -83,11 +83,15 @@ end
 initial begin
 	initialize();
 
+	// Set clock 0 to 1X from A
 	set_clock(4'b0000, 2'b00, "a");
+	// Set clock 1 to 2X from B
 	set_clock(4'b0001, 2'b01, "b");
 	send_instruction(a,b);
 
+	// Set clock 0 to 4X from A
 	set_clock(4'b0000, 2'b10, "a");
+	// Set clock 2 to 1X from B
 	set_clock(4'b0010, 2'b00, "b");
 	send_instruction(a,b);
 
