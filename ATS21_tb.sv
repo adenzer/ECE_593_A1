@@ -87,6 +87,10 @@ initial begin
 	set_clock(4'b0001, 2'b01, "b");
 	send_instruction(a,b);
 
+	set_clock(4'b0000, 2'b10, "a");
+	set_clock(4'b0010, 2'b00, "b");
+	send_instruction(a,b);
+
 	exit_simulation();
 end
 
@@ -130,7 +134,7 @@ task send_instruction(logic[31:0] a, logic[31:0] b);
 	wait_cycles(1);
 	ctrlA = a[15:0];
 	ctrlB = b[15:0];
-	wait_cycles(1);
+	wait_cycles(2);
 endtask
 
 task exit_simulation();
