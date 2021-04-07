@@ -83,29 +83,30 @@ end
 initial begin
 	initialize();
 
-	// Testing latching of instructions into DUT (Two 16-bit words)
-	a = 32'h11114444;
-	b = 32'h22223333;
-	send_instruction(a, b);
-
-	// A - Set Clock (Clock 0 to Clock 1X)
-	a_first = '0;
-	a_second = '0;
-	a_first[15:13] = 001;
-	a_first[12:9] = 4'b0000;
-	a_first[7:6] = 2'b00;
-	a = {a_first, a_second};
-	// B - Set Clock (Clock 1 to Clock 2X)
-	b_first = '0;
-	b_second = '0;
-	b_first[15:13] = 001;
-	b_first[12:9] = 4'b0001;
-	b_first[7:6] = 2'b01;
-	b = {b_first, b_second};
+	set_clock(4'b0000, 2'b00, "a");
+	set_clock(4'b0001, 2'b01, "b");
 	send_instruction(a,b);
 
 	exit_simulation();
 end
+
+task set_clock(logic[3:0] clock_id, logic[1:0] rate, string client);
+	if (client == "a") begin
+		a_first = '0;
+		a_second = '0;
+		a_first[15:13] = 001;
+		a_first[12:9] = clock_id;
+		a_first[7:6] = rate;
+		a = {a_first, a_second};
+	end else begin
+		b_first = '0;
+		b_second = '0;
+		b_first[15:13] = 001;
+		b_first[12:9] = clock_id;
+		b_first[7:6] = rate;
+		b = {b_first, b_second};
+	end
+endtask
 
 task wait_cycles(int t);
 	repeat(t) @(posedge(clk));
