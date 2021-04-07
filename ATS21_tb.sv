@@ -299,11 +299,28 @@ task send_instruction(logic[31:0] a, logic[31:0] b);
 	// Assert 'req' for 1 clock cycle and then send ctrlA and ctrlB
 	// words one cycle after another. Then finally wait two cycles for 
 	// the second word to latch and DUT to respond before sending anything more. 
+
+	// NOTE FOR TESTING: According to v0.4 of the design document, the same cycle
+	// req is asserted is when the design should bring in the top 16 bits, second 16 bits 
+	// the next cycle. The following cycle, bits [15:12] of the client need to go to '000' 
+	// to distinguish which client is requesting. If req is high for two cycles, it is an 
+	// indication a request is coming from the other client the cycle after. 
+
+	// Summary: We need to adapt our design to latch the inputs the same cycle req is high as 
+	// well as seperating A and B coming in as two processes rather than each happening always together
+	// everytime req is high. 
+
 	req = 1;
+	// Needs to be: 
+	//ctrlA = a[31:16];
+	//ctrlB = b[31:16];
 	wait_cycles(1);
 	req = 0;
 	ctrlA = a[31:16];
 	ctrlB = b[31:16];
+	// Needs to be: 
+	//ctrlA = a[15:0];
+	//ctrlB = b[15:0];
 	wait_cycles(1);
 	ctrlA = a[15:0];
 	ctrlB = b[15:0];
