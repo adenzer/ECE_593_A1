@@ -95,10 +95,8 @@ parameter num_clocks_bits = $clog2(num_clocks);
 enum logic {Nack = 1'b0, Ack = 1'b1} statusA, statusB;
 assign stat = {statusB, statusA};
 
-// temp regs for top 16-bits of input instruction
-logic [15:0] ctrlA_top, ctrlB_top;
-
-logic inCountA, inCountB;    // keep track of input instruction
+// temp regs for entire 32-bit input instruction
+logic [31:0] ctrlA_inst, ctrlB_inst;
 
 // Internal Clock Signals
 logic clk_1x;
@@ -145,6 +143,9 @@ typedef struct packed {
 
 ControlRegisters cr_bits;
 
+logic readFlag;     // read input while flag is high
+logic readComplete; // full 32-bit instruction has been read
+logic byteCount;    // keep track of input bytes
 
 /////////////////////////////////////////
 ////////// Tasks and Functions //////////
@@ -186,8 +187,7 @@ task Reset();
   // Reset Internal Signals
   readFlag = 0;
   readComplete = 0;
-  inCountA = 0;
-  inCountB = 0;
+  byteCount = 0;
   ctrlA_inst = 'z;
   ctrlB_inst = 'z;
 endtask
@@ -460,39 +460,36 @@ always_ff @(posedge clk or posedge reset) begin : module_behavior
 	if(reset)
 		Reset();
 	// Normal Operation
-  else begin
-    if (req) begin    // read first 16-bits of new instruction(s)
-      if ((ctrlA[15:13] != 3'b000) && (inCountA != 1'b1) begin
-        ctrlA_top <= ctrlA;     // read ctrlA
-        inCountA <= 1'b1;
+  else if (req) begin
+    ready <= 1'b1;      // ready to receive input
+    readFlag <= 1'b1;   // begin read cycle
+    end
+	else if (readFlag) begin
+    ready <= 1'b0;
+    if (byteCount == 0) begin         // read first 16-bit input
+      ctrlA_inst[31:16] <= ctrlA;     // read ctrlA
+      ctrlB_inst[31:16] <= ctrlB;     // read ctrlB
+      byteCount <= 1'b1;              // increment byte count
+      readFlag <= 1'b1;               // keep reading
+      readComplete <= 1'b0;           // read not complete
       end
-      else begin
-        inCountA <= 1'b0;
-      end
-      if ((ctrlB[15:13] != 3'b000) && (inCountB != 1'b1) begin
-        ctrlB_top <= ctrlB;     // read ctrlB
-        inCountB <= 1'b1;
-      end
-      else begin
-        inCountB <= 1'b0;
+    else if (byteCount == 1) begin    // read second 16-bit input
+      ctrlA_inst[15:0] <= ctrlA;      // read ctrlA
+      ctrlB_inst[15:0] <= ctrlB;      // read ctrlB
+      byteCount <= 1'b0;              // reset byte count
+      readFlag <= 1'b0;               // stop reading
+      readComplete <= 1'b1;           // full 32-bit instruction received
       end
     end
+  else if (readComplete) begin
+      readComplete <= 1'b0;
+      checkInst(ctrlA_inst, ctrlB_inst);    // process ctrl instructions
+    end
+  else
+      checkInst(32'h00000000, 32'h00000000);  // nop
 
-    // read second 16-bits of new instruction(s) and call instruction procedure
-    if (inCountA == 1'b1 && inCountB == 1'b1) begin
-      checkInst({ctrlA_top, ctrlA}, {ctrlB_top, ctrlB});
-    end
-    else if (inCountA == 1'b1 && inCountB == 1'b0) begin
-      checkInst({ctrlA_top, ctrlA}, 32'h00000000);
-    end
-    else if (inCountA == 1'b0 && inCountB == 1'b1)
-      checkInst(32'h00000000, {ctrlB_top, ctrlB});
-    end
-    else begin
-      checkInst(32'h00000000, 32'h00000000);
-    end
-  end
-  Check_Alarms();
+    Check_Alarms();
+
 end
 
 // increment 1x base clocks
