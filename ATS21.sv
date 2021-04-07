@@ -184,12 +184,10 @@ task Reset();
 	cr_bits.clientB_alarm = 1;
 
   // Reset Internal Signals
-  readFlag = 0;
-  readComplete = 0;
   inCountA = 0;
   inCountB = 0;
-  ctrlA_inst = 'z;
-  ctrlB_inst = 'z;
+  ctrlA_top = 'z;
+  ctrlB_top = 'z;
 endtask
 
 // Task that is called when an alarm or countdownt timer goes off.
@@ -462,14 +460,14 @@ always_ff @(posedge clk or posedge reset) begin : module_behavior
 	// Normal Operation
   else begin
     if (req) begin    // read first 16-bits of new instruction(s)
-      if ((ctrlA[15:13] != 3'b000) && (inCountA != 1'b1) begin
+      if ((ctrlA[15:13] != 3'b000) && (inCountA != 1'b1)) begin
         ctrlA_top <= ctrlA;     // read ctrlA
         inCountA <= 1'b1;
       end
       else begin
         inCountA <= 1'b0;
       end
-      if ((ctrlB[15:13] != 3'b000) && (inCountB != 1'b1) begin
+      if ((ctrlB[15:13] != 3'b000) && (inCountB != 1'b1)) begin
         ctrlB_top <= ctrlB;     // read ctrlB
         inCountB <= 1'b1;
       end
@@ -485,7 +483,7 @@ always_ff @(posedge clk or posedge reset) begin : module_behavior
     else if (inCountA == 1'b1 && inCountB == 1'b0) begin
       checkInst({ctrlA_top, ctrlA}, 32'h00000000);
     end
-    else if (inCountA == 1'b0 && inCountB == 1'b1)
+    else if (inCountA == 1'b0 && inCountB == 1'b1) begin
       checkInst(32'h00000000, {ctrlB_top, ctrlB});
     end
     else begin
