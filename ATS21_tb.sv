@@ -40,7 +40,7 @@ ATS21 dut(.clk(clk), .reset(reset), .req(req), .ctrlA(ctrlA), .ctrlB(ctrlB),
 
 // Reference Clock Generator (8ns Period)
 always begin
-	#4 clk = ~clk;
+	#1 clk = ~clk;
 end
 
 ///////////////////////////////////////

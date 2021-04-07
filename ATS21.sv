@@ -20,9 +20,6 @@ Assumptions:
 		- Reset
 		- Req
 		- Outputs (Ready, Data)
-		- Clk 1x is 8ns period (Reference Clock)
-		- Clk 2x is 4ns period
-		- Clk 4x is 2ns period
 
 Instructions (opcode is bits [31:29]):
 
@@ -200,16 +197,6 @@ task Alarm_Finished (int alarm_id);
 	alarms[alarm_id].finished = 1;
 	repeat(2) @(posedge(clk));
 	alarms[alarm_id].finished = 0;
-endtask
-
-// Assume 2X Clock is 4ns Period
-task Generate_2x_Clock();
-	repeat(2) #2 clk_2x <= ~clk_2x;
-endtask
-
-// Assume 4X Clock is 2ns Period
-task Generate_4x_Clock();
-	repeat(4) #1 clk_4x <= ~clk_4x;
 endtask
 
 // check if ctrlA and ctrlB have same opcode
@@ -457,14 +444,14 @@ endtask
 // Clock 1X Generation
 assign clk_1x = clk;
 
-// Clock 2X Generation
-always @(clk_1x) begin : clk2x_generation
-	Generate_2x_Clock();
+// Clock / 2 Generation
+always @(posedge clk_1x) begin : clkDiv2_generation
+	clk_2x <= ~clk_2x;
 end
 
-// Clock 4X Generation
-always @(clk_1x) begin : clk4x_generation
-	Generate_4x_Clock();
+// Clock / 4 Generation
+always @(posedge clk_2x) begin : clkDiv4_generation
+  clk_4x <= ~clk_4x;
 end
 
 // Behaviorial Block
