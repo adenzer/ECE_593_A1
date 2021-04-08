@@ -68,7 +68,8 @@ initial begin
 
 	wait_cycles(100);
 
-	set_alarm(5'b00000, 1'b0, 4'b0000, 20);
+	set_alarm(5'b00000, 1'b0, 4'b0000, 20, "a");
+	set_alarm(5'b00001, 1'b0, 4'b0001, 20, "b");
 
 	wait_cycles(100);
 
