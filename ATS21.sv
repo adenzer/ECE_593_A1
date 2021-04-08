@@ -423,7 +423,7 @@ task Check_Alarms(input logic [2:0] clk_rate);
   int i;
   logic outFlag;
   for (i = 0; i < num_alarms; i = i + 1) begin
-    if ((base_clocks[alarms[i].assigned_clock].count == alarms[i].value) && alarms[i].enable && (alarms[i].rate == clk_rate)) begin
+    if ((base_clocks[alarms[i].assigned_clock].count == alarms[i].value) && alarms[i].enable && (base_clocks[alarms[i].assigned_clock].rate == clk_rate)) begin
       alarms[i].finished <= 1'b1;
       outFlag <= 1'b1;
       if (~alarms[i].loop) begin
