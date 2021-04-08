@@ -336,7 +336,7 @@ task send_instruction(logic[31:0] a, logic[31:0] b);
 	req = 0;
 	ctrlA = a[15:0];
 	ctrlB = b[15:0];
-	// wait_cycles(1);
+	wait_cycles(1);
 endtask
 
 endmodule
