@@ -81,7 +81,7 @@ initial begin
 
 	wait_cycles(200);*/
 
-
+	// Staggered Instructions Testing
 	// Set clock 0 to 1X from A
 	set_clock(4'b0000, 2'b00, 16'h0000, "a");
 	// Set clock 1 to 2X from B
@@ -347,7 +347,7 @@ task send_instruction(logic[31:0] a, logic[31:0] b);
 	ctrlA = a[15:0];
 	ctrlB = b[15:0];
 	wait_cycles(1);
-	
+
 endtask
 
 // Send Staggered Instructions Task
