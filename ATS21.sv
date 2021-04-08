@@ -173,6 +173,7 @@ task Reset();
 		alarms[i].loop = 0;
 		alarms[i].assigned_clock = '0;
 		alarms[i].value = '0;
+		alarms[i].finished = 0;
 	 end
 
 	// Reset Control Bits
@@ -557,7 +558,7 @@ genvar j;
 generate
 	for (j = 0; j < num_alarms; j++)
 	 begin
-		assign alarms[j].finished = ((base_clocks[alarms[j].assigned_clock].count == alarms[j].value) && alarms[j].enable) ? 1'b1 : 1'b0;
+		always_comb if ((base_clocks[alarms[j].assigned_clock].count == alarms[j].value) && alarms[j].enable) alarms[j].finished =  1'b1;
 	 end
 endgenerate
 
