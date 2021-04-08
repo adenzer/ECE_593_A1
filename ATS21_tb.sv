@@ -52,7 +52,7 @@ initial begin
 	// Initialize Design
 	initialize();
 
-	/*// Set clock 0 to 1X from A
+	// Set clock 0 to 1X from A
 	set_clock(4'b0000, 2'b00, 16'h0000, "a");
 	// Set clock 1 to 2X from B
 	set_clock(4'b0001, 2'b01, 16'h0000, "b");
@@ -79,15 +79,14 @@ initial begin
 	set_alarm(5'b00110, 1'b0, 4'b0010, 16'h0090, "b");
 	send_instruction(a, b);
 
-	wait_cycles(200);*/
+	wait_cycles(50);
 
 	// Staggered Instructions Testing
-	// Set clock 0 to 1X from A
-	set_clock(4'b0000, 2'b00, 16'h0000, "a");
-	// Set clock 1 to 2X from B
-	set_clock(4'b0001, 2'b01, 16'h0000, "b");
+	// Set clock 3 to 1X from A
+	set_clock(4'b0011, 2'b00, 16'h0000, "a");
+	// Set clock 4 to 2X from B
+	set_clock(4'b0100, 2'b01, 16'h0000, "b");
 	send_staggered_instructions(a,b);
-
 
 	// End Simulation
 	exit_simulation();
