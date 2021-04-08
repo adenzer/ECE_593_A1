@@ -419,10 +419,10 @@ task processInst(input logic [31:0] ctrlA, input logic [31:0] ctrlB);
     endcase
 endtask
 
-task Check_Alarms_1x();
+task Check_Alarms_1x(input logic [2:0] clk_rate);
   int i;
   for (i = 0; i < num_alarms; i = i + 1) begin
-    if ((base_clocks[alarms[i].assigned_clock].count == alarms[i].value) && alarms[i].enable && (base_clocks[alarms[i].assigned_clock].rate == 2'b00)) begin
+    if ((base_clocks[alarms[i].assigned_clock].count == alarms[i].value) && alarms[i].enable && (base_clocks[alarms[i].assigned_clock].rate == clk_rate)) begin
       alarms[i].finished <= 1'b1;
       if (~alarms[i].loop) begin
         alarms[i].enable <= 1'b0;   // disable alarm if not set to repeat
@@ -438,10 +438,10 @@ task Check_Alarms_1x();
   end
 endtask
 
-task Check_Alarms_2x();
+task Check_Alarms_2x(input logic [2:0] clk_rate);
   int i;
   for (i = 0; i < num_alarms; i = i + 1) begin
-    if ((base_clocks[alarms[i].assigned_clock].count == alarms[i].value) && alarms[i].enable && (base_clocks[alarms[i].assigned_clock].rate == 2'b01)) begin
+    if ((base_clocks[alarms[i].assigned_clock].count == alarms[i].value) && alarms[i].enable && (base_clocks[alarms[i].assigned_clock].rate == clk_rate)) begin
       alarms[i].finished <= 1'b1;
       if (~alarms[i].loop) begin
         alarms[i].enable <= 1'b0;   // disable alarm if not set to repeat
@@ -457,10 +457,10 @@ task Check_Alarms_2x();
   end
 endtask
 
-task Check_Alarms_4x();
+task Check_Alarms_4x(input logic [2:0] clk_rate);
   int i;
   for (i = 0; i < num_alarms; i = i + 1) begin
-    if ((base_clocks[alarms[i].assigned_clock].count == alarms[i].value) && alarms[i].enable && (base_clocks[alarms[i].assigned_clock].rate == 2'b10)) begin
+    if ((base_clocks[alarms[i].assigned_clock].count == alarms[i].value) && alarms[i].enable && (base_clocks[alarms[i].assigned_clock].rate == clk_rate)) begin
       alarms[i].finished <= 1'b1;
       if (~alarms[i].loop) begin
         alarms[i].enable <= 1'b0;   // disable alarm if not set to repeat
@@ -573,9 +573,9 @@ always_ff @(posedge clk_4x) begin
   end
 end
 
-always_ff @(posedge clk_1x) Check_Alarms_1x();
-always_ff @(posedge clk_2x) Check_Alarms_2x();
-always_ff @(posedge clk_4x) Check_Alarms_4x();
+always_ff @(posedge clk_1x) Check_Alarms_1x(2'b00);
+always_ff @(posedge clk_2x) Check_Alarms_2x(2'b01);
+always_ff @(posedge clk_4x) Check_Alarms_4x(2'b10);
 
 // Continuous assignment of all alarm 'finished' signals with the corrosponding
 // data output bit. (i.e. alarms[0].finished = data[0], and so on . . .)
