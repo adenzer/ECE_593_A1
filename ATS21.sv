@@ -577,7 +577,7 @@ always @(posedge alarms[0] or
          posedge alarms[20] or
          posedge alarms[21] or
          posedge alarms[22] or
-         posedge alarms[23] or
+         posedge alarms[23]
          ) begin
   Alarm_Finished();
 end
