@@ -68,10 +68,11 @@ initial begin
 
 	wait_cycles(100);
 
-	set_alarm(5'b00000, 1'b0, 4'b0000, 20, "a");
-	set_alarm(5'b00001, 1'b0, 4'b0001, 20, "b");
+	set_alarm(5'b00000, 1'b0, 4'b0000, 400, "a");
+	set_alarm(5'b00001, 1'b0, 4'b0001, 400, "b");
+	send_instruction(a,b);
 
-	wait_cycles(100);
+	wait_cycles(500);
 
 	// End Simulation
 	exit_simulation();
