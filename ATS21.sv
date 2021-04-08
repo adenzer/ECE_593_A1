@@ -492,10 +492,10 @@ always_ff @(posedge clk or posedge reset) begin : module_behavior
     if ((inCountA == 1'b1) && (inCountB == 1'b1)) begin
       checkInst({ctrlA_top, ctrlA}, {ctrlB_top, ctrlB});
     end
-    else if ((inCountA == 1'b1) && (inCountB == 1'b0) begin
+    else if ((inCountA == 1'b1) && (inCountB == 1'b0)) begin
       checkInst({ctrlA_top, ctrlA}, 32'h00000000);
     end
-    else if ((inCountA == 1'b0) && (inCountB == 1'b1) begin
+    else if ((inCountA == 1'b0) && (inCountB == 1'b1)) begin
       checkInst(32'h00000000, {ctrlB_top, ctrlB});
     end
     else begin
