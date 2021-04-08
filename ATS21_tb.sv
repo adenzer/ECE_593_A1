@@ -58,11 +58,19 @@ initial begin
 	set_clock(4'b0001, 2'b01, "b");
 	send_instruction(a,b);
 
+	wait_cycles(100);
+
 	// Set clock 0 to 4X from A
 	set_clock(4'b0000, 2'b10, "a");
 	// Set clock 2 to 1X from B
 	set_clock(4'b0010, 2'b00, "b");
 	send_instruction(a,b);
+
+	wait_cycles(100);
+
+	set_alarm(5'b00000, 1'b0, 4'b0000, 20);
+
+	wait_cycles(100);
 
 	// End Simulation
 	exit_simulation();
