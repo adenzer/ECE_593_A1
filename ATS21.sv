@@ -436,7 +436,9 @@ task Check_Alarms();
   end
   if (outFlag) begin
     repeat(2) @(posedge clk);
-    alarms[i].finished = 1'b0;
+    for (i = 0; i < num_alarms; i = i + 1) begin
+      alarms[i].finished = 1'b0;
+    end
   end
 endtask
 
