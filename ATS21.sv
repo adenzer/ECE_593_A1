@@ -173,7 +173,6 @@ task Reset();
 		alarms[i].loop = 0;
 		alarms[i].assigned_clock = '0;
 		alarms[i].value = '0;
-		alarms[i].finished = 0;
 	 end
 
 	// Reset Control Bits
