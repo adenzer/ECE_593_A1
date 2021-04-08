@@ -421,19 +421,23 @@ endtask
 
 task Check_Alarms();
   int i;
+  logic outFlag;
   for (i = 0; i < num_alarms; i = i + 1) begin
     if ((base_clocks[alarms[i].assigned_clock].count == alarms[i].value) && alarms[i].enable) begin
       alarms[i].finished = 1'b1;
-      // Alarm_Finished(i);
+      outFlag = 1;
       if (~alarms[i].loop) begin
         alarms[i].enable = 1'b0;   // disable alarm if not set to repeat
       end
     end
-    else
+    else begin
       alarms[i].finished = 1'b0;
+    end
   end
-  repeat(2) @(posedge clk);
-  alarms[i].finished = 1'b0;
+  if (outFlag) begin
+    repeat(2) @(posedge clk);
+    alarms[i].finished = 1'b0;
+  end
 endtask
 
 /////////////////////////////////////////////////////////////////
