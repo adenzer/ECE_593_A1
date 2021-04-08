@@ -460,14 +460,14 @@ always_ff @(posedge clk or posedge reset) begin : module_behavior
 	// Normal Operation
   else begin
     if (req) begin    // read first 16-bits of new instruction(s)
-      if ((ctrlA[15:13] != 3'b000) && (inCountA != 1'b1) begin
+      if ((ctrlA[15:13] != 3'b000) && (inCountA != 1'b1)) begin
         ctrlA_top <= ctrlA;
         inCountA <= 1'b1;
       end
       else begin
         inCountA <= 1'b0;
       end
-      if ((ctrlB[15:13] != 3'b000) && (inCountB != 1'b1) begin
+      if ((ctrlB[15:13] != 3'b000) && (inCountB != 1'b1)) begin
         ctrlB_top <= ctrlB;
         inCountB <= 1'b1;
       end
