@@ -72,6 +72,8 @@ initial begin
 	send_instruction(a,32'h00000000);
 	set_alarm(5'b10111, 1'b0, 4'b0000, 16'h0090, "b");
 	send_instruction(32'h00000000, b);
+	set_countdown(5'b00001, 4'b0010, 16'h0010, "a");
+	send_instruction(a, 32'h00000000);
 
 	wait_cycles(200);
 
