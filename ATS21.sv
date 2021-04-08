@@ -554,33 +554,43 @@ always_ff @(posedge clk_4x) begin
   end
 end
 
-always @(posedge alarms[0] or
-         posedge alarms[1] or
-         posedge alarms[2] or
-         posedge alarms[3] or
-         posedge alarms[4] or
-         posedge alarms[5] or
-         posedge alarms[6] or
-         posedge alarms[7] or
-         posedge alarms[8] or
-         posedge alarms[9] or
-         posedge alarms[10] or
-         posedge alarms[11] or
-         posedge alarms[12] or
-         posedge alarms[13] or
-         posedge alarms[14] or
-         posedge alarms[15] or
-         posedge alarms[16] or
-         posedge alarms[17] or
-         posedge alarms[18] or
-         posedge alarms[19] or
-         posedge alarms[20] or
-         posedge alarms[21] or
-         posedge alarms[22] or
-         posedge alarms[23]
-         ) begin
-  Alarm_Finished();
-end
+// always @(posedge alarms[0] or
+//          posedge alarms[1] or
+//          posedge alarms[2] or
+//          posedge alarms[3] or
+//          posedge alarms[4] or
+//          posedge alarms[5] or
+//          posedge alarms[6] or
+//          posedge alarms[7] or
+//          posedge alarms[8] or
+//          posedge alarms[9] or
+//          posedge alarms[10] or
+//          posedge alarms[11] or
+//          posedge alarms[12] or
+//          posedge alarms[13] or
+//          posedge alarms[14] or
+//          posedge alarms[15] or
+//          posedge alarms[16] or
+//          posedge alarms[17] or
+//          posedge alarms[18] or
+//          posedge alarms[19] or
+//          posedge alarms[20] or
+//          posedge alarms[21] or
+//          posedge alarms[22] or
+//          posedge alarms[23]
+//          ) begin
+//   Alarm_Finished();
+// end
+
+genvar k;
+generate
+	for (k = 0; k < num_alarms; k++)
+	 begin
+		always @(posedge alarms[k]) begin
+      Alarm_Finished();
+    end
+	 end
+endgenerate
 
 // Continuous assignment of all alarm 'finished' signals with the corrosponding
 // data output bit. (i.e. alarms[0].finished = data[0], and so on . . .)
