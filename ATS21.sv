@@ -522,7 +522,7 @@ end
 always_ff @(posedge clk_1x) begin
   int i;
   for (i = 0; i < num_alarms; i = i + 1) begin
-    if ((base_clocks[alarms[i].assigned_clock].count == alarms[i].value) && alarms[i].finished && (base_clocks[alarms[i].assigned_clock].rate == 2'b00)) begin
+    if ((base_clocks[alarms[i].assigned_clock].count == alarms[i].value) && alarms[i].enable && (base_clocks[alarms[i].assigned_clock].rate == 2'b00)) begin
       alarms[i].finished <= 1'b1;
       if (~alarms[i].loop) begin
         alarms[i].enable <= 1'b0;   // disable alarm if not set to repeat
