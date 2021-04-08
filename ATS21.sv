@@ -191,11 +191,11 @@ task Reset();
 endtask
 
 // Task that is called when an alarm or countdownt timer goes off.
-task Alarm_Finished (int alarm_id);
-	alarms[alarm_id].finished = 1;
-	repeat(2) @(posedge(clk));
-	alarms[alarm_id].finished = 0;
-endtask
+// task Alarm_Finished (int alarm_id);
+// 	alarms[alarm_id].finished = 1;
+// 	repeat(2) @(posedge(clk));
+// 	alarms[alarm_id].finished = 0;
+// endtask
 
 // check if ctrlA and ctrlB have same opcode
 // if so, check if they are trying to change the same clock/alarm/timer
@@ -419,10 +419,48 @@ task processInst(input logic [31:0] ctrlA, input logic [31:0] ctrlB);
     endcase
 endtask
 
-task Check_Alarms(input logic [2:0] clk_rate);
+task Check_Alarms_1x();
   int i;
   for (i = 0; i < num_alarms; i = i + 1) begin
-    if ((base_clocks[alarms[i].assigned_clock].count == alarms[i].value) && alarms[i].enable && (base_clocks[alarms[i].assigned_clock].rate == clk_rate)) begin
+    if ((base_clocks[alarms[i].assigned_clock].count == alarms[i].value) && alarms[i].enable && (base_clocks[alarms[i].assigned_clock].rate == 2'b00)) begin
+      alarms[i].finished <= 1'b1;
+      if (~alarms[i].loop) begin
+        alarms[i].enable <= 1'b0;   // disable alarm if not set to repeat
+      end
+    end
+    else begin
+      alarms[i].finished <= 1'b0;
+    end
+  end
+  repeat(2) @(posedge clk);
+  for (i = 0; i < num_alarms; i = i + 1) begin
+    alarms[i].finished <= 1'b0;
+  end
+endtask
+
+task Check_Alarms_2x();
+  int i;
+  for (i = 0; i < num_alarms; i = i + 1) begin
+    if ((base_clocks[alarms[i].assigned_clock].count == alarms[i].value) && alarms[i].enable && (base_clocks[alarms[i].assigned_clock].rate == 2'b01)) begin
+      alarms[i].finished <= 1'b1;
+      if (~alarms[i].loop) begin
+        alarms[i].enable <= 1'b0;   // disable alarm if not set to repeat
+      end
+    end
+    else begin
+      alarms[i].finished <= 1'b0;
+    end
+  end
+  repeat(2) @(posedge clk);
+  for (i = 0; i < num_alarms; i = i + 1) begin
+    alarms[i].finished <= 1'b0;
+  end
+endtask
+
+task Check_Alarms_4x();
+  int i;
+  for (i = 0; i < num_alarms; i = i + 1) begin
+    if ((base_clocks[alarms[i].assigned_clock].count == alarms[i].value) && alarms[i].enable && (base_clocks[alarms[i].assigned_clock].rate == 2'b10)) begin
       alarms[i].finished <= 1'b1;
       if (~alarms[i].loop) begin
         alarms[i].enable <= 1'b0;   // disable alarm if not set to repeat
@@ -535,9 +573,9 @@ always_ff @(posedge clk_4x) begin
   end
 end
 
-always_ff @(posedge clk_1x) Check_Alarms(2'b00);
-always_ff @(posedge clk_2x) Check_Alarms(2'b01);
-always_ff @(posedge clk_4x) Check_Alarms(2'b10);
+always_ff @(posedge clk_1x) Check_Alarms_1x();
+always_ff @(posedge clk_2x) Check_Alarms_2x();
+always_ff @(posedge clk_4x) Check_Alarms_4x();
 
 // Continuous assignment of all alarm 'finished' signals with the corrosponding
 // data output bit. (i.e. alarms[0].finished = data[0], and so on . . .)
