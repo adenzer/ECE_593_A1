@@ -522,10 +522,9 @@ end
 always_ff @(posedge clk_1x) begin
   int i;
   for (i = 0; i < num_alarms; i = i + 1) begin
-    if ((base_clocks[alarms[i].assigned_clock].count == alarms[i].value) && alarms[i].enable && (base_clocks[alarms[i].assigned_clock].rate == 2'b00)) begin
-      alarms[i].finished = 1'b1;
+    if (alarms[i].finished && (base_clocks[alarms[i].assigned_clock].rate == 2'b00)) begin
       if (~alarms[i].loop) begin
-        alarms[i].enable = 1'b0;   // disable alarm if not set to repeat
+        alarms[i].enable <= 1'b0;   // disable alarm if not set to repeat
       end
     end
   end
@@ -535,10 +534,9 @@ end
 always_ff @(posedge clk_2x) begin
   int i;
   for (i = 0; i < num_alarms; i = i + 1) begin
-    if ((base_clocks[alarms[i].assigned_clock].count == alarms[i].value) && alarms[i].enable && (base_clocks[alarms[i].assigned_clock].rate == 2'b01)) begin
-      alarms[i].finished = 1'b1;
+    if (alarms[i].finished && (base_clocks[alarms[i].assigned_clock].rate == 2'b01)) begin
       if (~alarms[i].loop) begin
-        alarms[i].enable = 1'b0;   // disable alarm if not set to repeat
+        alarms[i].enable <= 1'b0;   // disable alarm if not set to repeat
       end
     end
   end
@@ -548,20 +546,27 @@ end
 always_ff @(posedge clk_4x) begin
   int i;
   for (i = 0; i < num_alarms; i = i + 1) begin
-    if ((base_clocks[alarms[i].assigned_clock].count == alarms[i].value) && alarms[i].enable && (base_clocks[alarms[i].assigned_clock].rate == 2'b10)) begin
-      alarms[i].finished = 1'b1;
+    if (alarms[i].finished && (base_clocks[alarms[i].assigned_clock].rate == 2'b10)) begin
       if (~alarms[i].loop) begin
-        alarms[i].enable = 1'b0;   // disable alarm if not set to repeat
+        alarms[i].enable <= 1'b0;   // disable alarm if not set to repeat
       end
     end
   end
 end
 
+genvar j;
+generate
+	for (j = 0; j < num_alarms; j++)
+	 begin
+		assign alarms[j].finished = ((base_clocks[alarms[j].assigned_clock].count == alarms[j].value) && alarms[j].enable) ? 1'b1 : 1'b0;
+	 end
+endgenerate
+
 genvar k;
 generate
 	for (k = 0; k < num_alarms; k++)
 	 begin
-		always @(posedge alarms[k]) begin
+		always @(posedge alarms[k].finished) begin
       Alarm_Finished();
     end
 	 end
