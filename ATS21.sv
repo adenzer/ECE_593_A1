@@ -311,7 +311,8 @@ task processInst(input logic [31:0] ctrlA, input logic [31:0] ctrlB);
             alarms[ctrlA[28:24]].countdown <= 1'b0;
             alarms[ctrlA[28:24]].loop <= ctrlA[23];
             alarms[ctrlA[28:24]].value <= ctrlA[15:0];
-            #1 alarms[ctrlA[28:24]].enable <= 1'b1;    // enable alarm when set
+            #0 alarms[ctrlA[28:24]].enable <= 1'b1;    // enable alarm when set
+            #0 alarms[ctrlA[28:24]].finished <= 1'b0;
             statusA <= Ack;
           end
           else begin
@@ -325,7 +326,8 @@ task processInst(input logic [31:0] ctrlA, input logic [31:0] ctrlB);
             alarms[ctrlA[28:24]].countdown <= 1'b1;
             alarms[ctrlA[28:24]].loop <= 1'b0;
             alarms[ctrlA[28:24]].value <= ctrlA[15:0] + base_clocks[ctrlA[19:16]].count; // timer expires at current base clock plus duration of timer
-            #1 alarms[ctrlA[28:24]].enable <= 1'b1;    // enable timer when set
+            #0 alarms[ctrlA[28:24]].enable <= 1'b1;    // enable timer when set
+            #0 alarms[ctrlA[28:24]].finished <= 1'b0;
             statusA <= Ack;
           end
           else begin
@@ -382,6 +384,7 @@ task processInst(input logic [31:0] ctrlA, input logic [31:0] ctrlB);
             alarms[ctrlB[28:24]].loop <= ctrlB[23];
             alarms[ctrlB[28:24]].value <= ctrlB[15:0];
             #0 alarms[ctrlB[28:24]].enable <= 1'b1;    // enable alarm when set
+            #0 alarms[ctrlB[28:24]].finished <= 1'b0;
             statusB <= Ack;
           end
           else begin
@@ -396,6 +399,7 @@ task processInst(input logic [31:0] ctrlA, input logic [31:0] ctrlB);
             alarms[ctrlB[28:24]].loop <= 1'b0;
             alarms[ctrlB[28:24]].value <= ctrlB[15:0] + base_clocks[ctrlB[19:16]].count;  // timer expires at current base clock plus duration of timer
             #0 alarms[ctrlB[28:24]].enable <= 1'b1;    // enable timer when set
+            #0 alarms[ctrlB[28:24]].finished <= 1'b0;
             statusB <= Ack;
           end
           else begin
@@ -483,7 +487,7 @@ always_ff @(posedge clk or posedge reset) begin : module_behavior
 end
 
 // increment 1x base clocks
-always_ff @(posedge clk) begin
+always_ff @(posedge clk_1x) begin
   int i;
   for (i = 0; i < num_clocks; i = i + 1) begin
     if (base_clocks[i].enable) begin
@@ -522,7 +526,7 @@ end
 always_ff @(posedge clk_1x) begin
   int i;
   for (i = 0; i < num_alarms; i = i + 1) begin
-    if ((base_clocks[alarms[i].assigned_clock].count == alarms[i].value) && alarms[i].enable && (base_clocks[alarms[i].assigned_clock].rate == 2'b00)) begin
+    if ((base_clocks[alarms[i].assigned_clock].count + 1 == alarms[i].value) && alarms[i].enable && (base_clocks[alarms[i].assigned_clock].rate == 2'b00)) begin
       alarms[i].finished <= 1'b1;
       if (~alarms[i].loop) begin
         alarms[i].enable <= 1'b0;   // disable alarm if not set to repeat
@@ -535,7 +539,7 @@ end
 always_ff @(posedge clk_2x) begin
   int i;
   for (i = 0; i < num_alarms; i = i + 1) begin
-    if ((base_clocks[alarms[i].assigned_clock].count == alarms[i].value) && alarms[i].enable && (base_clocks[alarms[i].assigned_clock].rate == 2'b01)) begin
+    if ((base_clocks[alarms[i].assigned_clock].count + 1 == alarms[i].value) && alarms[i].enable && (base_clocks[alarms[i].assigned_clock].rate == 2'b01)) begin
       alarms[i].finished <= 1'b1;
       if (~alarms[i].loop) begin
         alarms[i].enable <= 1'b0;   // disable alarm if not set to repeat
@@ -548,7 +552,7 @@ end
 always_ff @(posedge clk_4x) begin
   int i;
   for (i = 0; i < num_alarms; i = i + 1) begin
-    if ((base_clocks[alarms[i].assigned_clock].count == alarms[i].value) && alarms[i].enable && (base_clocks[alarms[i].assigned_clock].rate == 2'b10)) begin
+    if ((base_clocks[alarms[i].assigned_clock].count + 1 == alarms[i].value) && alarms[i].enable && (base_clocks[alarms[i].assigned_clock].rate == 2'b10)) begin
       alarms[i].finished <= 1'b1;
       if (~alarms[i].loop) begin
         alarms[i].enable <= 1'b0;   // disable alarm if not set to repeat
@@ -557,6 +561,8 @@ always_ff @(posedge clk_4x) begin
   end
 end
 
+// monitor finished signals
+// when they go high, keep them high for two cycles
 genvar k;
 generate
 	for (k = 0; k < num_alarms; k++)
