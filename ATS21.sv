@@ -468,6 +468,10 @@ always_ff @(posedge clk or posedge reset) begin : module_behavior
           ctrlA_top <= ctrlA;     // read ctrlA
           inCountA <= 1'b1;
         end
+        else begin
+          ctrlA_top <= 16'h0000;
+          inCountA <= 1'b0;
+        end
       end
       if (inCountB == 1'b1) begin
         inCountB <= 1'b0;
@@ -477,17 +481,21 @@ always_ff @(posedge clk or posedge reset) begin : module_behavior
           ctrlB_top <= ctrlB;     // read ctrlB
           inCountB <= 1'b1;
         end
+        else begin
+          ctrlB_top <= 16'h0000;
+          inCountB <= 1'b0;
+        end
       end
     end
 
     // read second 16-bits of new instruction(s) and call instruction procedure
-    if (inCountA == 1'b1 && inCountB == 1'b1) begin
+    if ((inCountA == 1'b1) && (inCountB == 1'b1)) begin
       checkInst({ctrlA_top, ctrlA}, {ctrlB_top, ctrlB});
     end
-    else if (inCountA == 1'b1 && inCountB == 1'b0) begin
+    else if ((inCountA == 1'b1) && (inCountB == 1'b0) begin
       checkInst({ctrlA_top, ctrlA}, 32'h00000000);
     end
-    else if (inCountA == 1'b0 && inCountB == 1'b1) begin
+    else if ((inCountA == 1'b0) && (inCountB == 1'b1) begin
       checkInst(32'h00000000, {ctrlB_top, ctrlB});
     end
     else begin
