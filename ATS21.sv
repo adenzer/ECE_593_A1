@@ -173,7 +173,7 @@ task Reset();
 		alarms[i].loop = 0;
 		alarms[i].assigned_clock = '0;
 		alarms[i].value = '0;
-		// alarms[i].finished = 0;
+		alarms[i].finished = 0;
 	 end
 
 	// Reset Control Bits
@@ -522,7 +522,8 @@ end
 always_ff @(posedge clk_1x) begin
   int i;
   for (i = 0; i < num_alarms; i = i + 1) begin
-    if (alarms[i].finished && (base_clocks[alarms[i].assigned_clock].rate == 2'b00)) begin
+    if ((base_clocks[alarms[i].assigned_clock].count == alarms[i].value) && alarms[i].finished && (base_clocks[alarms[i].assigned_clock].rate == 2'b00)) begin
+      alarms[i].finished <= 1'b1;
       if (~alarms[i].loop) begin
         alarms[i].enable <= 1'b0;   // disable alarm if not set to repeat
       end
@@ -534,7 +535,8 @@ end
 always_ff @(posedge clk_2x) begin
   int i;
   for (i = 0; i < num_alarms; i = i + 1) begin
-    if (alarms[i].finished && (base_clocks[alarms[i].assigned_clock].rate == 2'b01)) begin
+    if ((base_clocks[alarms[i].assigned_clock].count == alarms[i].value) && alarms[i].enable && (base_clocks[alarms[i].assigned_clock].rate == 2'b01)) begin
+      alarms[i].finished <= 1'b1;
       if (~alarms[i].loop) begin
         alarms[i].enable <= 1'b0;   // disable alarm if not set to repeat
       end
@@ -546,21 +548,14 @@ end
 always_ff @(posedge clk_4x) begin
   int i;
   for (i = 0; i < num_alarms; i = i + 1) begin
-    if (alarms[i].finished && (base_clocks[alarms[i].assigned_clock].rate == 2'b10)) begin
+    if ((base_clocks[alarms[i].assigned_clock].count == alarms[i].value) && alarms[i].enable && (base_clocks[alarms[i].assigned_clock].rate == 2'b10)) begin
+      alarms[i].finished <= 1'b1;
       if (~alarms[i].loop) begin
         alarms[i].enable <= 1'b0;   // disable alarm if not set to repeat
       end
     end
   end
 end
-
-genvar j;
-generate
-	for (j = 0; j < num_alarms; j++)
-	 begin
-		always_comb if ((base_clocks[alarms[j].assigned_clock].count == alarms[j].value) && alarms[j].enable) alarms[j].finished =  1'b1;
-	 end
-endgenerate
 
 genvar k;
 generate
