@@ -419,28 +419,28 @@ task processInst(input logic [31:0] ctrlA, input logic [31:0] ctrlB);
     endcase
 endtask
 
-// task Check_Alarms();
-//   int i;
-//   logic outFlag;
-//   for (i = 0; i < num_alarms; i = i + 1) begin
-//     if ((base_clocks[alarms[i].assigned_clock].count == alarms[i].value) && alarms[i].enable) begin
-//       alarms[i].finished <= 1'b1;
-//       outFlag <= 1'b1;
-//       if (~alarms[i].loop) begin
-//         alarms[i].enable <= 1'b0;   // disable alarm if not set to repeat
-//       end
-//     end
-//     else begin
-//       alarms[i].finished <= 1'b0;
-//     end
-//   end
-//   if (i == num_alarms && outFlag) begin
-//     repeat(2) @(posedge clk);
-//     for (i = 0; i < num_alarms; i = i + 1) begin
-//       alarms[i].finished <= 1'b0;
-//     end
-//   end
-// endtask
+task Check_Alarms(input logic [2:0] clk_rate);
+  int i;
+  logic outFlag;
+  for (i = 0; i < num_alarms; i = i + 1) begin
+    if ((base_clocks[alarms[i].assigned_clock].count == alarms[i].value) && alarms[i].enable && (alarms[i].rate == clk_rate)) begin
+      alarms[i].finished <= 1'b1;
+      outFlag <= 1'b1;
+      if (~alarms[i].loop) begin
+        alarms[i].enable <= 1'b0;   // disable alarm if not set to repeat
+      end
+    end
+    else begin
+      alarms[i].finished <= 1'b0;
+    end
+  end
+  if (i == num_alarms && outFlag) begin
+    repeat(2) @(posedge clk);
+    for (i = 0; i < num_alarms; i = i + 1) begin
+      alarms[i].finished <= 1'b0;
+    end
+  end
+endtask
 
 /////////////////////////////////////////////////////////////////
 ////////// Reference Design Behaviorial Implementation //////////
@@ -501,30 +501,6 @@ always_ff @(posedge clk or posedge reset) begin : module_behavior
       checkInst(32'h00000000, 32'h00000000);
     end
   end
-  // Check_Alarms();
-end
-
-always_comb begin
-  int i;
-  logic outFlag;
-  for (i = 0; i < num_alarms; i = i + 1) begin
-    if ((base_clocks[alarms[i].assigned_clock].count == alarms[i].value) && alarms[i].enable) begin
-      alarms[i].finished = 1'b1;
-      outFlag = 1'b1;
-      if (~alarms[i].loop) begin
-        alarms[i].enable = 1'b0;   // disable alarm if not set to repeat
-      end
-    end
-    else begin
-      alarms[i].finished = 1'b0;
-    end
-  end
-  if (i == num_alarms && outFlag) begin
-    repeat(2) @(posedge clk);
-    for (i = 0; i < num_alarms; i = i + 1) begin
-      alarms[i].finished = 1'b0;
-    end
-  end
 end
 
 // increment 1x base clocks
@@ -537,6 +513,7 @@ always_ff @(posedge clk) begin
       end
     end
   end
+  Check_Alarms(2'b00);
 end
 
 // increment 2x base clocks
@@ -549,6 +526,7 @@ always_ff @(posedge clk_2x) begin
       end
     end
   end
+  Check_Alarms(2'b01);
 end
 
 // increment 4x base clocks
@@ -561,6 +539,7 @@ always_ff @(posedge clk_4x) begin
       end
     end
   end
+  Check_Alarms(2'b10);
 end
 
 // Continuous assignment of all alarm 'finished' signals with the corrosponding
