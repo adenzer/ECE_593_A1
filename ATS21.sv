@@ -460,7 +460,7 @@ always_ff @(posedge clk or posedge reset) begin : module_behavior
 	// Normal Operation
   else begin
     if (req) begin    // read first 16-bits of new instruction(s)
-      if ((ctrlA[15:13] != 3'b000) && (inCountA != 1'b1)) begin
+      if ((ctrlA[15:13] != 3'b000) && (inCountA == 1'b0)) begin
         ctrlA_top <= ctrlA;
         inCountA <= 1'b1;
       end
@@ -479,7 +479,7 @@ always_ff @(posedge clk or posedge reset) begin : module_behavior
       inCountA <= 1'b0;
       inCountB <= 1'b0;
     end
-  
+
     // read second 16-bits of new instruction(s) and call instruction procedure
     if ((inCountA == 1'b1) && (inCountB == 1'b1)) begin
       checkInst({ctrlA_top, ctrlA}, {ctrlB_top, ctrlB});
