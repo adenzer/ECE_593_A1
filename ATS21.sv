@@ -519,39 +519,39 @@ always_ff @(posedge clk_4x) begin
 end
 
 // check alarms on 1x clocks
-always @(posedge clk_1x) begin
+always_ff @(posedge clk_1x) begin
   int i;
   for (i = 0; i < num_alarms; i = i + 1) begin
     if ((base_clocks[alarms[i].assigned_clock].count == alarms[i].value) && alarms[i].enable && (base_clocks[alarms[i].assigned_clock].rate == 2'b00)) begin
-      alarms[i].finished = 1'b1;
+      alarms[i].finished <= 1'b1;
       if (~alarms[i].loop) begin
-        alarms[i].enable = 1'b0;   // disable alarm if not set to repeat
+        alarms[i].enable <= 1'b0;   // disable alarm if not set to repeat
       end
     end
   end
 end
 
 // check alarms on 2x clocks
-always @(posedge clk_2x) begin
+always_ff @(posedge clk_2x) begin
   int i;
   for (i = 0; i < num_alarms; i = i + 1) begin
     if ((base_clocks[alarms[i].assigned_clock].count == alarms[i].value) && alarms[i].enable && (base_clocks[alarms[i].assigned_clock].rate == 2'b01)) begin
-      alarms[i].finished = 1'b1;
+      alarms[i].finished <= 1'b1;
       if (~alarms[i].loop) begin
-        alarms[i].enable = 1'b0;   // disable alarm if not set to repeat
+        alarms[i].enable <= 1'b0;   // disable alarm if not set to repeat
       end
     end
   end
 end
 
 // check alarms on 4x clocks
-always @(posedge clk_4x) begin
+always_ff @(posedge clk_4x) begin
   int i;
   for (i = 0; i < num_alarms; i = i + 1) begin
     if ((base_clocks[alarms[i].assigned_clock].count == alarms[i].value) && alarms[i].enable && (base_clocks[alarms[i].assigned_clock].rate == 2'b10)) begin
-      alarms[i].finished = 1'b1;
+      alarms[i].finished <= 1'b1;
       if (~alarms[i].loop) begin
-        alarms[i].enable = 1'b0;   // disable alarm if not set to repeat
+        alarms[i].enable <= 1'b0;   // disable alarm if not set to repeat
       end
     end
   end
