@@ -68,7 +68,7 @@ initial begin
 
 	wait_cycles(100);
 
-	set_alarm(5'b00000, 1'b0, 4'b0000, 16'h0045, "a");
+	set_alarm(5'b00000, 1'b1, 4'b0000, 16'h0045, "a");
 	send_instruction(a,32'h00000000);
 	set_alarm(5'b00010, 1'b0, 4'b0000, 16'h0045, "b");
 	send_instruction(32'h00000000, b);
