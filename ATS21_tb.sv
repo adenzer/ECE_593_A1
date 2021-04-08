@@ -53,17 +53,17 @@ initial begin
 	initialize();
 
 	// Set clock 0 to 1X from A
-	set_clock(4'b0000, 2'b00, "a");
+	set_clock(4'b0000, 2'b00, 16'h0000, "a");
 	// Set clock 1 to 2X from B
-	set_clock(4'b0001, 2'b01, "b");
+	set_clock(4'b0001, 2'b01, 16'h0000, "b");
 	send_instruction(a,b);
 
 	wait_cycles(100);
 
 	// Set clock 0 to 4X from A
-	set_clock(4'b0000, 2'b10, "a");
+	set_clock(4'b0000, 2'b10, 16'h0000, "a");
 	// Set clock 2 to 1X from B
-	set_clock(4'b0010, 2'b00, "b");
+	set_clock(4'b0010, 2'b00, 16'h0000, "b");
 	send_instruction(a,b);
 
 	wait_cycles(100);
@@ -118,7 +118,7 @@ task Nop(string client);
 endtask
 
 // Set Clock Instruction (Opcode 001)
-task set_clock(logic[3:0] clock_id, logic[1:0] rate, string client);
+task set_clock(logic[3:0] clock_id, logic[1:0] rate, logic[15:0] time_val, string client);
 	// Check for which client is setting the clock and set fields accordingly:
 	// - [1][12:9] Clock #
 	// - [1][7:6] Rate
@@ -132,6 +132,7 @@ task set_clock(logic[3:0] clock_id, logic[1:0] rate, string client);
 		a_first[15:13] = 3'b001;
 		a_first[12:9] = clock_id;
 		a_first[7:6] = rate;
+		a_second = time_val;
 		// Assign Output
 		a = {a_first, a_second};
 	end else begin
@@ -142,6 +143,7 @@ task set_clock(logic[3:0] clock_id, logic[1:0] rate, string client);
 		b_first[15:13] = 3'b001;
 		b_first[12:9] = clock_id;
 		b_first[7:6] = rate;
+		b_second = time_val;
 		// Assign Output
 		b = {b_first, b_second};
 	end
