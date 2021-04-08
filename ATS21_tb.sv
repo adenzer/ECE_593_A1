@@ -52,7 +52,7 @@ initial begin
 	// Initialize Design
 	initialize();
 
-	// Set clock 0 to 1X from A
+	/*// Set clock 0 to 1X from A
 	set_clock(4'b0000, 2'b00, 16'h0000, "a");
 	// Set clock 1 to 2X from B
 	set_clock(4'b0001, 2'b01, 16'h0000, "b");
@@ -79,7 +79,15 @@ initial begin
 	set_alarm(5'b00110, 1'b0, 4'b0010, 16'h0090, "b");
 	send_instruction(a, b);
 
-	wait_cycles(200);
+	wait_cycles(200);*/
+
+
+	// Set clock 0 to 1X from A
+	set_clock(4'b0000, 2'b00, 16'h0000, "a");
+	// Set clock 1 to 2X from B
+	set_clock(4'b0001, 2'b01, 16'h0000, "b");
+	send_staggered_instructions(a,b);
+
 
 	// End Simulation
 	exit_simulation();
@@ -99,6 +107,9 @@ task initialize();
 	// Initialize Variables and Reset for 4 cycles
 	clk = 0; reset = 1; req = 0;
 	ctrlA = '0; ctrlB = '0;
+	a_first = '0; a_second = '0;
+	b_first = '0; b_second = '0;
+	a = '0; b = '0;
 	wait_cycles(4);
 	reset = 0;
 	wait_cycles(1);
@@ -315,9 +326,6 @@ endtask
 
 // Send Instruction Task
 task send_instruction(logic[31:0] a, logic[31:0] b);
-	// Assert 'req' for 1 clock cycle and then send ctrlA and ctrlB
-	// words one cycle after another. Then finally wait two cycles for
-	// the second word to latch and DUT to respond before sending anything more.
 
 	// NOTE FOR TESTING: According to v0.4 of the design document, the same cycle
 	// req is asserted is when the design should bring in the top 16 bits, second 16 bits
@@ -325,9 +333,11 @@ task send_instruction(logic[31:0] a, logic[31:0] b);
 	// to distinguish which client is requesting. If req is high for two cycles, it is an
 	// indication a request is coming from the other client the cycle after.
 
-	// Summary: We need to adapt our design to latch the inputs the same cycle req is high as
-	// well as seperating A and B coming in as two processes rather than each happening always together
-	// everytime req is high.
+	// Assert 'req' for 1 clock cycle and then send ctrlA and ctrlB
+	// words one cycle after another. Then finally wait one cycle for
+	// the second word to latch and DUT to respond before sending anything more.
+
+	// If we're only sending one instruction, be sure to set the other input to a Nop.
 
 	req = 1;
 	ctrlA = a[31:16];
@@ -337,6 +347,28 @@ task send_instruction(logic[31:0] a, logic[31:0] b);
 	ctrlA = a[15:0];
 	ctrlB = b[15:0];
 	wait_cycles(1);
+	
+endtask
+
+// Send Staggered Instructions Task
+task send_staggered_instructions(logic[31:0] a, logic[31:0] b);
+
+	// Testing when 'req' is high for two cycles. Design should take in the first 16 bits on the first
+	// instruction while req is high for the first cycle, then the second 16 bits the second cycle while
+	// also capturing the first 16 bits from the second instruction then the second 16 bits the next cycle. 
+
+	req = 1;
+	ctrlA = a[31:16];
+	ctrlB[15:12] = 3'b000;
+	wait_cycles(1);
+	ctrlA = a[15:0];
+	ctrlB = b[31:16];
+	wait_cycles(1);
+	req = 0;
+	ctrlA[15:12] = 3'b000;
+	ctrlB = b[15:0];
+	wait_cycles(1);
+
 endtask
 
 endmodule
