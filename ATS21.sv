@@ -15,12 +15,6 @@ of the 16 clocks. The clocks can run at 1x, 2x, or 4x the reference clock speed.
 
 ** add more here later (design assumptions, etc.) ***
 
-Assumptions:
-	- Active High Signals
-		- Reset
-		- Req
-		- Outputs (Ready, Data)
-
 Instructions (opcode is bits [31:29]):
 
   nop -
