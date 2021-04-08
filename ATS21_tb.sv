@@ -38,7 +38,7 @@ logic[15:0] a_first, a_second, b_first, b_second;
 ATS21 dut(.clk(clk), .reset(reset), .req(req), .ctrlA(ctrlA), .ctrlB(ctrlB),
 			.ready(ready), .stat(stat), .data(data));
 
-// Reference Clock Generator (8ns Period)
+// Reference Clock Generator 
 always begin
 	#1 clk = ~clk;
 end
@@ -56,36 +56,41 @@ initial begin
 	set_clock(4'b0000, 2'b00, 16'h0000, "a");
 	// Set clock 1 to 2X from B
 	set_clock(4'b0001, 2'b01, 16'h0000, "b");
-	send_instruction(a,b);
-
-	wait_cycles(100);
-
-	// Set clock 0 to 4X from A
-	set_clock(4'b0000, 2'b10, 16'h0000, "a");
-	// Set clock 2 to 1X from B
-	set_clock(4'b0010, 2'b00, 16'h0000, "b");
-	send_instruction(a,b);
-
-	wait_cycles(100);
-
-	set_alarm(5'b00000, 1'b1, 4'b0000, 16'h0025, "a");
-	send_instruction(a,32'h00000000);
-	set_alarm(5'b10111, 1'b0, 4'b0000, 16'h0025, "b");
-	send_instruction(32'h00000000, b);
-	set_countdown(5'b00001, 4'b0010, 16'h0010, "a");
-	send_instruction(a, 32'h00000000);
-
-	set_alarm(5'b01100, 1'b1, 4'b0010, 16'h0090, "a");
-	set_alarm(5'b00110, 1'b0, 4'b0010, 16'h0090, "b");
+	// Simulatenous Instructions
 	send_instruction(a, b);
 
-	wait_cycles(50);
+	wait_cycles(10);
 
+	// Set clock 1 to 4X from A
+	set_clock(4'b0001, 2'b10, 16'h0000, "a");
+	// Set clock 2 to 1X from B
+	set_clock(4'b0010, 2'b00, 16'h0000, "b");
+	// Simulatenous Instructions
+	send_instruction(a, b);
+
+	wait_cycles(10);
+
+	// Set alarm 0 to reference clock 0, loop, and go off at count 50 cycles
+	set_alarm(5'b00000, 1'b1, 4'b0000, 16'd50, "a");
+	// Set alarm 23 to reference clock 0, don't loop, and go off at count 50 cycles
+	set_alarm(5'b10111, 1'b0, 4'b0000, 16'd50, "b");
 	// Staggered Instructions Testing
+	send_staggered_instructions(a,b);
+
+	wait_cycles(15);
+
+	// Set alarm 1 to reference clock 1, and go off after 10 cycles (countdown)
+	set_countdown(5'b00001, 4'b0001, 16'd10, "a");
+	Nop("b");
+	send_instruction(a, b);
+
+	wait_cycles(30);
+
 	// Set clock 3 to 1X from A
 	set_clock(4'b0011, 2'b00, 16'h0000, "a");
 	// Set clock 4 to 2X from B
 	set_clock(4'b0100, 2'b01, 16'h0000, "b");
+	// Staggered Instructions Testing
 	send_staggered_instructions(a,b);
 
 	// End Simulation
@@ -125,9 +130,9 @@ endtask
 task Nop(string client);
 	// Clear A and B input vectors
 	if (client == "a") begin
-		a = '0;
+		a[15:12] = 3'b000;
 	end else begin
-		b = '0;
+		b[15:12] = 3'b000;
 	end
 endtask
 
