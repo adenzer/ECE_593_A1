@@ -434,7 +434,7 @@ task Check_Alarms(input logic [2:0] clk_rate);
       alarms[i].finished <= 1'b0;
     end
   end
-  if (i == num_alarms && outFlag) begin
+  if (outFlag) begin
     repeat(2) @(posedge clk);
     for (i = 0; i < num_alarms; i = i + 1) begin
       alarms[i].finished <= 1'b0;
@@ -539,7 +539,7 @@ always_ff @(posedge clk_4x) begin
   end
 end
 
-always_ff @(posedge clk)    Check_Alarms(2'b00);
+always_ff @(posedge clk_1x) Check_Alarms(2'b00);
 always_ff @(posedge clk_2x) Check_Alarms(2'b01);
 always_ff @(posedge clk_4x) Check_Alarms(2'b10);
 
