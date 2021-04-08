@@ -191,11 +191,13 @@ task Reset();
 endtask
 
 // Task that is called when an alarm or countdownt timer goes off.
-// task Alarm_Finished (int alarm_id);
-// 	alarms[alarm_id].finished = 1;
-// 	repeat(2) @(posedge(clk));
-// 	alarms[alarm_id].finished = 0;
-// endtask
+task Alarm_Finished ();
+  int i;
+	repeat(2) @(posedge(clk));
+  for (i=0; i < num_alarms; i = i + 1) begin
+	  alarms[i].finished = 0;
+  end
+endtask
 
 // check if ctrlA and ctrlB have same opcode
 // if so, check if they are trying to change the same clock/alarm/timer
@@ -419,63 +421,6 @@ task processInst(input logic [31:0] ctrlA, input logic [31:0] ctrlB);
     endcase
 endtask
 
-// task Check_Alarms_1x(input logic [2:0] clk_rate);
-//   int i;
-//   for (i = 0; i < num_alarms; i = i + 1) begin
-//     if ((base_clocks[alarms[i].assigned_clock].count == alarms[i].value) && alarms[i].enable && (base_clocks[alarms[i].assigned_clock].rate == clk_rate)) begin
-//       alarms[i].finished <= 1'b1;
-//       if (~alarms[i].loop) begin
-//         alarms[i].enable <= 1'b0;   // disable alarm if not set to repeat
-//       end
-//     end
-//     else begin
-//       alarms[i].finished <= 1'b0;
-//     end
-//   end
-//   repeat(2) @(posedge clk);
-//   for (i = 0; i < num_alarms; i = i + 1) begin
-//     alarms[i].finished <= 1'b0;
-//   end
-// endtask
-//
-// task Check_Alarms_2x(input logic [2:0] clk_rate);
-//   int i;
-//   for (i = 0; i < num_alarms; i = i + 1) begin
-//     if ((base_clocks[alarms[i].assigned_clock].count == alarms[i].value) && alarms[i].enable && (base_clocks[alarms[i].assigned_clock].rate == clk_rate)) begin
-//       alarms[i].finished <= 1'b1;
-//       if (~alarms[i].loop) begin
-//         alarms[i].enable <= 1'b0;   // disable alarm if not set to repeat
-//       end
-//     end
-//     else begin
-//       alarms[i].finished <= 1'b0;
-//     end
-//   end
-//   repeat(2) @(posedge clk);
-//   for (i = 0; i < num_alarms; i = i + 1) begin
-//     alarms[i].finished <= 1'b0;
-//   end
-// endtask
-//
-// task Check_Alarms_4x(input logic [2:0] clk_rate);
-//   int i;
-//   for (i = 0; i < num_alarms; i = i + 1) begin
-//     if ((base_clocks[alarms[i].assigned_clock].count == alarms[i].value) && alarms[i].enable && (base_clocks[alarms[i].assigned_clock].rate == clk_rate)) begin
-//       alarms[i].finished <= 1'b1;
-//       if (~alarms[i].loop) begin
-//         alarms[i].enable <= 1'b0;   // disable alarm if not set to repeat
-//       end
-//     end
-//     else begin
-//       alarms[i].finished <= 1'b0;
-//     end
-//   end
-//   repeat(2) @(posedge clk);
-//   for (i = 0; i < num_alarms; i = i + 1) begin
-//     alarms[i].finished <= 1'b0;
-//   end
-// endtask
-
 /////////////////////////////////////////////////////////////////
 ////////// Reference Design Behaviorial Implementation //////////
 /////////////////////////////////////////////////////////////////
@@ -582,13 +527,6 @@ always_ff @(posedge clk_1x) begin
         alarms[i].enable <= 1'b0;   // disable alarm if not set to repeat
       end
     end
-    else begin
-      alarms[i].finished <= 1'b0;
-    end
-  end
-  repeat(2) @(posedge clk);
-  for (i = 0; i < num_alarms; i = i + 1) begin
-    alarms[i].finished <= 1'b0;
   end
 end
 
@@ -601,13 +539,6 @@ always_ff @(posedge clk_2x) begin
         alarms[i].enable <= 1'b0;   // disable alarm if not set to repeat
       end
     end
-    else begin
-      alarms[i].finished <= 1'b0;
-    end
-  end
-  repeat(2) @(posedge clk);
-  for (i = 0; i < num_alarms; i = i + 1) begin
-    alarms[i].finished <= 1'b0;
   end
 end
 
@@ -620,14 +551,35 @@ always_ff @(posedge clk_4x) begin
         alarms[i].enable <= 1'b0;   // disable alarm if not set to repeat
       end
     end
-    else begin
-      alarms[i].finished <= 1'b0;
-    end
   end
-  repeat(2) @(posedge clk);
-  for (i = 0; i < num_alarms; i = i + 1) begin
-    alarms[i].finished <= 1'b0;
-  end
+end
+
+always @(posedge alarms[0] or
+         posedge alarms[1] or
+         posedge alarms[2] or
+         posedge alarms[3] or
+         posedge alarms[4] or
+         posedge alarms[5] or
+         posedge alarms[6] or
+         posedge alarms[7] or
+         posedge alarms[8] or
+         posedge alarms[9] or
+         posedge alarms[10] or
+         posedge alarms[11] or
+         posedge alarms[12] or
+         posedge alarms[13] or
+         posedge alarms[14] or
+         posedge alarms[15] or
+         posedge alarms[16] or
+         posedge alarms[17] or
+         posedge alarms[18] or
+         posedge alarms[19] or
+         posedge alarms[20] or
+         posedge alarms[21] or
+         posedge alarms[22] or
+         posedge alarms[23] or
+         ) begin
+  Alarm_Finished();
 end
 
 // Continuous assignment of all alarm 'finished' signals with the corrosponding
