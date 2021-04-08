@@ -229,13 +229,14 @@ task checkInst(input logic [31:0] ctrlA, input logic [31:0] ctrlB);
         end
       101:
         begin
-          if (ctrlA[28:25] == ctrlB[28:25]) begin
-            statusA <= Nack;
-            statusB <= Nack;
-          end
-          else begin
-            processInst(ctrlA, ctrlB);
-          end
+          processInst(ctrlA, ctrlB);
+          // if (ctrlA[28:24] == ctrlB[28:24]) begin
+          //   statusA <= Nack;
+          //   statusB <= Nack;
+          // end
+          // else begin
+          //   processInst(ctrlA, ctrlB);
+          // end
         end
       110:
         begin
