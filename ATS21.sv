@@ -457,7 +457,7 @@ always_ff @(posedge clk or posedge reset) begin : module_behavior
       else begin
         inCountA <= 1'b0;
       end
-      if ((ctrlB[15:13] != 3'b000) && (inCountB != 1'b1)) begin
+      if ((ctrlB[15:13] != 3'b000) && (inCountB == 1'b0)) begin
         ctrlB_top <= ctrlB;
         inCountB <= 1'b1;
       end
