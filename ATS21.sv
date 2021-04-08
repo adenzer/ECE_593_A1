@@ -513,7 +513,6 @@ always_ff @(posedge clk) begin
       end
     end
   end
-  Check_Alarms(2'b00);
 end
 
 // increment 2x base clocks
@@ -526,7 +525,6 @@ always_ff @(posedge clk_2x) begin
       end
     end
   end
-  Check_Alarms(2'b01);
 end
 
 // increment 4x base clocks
@@ -539,8 +537,11 @@ always_ff @(posedge clk_4x) begin
       end
     end
   end
-  Check_Alarms(2'b10);
 end
+
+always_ff @(posedge clk)    Check_Alarms(2'b00);
+always_ff @(posedge clk_2x) Check_Alarms(2'b01);
+always_ff @(posedge clk_4x) Check_Alarms(2'b10);
 
 // Continuous assignment of all alarm 'finished' signals with the corrosponding
 // data output bit. (i.e. alarms[0].finished = data[0], and so on . . .)
