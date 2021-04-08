@@ -518,69 +518,44 @@ always_ff @(posedge clk_4x) begin
   end
 end
 
+// check alarms on 1x clocks
 always_ff @(posedge clk_1x) begin
   int i;
   for (i = 0; i < num_alarms; i = i + 1) begin
     if ((base_clocks[alarms[i].assigned_clock].count == alarms[i].value) && alarms[i].enable && (base_clocks[alarms[i].assigned_clock].rate == 2'b00)) begin
-      alarms[i].finished <= 1'b1;
+      alarms[i].finished = 1'b1;
       if (~alarms[i].loop) begin
-        alarms[i].enable <= 1'b0;   // disable alarm if not set to repeat
+        alarms[i].enable = 1'b0;   // disable alarm if not set to repeat
       end
     end
   end
 end
 
+// check alarms on 2x clocks
 always_ff @(posedge clk_2x) begin
   int i;
   for (i = 0; i < num_alarms; i = i + 1) begin
     if ((base_clocks[alarms[i].assigned_clock].count == alarms[i].value) && alarms[i].enable && (base_clocks[alarms[i].assigned_clock].rate == 2'b01)) begin
-      alarms[i].finished <= 1'b1;
+      alarms[i].finished = 1'b1;
       if (~alarms[i].loop) begin
-        alarms[i].enable <= 1'b0;   // disable alarm if not set to repeat
+        alarms[i].enable = 1'b0;   // disable alarm if not set to repeat
       end
     end
   end
 end
 
+// check alarms on 4x clocks
 always_ff @(posedge clk_4x) begin
   int i;
   for (i = 0; i < num_alarms; i = i + 1) begin
     if ((base_clocks[alarms[i].assigned_clock].count == alarms[i].value) && alarms[i].enable && (base_clocks[alarms[i].assigned_clock].rate == 2'b10)) begin
-      alarms[i].finished <= 1'b1;
+      alarms[i].finished = 1'b1;
       if (~alarms[i].loop) begin
-        alarms[i].enable <= 1'b0;   // disable alarm if not set to repeat
+        alarms[i].enable = 1'b0;   // disable alarm if not set to repeat
       end
     end
   end
 end
-
-// always @(posedge alarms[0] or
-//          posedge alarms[1] or
-//          posedge alarms[2] or
-//          posedge alarms[3] or
-//          posedge alarms[4] or
-//          posedge alarms[5] or
-//          posedge alarms[6] or
-//          posedge alarms[7] or
-//          posedge alarms[8] or
-//          posedge alarms[9] or
-//          posedge alarms[10] or
-//          posedge alarms[11] or
-//          posedge alarms[12] or
-//          posedge alarms[13] or
-//          posedge alarms[14] or
-//          posedge alarms[15] or
-//          posedge alarms[16] or
-//          posedge alarms[17] or
-//          posedge alarms[18] or
-//          posedge alarms[19] or
-//          posedge alarms[20] or
-//          posedge alarms[21] or
-//          posedge alarms[22] or
-//          posedge alarms[23]
-//          ) begin
-//   Alarm_Finished();
-// end
 
 genvar k;
 generate
