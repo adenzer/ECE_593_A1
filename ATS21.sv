@@ -207,7 +207,7 @@ endtask
 task checkInst(input logic [31:0] ctrlA, input logic [31:0] ctrlB);
   if (ctrlA[31:29] == ctrlB[31:29]) begin
     case (ctrlA[31:29])
-      001:
+      3'b001:
         begin
           if (ctrlA[28:25] == ctrlB[28:25]) begin
             statusA <= Nack;
@@ -217,7 +217,7 @@ task checkInst(input logic [31:0] ctrlA, input logic [31:0] ctrlB);
             processInst(ctrlA, ctrlB);
           end
         end
-      010:
+      3'b010:
         begin
           if (ctrlA[28:25] == ctrlB[28:25]) begin
             statusA <= Nack;
@@ -227,18 +227,7 @@ task checkInst(input logic [31:0] ctrlA, input logic [31:0] ctrlB);
             processInst(ctrlA, ctrlB);
           end
         end
-      101:
-        begin
-          processInst(ctrlA, ctrlB);
-          // if (ctrlA[28:24] == ctrlB[28:24]) begin
-          //   statusA <= Nack;
-          //   statusB <= Nack;
-          // end
-          // else begin
-          //   processInst(ctrlA, ctrlB);
-          // end
-        end
-      110:
+      3'b101:
         begin
           if (ctrlA[28:24] == ctrlB[28:24]) begin
             statusA <= Nack;
@@ -248,7 +237,17 @@ task checkInst(input logic [31:0] ctrlA, input logic [31:0] ctrlB);
             processInst(ctrlA, ctrlB);
           end
         end
-      111:
+      3'b110:
+        begin
+          if (ctrlA[28:24] == ctrlB[28:24]) begin
+            statusA <= Nack;
+            statusB <= Nack;
+          end
+          else begin
+            processInst(ctrlA, ctrlB);
+          end
+        end
+      3'b111:
         begin
           if (ctrlA[28:24] == ctrlB[28:24]) begin
             statusA <= Nack;
