@@ -14,7 +14,7 @@ to the data output bits.
 
 DUT takes a 32 bit instruction in two sets of 16 bits each clock (2 clocks). Tasks for each instruction are implemented to make stimulus generation simple for the testbench writer. A seperate send_instruction() task asserts the 'req' signal to the design and sends the ctrlA and ctrlB inputs to the desired instructions to send. After the exit_simulation() task is called, the tool exits after 20 clock cycles.
 
-Current Tests : 
+Current Tests :
 
 	Test Reset 
 		- All clocks and alarms set to 0, control bits set to 1. 
@@ -32,7 +32,7 @@ Current Tests :
 		- Countdown goes off 'n' cycles after the client req is asserted
 		- Multiple data bits are able to be asserted simulatenously
 
-Future Tests : 
+Future Tests :
 
 	Test ATS21 Modes more thoroughly
 	Clock start values 
@@ -41,7 +41,7 @@ Future Tests :
 
 ## Makefile
 
-Targets: 
+Targets:
 	
 	help - Displays User Options
 	compile - Compiles Reference Design and Testbench (ATS21.sv and ATS21_tb.sv).
