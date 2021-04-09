@@ -38,3 +38,12 @@ Future Tests :
 	Clock start values 
 	Repeating Alarms (longer simulations)
 	Disabling / Reenabling alarms and clocks
+
+## Makefile
+
+Targets: 
+	
+	help - Displays User Options
+	compile - Compiles Reference Design and Testbench (ATS21.sv and ATS21_tb.sv).
+	sim_c - Simulates the testbench in the command line
+	sim_gui - Simulates the testbench in the gui with a pre-organized wave file (wave_simple.do)
