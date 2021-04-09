@@ -14,6 +14,31 @@ writer. A seperate send_instruction() task asserts the 'req' signal to the desig
 sends the ctrlA and ctrlB inputs to the desired instructions to send. After the exit_simulation()
 task is called, the tool exits after 20 clock cycles.
 
+Current Tests : 
+
+	Test Reset 
+		- All clocks and alarms set to 0, control bits set to 1. 
+	Test setting BCs and ATs
+		- Correct rates and clocks specified by the instructions are set
+	Test sending simultaneous and staggered instructions
+		- Verified all forms of instruction input layed out in the v0.4 design document can be
+		  handled by the design and testbench feeds the design accordingly. 
+		  	- When one client makes a request a Nop() is called for the other client. 
+		  	- When both clients make a request, they are both handled. 
+		  	- When one client makes a request the cycle after another (i.e. req is high two cycles)
+		  	  they are both handled properly. 
+	Test AT function
+		- Alarm goes off when 'n' count is reached on one of the 16 specified clocks
+		- Countdown goes off 'n' cycles after the client req is asserted
+		- Multiple data bits are able to be asserted simulatenously
+
+Future Tests : 
+
+	Test ATS21 Modes more thoroughly
+	Clock start values 
+	Repeating Alarms (longer simulations)
+	Disabling / Reenabling alarms and clocks
+
 */
 
 ////////////////////////////////////////////////////

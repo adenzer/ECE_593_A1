@@ -11,51 +11,53 @@ Description:
 Implements the ATS21, a programmable multi-clock/timer/alarm component described
 in the high level spec document provided by our instructor Tom Schubert. The
 component contains 16 different clocks and 24 alarms that can be set against any
-of the 16 clocks. The clocks can run at 1x, 2x, or 4x the reference clock speed.
+of the 16 clocks. The clocks can run at 1x, 2x, or 4x the reference clock speed. 
+Clocks, Alarms, and Global Control Registers are managed using arrays of packed structs 
+with the appropriate fields for each struct.
 
-** add more here later (design assumptions, etc.) ***
+The module's primary behavioral implementation begins on line 425, between there are Reset(), 
+AlarmFinished(), checkInst(), and processInst() tasks that are used in the behavioral blocks. 
+The behavior always_ff block is responsible for detecting req being asserted on the clock
+and taking in the inputs using inCount signals and ctrlA/B_top buffers. The checkInst() task is 
+responsible for input error handling as well as instruction decoding. checkInst() then calls processInst()
+for the current valid instruction where struct fields are manipulated according to the
+instruction set. This is also where status bits are set. Following the calling of checkInst() 
+we have written always_ff blocks for incrimenting the clocks and checking the alarms for the respective 
+clock domains. Finally at the bottom we have two for loops, one for calling the AlarmFinished() 
+on detection of an alarm going off, and one for assigning all the alarm struct .finished fields 
+to the data output bits. 
 
-Instructions (opcode is bits [31:29]):
+32-bit Instructions (opcode is bits [31:29]):
 
-  nop -
-    opcode 000
-    fields:
-      none
+  Nop - 000
 
-  set clock -
-    opcode 001
-    fields:
+  Set clock - 001
       clock # - bits [28:25]
       rate - bits [23:22]
+        - 00 clk
+        - 01 clk/2
+        - 10 clk/4
 
-  enable/disable clock -
-    opcode 010
-    fields:
+  Enable/disable clock - 010
       clock # - bits [28:25]
       enable/disable - bit [23]
 
-  set alarm -
-    opcode 101
-    fields:
+  Set alarm - 101
       alarm # - bits [28:24]
       repeat - bit [23]
       clock # - bits [19:16]
+      alarm time - bits [31:0]
 
-  set countdown timer -
-    opcode 110
-    fields:
+  Set countdown timer - 110
       alarm # - bits [28:24]
       clock # - bits [19:16]
+      interval - bits[31:0]
 
-  enable/disable alarm/timer -
-    opcode 111
-    fields:
+  Enable/disable alarm/timer - 111
       alarm/timer # - bits [28:24]
       enable/disable - bit [23]
 
-  set ATS21 mode -
-    opcode 011
-    fields:
+  Set ATS21 mode - 011
       device active - [28]
       allow timer/alarm change - bits [27:26]
       allow clock change - bits [25:24]
