@@ -11,21 +11,21 @@ Description:
 Implements the ATS21, a programmable multi-clock/timer/alarm component described
 in the high level spec document provided by our instructor Tom Schubert. The
 component contains 16 different clocks and 24 alarms that can be set against any
-of the 16 clocks. The clocks can run at 1x, 2x, or 4x the reference clock speed. 
-Clocks, Alarms, and Global Control Registers are managed using arrays of packed structs 
+of the 16 clocks. The clocks can run at 1x, 2x, or 4x the reference clock speed.
+Clocks, Alarms, and Global Control Registers are managed using arrays of packed structs
 with the appropriate fields for each struct.
 
-The module's primary behavioral implementation begins on line 425, between there are Reset(), 
-AlarmFinished(), checkInst(), and processInst() tasks that are used in the behavioral blocks. 
+The module's primary behavioral implementation begins on line 425, between there are Reset(),
+AlarmFinished(), checkInst(), and processInst() tasks that are used in the behavioral blocks.
 The behavior always_ff block is responsible for detecting req being asserted on the clock
-and taking in the inputs using inCount signals and ctrlA/B_top buffers. The checkInst() task is 
+and taking in the inputs using inCount signals and ctrlA/B_top buffers. The checkInst() task is
 responsible for input error handling as well as instruction decoding. checkInst() then calls processInst()
 for the current valid instruction where struct fields are manipulated according to the
-instruction set. This is also where status bits are set. Following the calling of checkInst() 
-we have written always_ff blocks for incrimenting the clocks and checking the alarms for the respective 
-clock domains. Finally at the bottom we have two for loops, one for calling the AlarmFinished() 
-on detection of an alarm going off, and one for assigning all the alarm struct .finished fields 
-to the data output bits. 
+instruction set. This is also where status bits are set. Following the calling of checkInst()
+we have written always_ff blocks for incrimenting the clocks and checking the alarms for the respective
+clock domains. Finally at the bottom we have two for loops, one for calling the AlarmFinished()
+on detection of an alarm going off, and one for assigning all the alarm struct .finished fields
+to the data output bits.
 
 32-bit Instructions (opcode is bits [31:29]):
 
@@ -260,6 +260,7 @@ task checkInst(input logic [31:0] ctrlA, input logic [31:0] ctrlB);
         end
     endcase
   end
+  // if one is an alarm and the other is a countdown timer, both trying to set the same alarm/timer, disregard
   else if (((ctrlA[31:29] == 3'b101) && (ctrlB[31:29] == 3'b110)) ||
            ((ctrlA[31:29] == 3'b110) && (ctrlB[31:29] == 3'b101))) begin
     if (ctrlA[28:24] == ctrlB[28:24]) begin
@@ -304,8 +305,8 @@ task processInst(input logic [31:0] ctrlA, input logic [31:0] ctrlB);
         begin
           if (cr_bits.clientA_alarm) begin
             alarms[ctrlA[28:24]].assigned_clock <= ctrlA[19:16];
-            alarms[ctrlA[28:24]].countdown <= 1'b0;
-            alarms[ctrlA[28:24]].loop <= ctrlA[23];
+            alarms[ctrlA[28:24]].countdown <= 1'b0;    // alarm, not a countdown timer
+            alarms[ctrlA[28:24]].loop <= ctrlA[23];    // enable/disable repeat alarm
             alarms[ctrlA[28:24]].value <= ctrlA[15:0];
             #0 alarms[ctrlA[28:24]].enable <= 1'b1;    // enable alarm when set
             #0 alarms[ctrlA[28:24]].finished <= 1'b0;
@@ -319,10 +320,10 @@ task processInst(input logic [31:0] ctrlA, input logic [31:0] ctrlB);
         begin
           if (cr_bits.clientA_alarm) begin
             alarms[ctrlA[28:24]].assigned_clock <= ctrlA[19:16];
-            alarms[ctrlA[28:24]].countdown <= 1'b1;
-            alarms[ctrlA[28:24]].loop <= 1'b0;
+            alarms[ctrlA[28:24]].countdown <= 1'b1;     // countdown timer, not alarm
+            alarms[ctrlA[28:24]].loop <= 1'b0;          // countdown timers can't repeat
             alarms[ctrlA[28:24]].value <= ctrlA[15:0] + base_clocks[ctrlA[19:16]].count; // timer expires at current base clock plus duration of timer
-            #0 alarms[ctrlA[28:24]].enable <= 1'b1;    // enable timer when set
+            #0 alarms[ctrlA[28:24]].enable <= 1'b1;     // enable timer when set
             #0 alarms[ctrlA[28:24]].finished <= 1'b0;
             statusA <= Ack;
           end
@@ -341,9 +342,9 @@ task processInst(input logic [31:0] ctrlA, input logic [31:0] ctrlB);
         end
       3'b011:   // set ATS21 mode
         begin
-          cr_bits.active <= ctrlA[28];
-          cr_bits.clientA_clock <= ctrlA[27:26];
-          cr_bits.clientA_alarm <= ctrlA[25:24];
+          cr_bits.active <= ctrlA[28];            // device enable bit
+          cr_bits.clientA_clock <= ctrlA[27:26];  // alarm change permission bits
+          cr_bits.clientA_alarm <= ctrlA[25:24];  // clock change permission bits
         end
       default:  statusA <= Nack;
     endcase
@@ -376,7 +377,7 @@ task processInst(input logic [31:0] ctrlA, input logic [31:0] ctrlB);
         begin
           if (cr_bits.clientB_alarm) begin
             alarms[ctrlB[28:24]].assigned_clock <= ctrlB[19:16];
-            alarms[ctrlB[28:24]].countdown <= 1'b0;
+            alarms[ctrlB[28:24]].countdown <= 1'b0;    // alarm, not countdown timer
             alarms[ctrlB[28:24]].loop <= ctrlB[23];
             alarms[ctrlB[28:24]].value <= ctrlB[15:0];
             #0 alarms[ctrlB[28:24]].enable <= 1'b1;    // enable alarm when set
@@ -391,8 +392,8 @@ task processInst(input logic [31:0] ctrlA, input logic [31:0] ctrlB);
         begin
           if (cr_bits.clientB_alarm) begin
             alarms[ctrlB[28:24]].assigned_clock <= ctrlB[19:16];
-            alarms[ctrlB[28:24]].countdown <= 1'b1;
-            alarms[ctrlB[28:24]].loop <= 1'b0;
+            alarms[ctrlB[28:24]].countdown <= 1'b1;   // countdown timer, not alarm
+            alarms[ctrlB[28:24]].loop <= 1'b0;    // countdown timers cannot repeat
             alarms[ctrlB[28:24]].value <= ctrlB[15:0] + base_clocks[ctrlB[19:16]].count;  // timer expires at current base clock plus duration of timer
             #0 alarms[ctrlB[28:24]].enable <= 1'b1;    // enable timer when set
             #0 alarms[ctrlB[28:24]].finished <= 1'b0;
@@ -413,8 +414,8 @@ task processInst(input logic [31:0] ctrlA, input logic [31:0] ctrlB);
         end
       3'b011:   // set ATS21 mode
         begin
-          cr_bits.active <= ctrlB[28];
-          cr_bits.clientB_clock <= ctrlB[27:26];
+          cr_bits.active <= ctrlB[28];    // device active bit
+          cr_bits.clientB_clock <= ctrlB[27:26];  //
           cr_bits.clientB_alarm <= ctrlB[25:24];
         end
       default:  statusB <= Nack;
@@ -445,17 +446,19 @@ always_ff @(posedge clk or posedge reset) begin : module_behavior
 		Reset();
 	// Normal Operation
   else begin
-    if (req) begin    // read first 16-bits of new instruction(s)
-      if ((ctrlA[15:13] != 3'b000) && (inCountA == 1'b0)) begin
+    if (req && cr_bits.active) begin    // if device is active and request signal received
+       // read first 16-bits of ctrlA instruction
+      if ((ctrlA[15:13] != 3'b000) && (inCountA == 1'b0)) begin    // if not NOP and top half of instruction not yet received
         ctrlA_top <= ctrlA;
-        inCountA <= 1'b1;
+        inCountA <= 1'b1;   // on next cycle, read second half of ctrlA instruction
       end
       else begin
         inCountA <= 1'b0;
       end
-      if ((ctrlB[15:13] != 3'b000) && (inCountB == 1'b0)) begin
+      // read first 16-bits of ctrlB instruction
+      if ((ctrlB[15:13] != 3'b000) && (inCountB == 1'b0)) begin    // if not NOP and top half of instruction not yet received
         ctrlB_top <= ctrlB;
-        inCountB <= 1'b1;
+        inCountB <= 1'b1;   // on next cycle, read second half of ctrlB instruction
       end
       else begin
         inCountB <= 1'b0;
@@ -467,16 +470,16 @@ always_ff @(posedge clk or posedge reset) begin : module_behavior
     end
 
     // read second 16-bits of new instruction(s) and call instruction procedure
-    if ((inCountA == 1'b1) && (inCountB == 1'b1)) begin
+    if ((inCountA == 1'b1) && (inCountB == 1'b1)) begin    // if both ctrlA and ctrlB have received first half, append second half and send to decode
       checkInst({ctrlA_top, ctrlA}, {ctrlB_top, ctrlB});
     end
-    else if ((inCountA == 1'b1) && (inCountB == 1'b0)) begin
+    else if ((inCountA == 1'b1) && (inCountB == 1'b0)) begin   // if ctrlA is ready for second half of instruction but ctrlB is not, send ctrlA to decode and send NOP for ctrlB
       checkInst({ctrlA_top, ctrlA}, 32'h00000000);
     end
-    else if ((inCountA == 1'b0) && (inCountB == 1'b1)) begin
+    else if ((inCountA == 1'b0) && (inCountB == 1'b1)) begin    // if ctrlB is ready for second half of instruction but ctrlA is not, send ctrlB to decode and send NOP for ctrlA
       checkInst(32'h00000000, {ctrlB_top, ctrlB});
     end
-    else begin
+    else begin    // if neither instruction is ready, send NOPs for both
       checkInst(32'h00000000, 32'h00000000);
     end
   end
