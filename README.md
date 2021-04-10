@@ -38,6 +38,7 @@ Future Tests :
 	Clock start values 
 	Repeating Alarms (longer simulations)
 	Disabling / Reenabling alarms and clocks
+	Check behavior when alarms/timers finish on same cycle as new one is set
 
 ## Makefile
 
