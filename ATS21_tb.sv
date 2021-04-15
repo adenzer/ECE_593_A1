@@ -56,9 +56,6 @@ logic [15:0] ctrlA, ctrlB;
 logic [ 2:0] opcodeA, opcodeB;
 logic [23:0] data;
 
-// Testbench Input Signals
-logic[31:0] a, b;
-logic[15:0] a_first, a_second, b_first, b_second;
 
 // Instantiate DUT
 ATS21 dut(.clk(clk), .reset(reset), .req(req), .ctrlA(ctrlA), .ctrlB(ctrlB),
@@ -74,7 +71,7 @@ end
 ///////////////////////////////////////
 
 covergroup ats21 @(posedge clk);
-	// option.at_least =2;
+	option.at_least =2;
 	coverpoint opcodeA {
 		bins a0[1] = {3'b001};
 		bins a1[1] = {3'b010};
@@ -166,11 +163,8 @@ endtask
 // Init Task
 task initialize();
 	// Initialize Variables and Reset for 4 cycles
-	clk = 0; reset = 1; req = 0;
-	ctrlA = '0; ctrlB = '0;
-	a_first = '0; a_second = '0;
-	b_first = '0; b_second = '0;
-	a = '0; b = '0;
+	clk = 0; reset = 1;
+	req = 0; ctrlA = '0; ctrlB = '0;
 	wait_cycles(4);
 	reset = 0;
 	wait_cycles(1);
