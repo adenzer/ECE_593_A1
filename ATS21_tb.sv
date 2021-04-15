@@ -167,16 +167,16 @@ covergroup ats21 @(posedge clk);
 	// coverpoint alarm_value;
 	// coverpoint alarm_finished;
 
-	coverpoint base_clocks.rate;
-	coverpoint base_clocks.enable;
-	coverpoint base_clocks.count;
+	coverpoint base_clocks[0].rate;
+	coverpoint base_clocks[0].enable;
+	coverpoint base_clocks[0].count;
 
-	coverpoint alarms.enable;
-	coverpoint alarms.countdown;
-	coverpoint alarms.loop;
-	coverpoint alarms.assigned_clock;
-	coverpoint alarms.value;
-	coverpoint alarms.finished;
+	coverpoint alarms[0].enable;
+	coverpoint alarms[0].countdown;
+	coverpoint alarms[0].loop;
+	coverpoint alarms[0].assigned_clock;
+	coverpoint alarms[0].value;
+	coverpoint alarms[0].finished;
 
 
 	coverpoint cr_bits.active;
