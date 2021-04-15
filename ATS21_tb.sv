@@ -71,27 +71,29 @@ end
 ///////////////////////////////////////
 assign sameOpcode = opcodeA == opcodeB;
 assign ABsameTime = opcodeA != 3'b000 && opcodeB != 3'b000;
-//
-// genvar j;
-// generate
-// 	for (j = 0; j < num_clock; j++)
-// 	 begin
-// 		assign BC_enable[j] = dut.base_clocks[j].enable;
-// 		assign BC_rate[j] = dut.base_clocks[j].rate;
-// 	 end
-// endgenerate
-//
-// genvar k;
-// generate
-// 	for (k = 0; k < num_alarms; k++)
-// 	 begin
-// 		assign alarm_enable[k] = dut.alarms[k].enable;
-// 		assign alarm_countdown[k] = dut.alarms[k].countdown;
-// 		assign alarm_loop[k] = dut.alarms[k].loop;
-// 		assign alarm_
-// 		assign alarm_finished[k] = dut.alarms[k].finished;
-// 	 end
-// endgenerate
+
+genvar j;
+generate
+	for (j = 0; j < num_clock; j++)
+	 begin
+		assign BC_enable[j] = dut.base_clocks[j].enable;
+		assign BC_rate[j] = dut.base_clocks[j].rate;
+		assign BC_count[j] = dut.base_clocks[j].count;
+	 end
+endgenerate
+
+genvar k;
+generate
+	for (k = 0; k < num_alarms; k++)
+	 begin
+		assign alarm_enable[k] = dut.alarms[k].enable;
+		assign alarm_countdown[k] = dut.alarms[k].countdown;
+		assign alarm_loop[k] = dut.alarms[k].loop;
+		assign alarm_bc[k] = dut.alarms[k].assigned_clock;
+		assign alarm_value[k] = dut.alarms[k].value;
+		assign alarm_finished[k] = dut.alarms[k].finished;
+	 end
+endgenerate
 
 covergroup ats21 @(posedge clk);
 	option.at_least =2;
@@ -114,11 +116,23 @@ covergroup ats21 @(posedge clk);
 	coverpoint sameOpcode;
 	coverpoint ABsameTime;
 
+	coverpoint BC_rate;
+	coverpoint BC_count;
+	coverpoint BC_enable;
+	coverpoint alarm_enable;
+	coverpoint alarm_countdown;
+	coverpoint alarm_loop;
+	coverpoint alarm_bc;
+	coverpoint alarm_value;
+	coverpoint alarm_finished;
+
 	coverpoint dut.checkInst.ctrlA;
 	coverpoint dut.checkInst.ctrlB;
+
+	coverpoint dut.procInst.ctrlA;
+	coverpoint dut.procInst.ctrlB;
+
 	coverpoint dut.cr_bits;
-	coverpoint dut.base_clocks;
-	coverpoint dut.alarms;
 
 
 	coverpoint data[0];
