@@ -73,7 +73,7 @@ end
 ////////// Testbench Simulus //////////
 ///////////////////////////////////////
 
-covergroup instructions @(posedge clk);
+covergroup ats21 @(posedge clk);
 	// option.at_least =2;
 	coverpoint opcodeA {
 		bins a0[1] = {3'b001};
@@ -124,7 +124,7 @@ covergroup instructions @(posedge clk);
 	}
 endgroup // instructions
 
-instructions fcover = new;
+ats21 fcover = new;
 
 
 class InputTwiddle;
@@ -136,7 +136,8 @@ endclass
 // Simulation
 initial begin
 
-	InputTwiddle i = new;
+	InputTwiddle i;
+	i = new;
 
 	// Initialize Design
 	initialize();
@@ -182,253 +183,5 @@ task exit_simulation();
 	$stop;
 endtask
 
-// No Operation
-task Nop(string client);
-	// Clear A and B input vectors
-	if (client == "a") begin
-		a[15:12] = 3'b000;
-	end else begin
-		b[15:12] = 3'b000;
-	end
-endtask
-
-// Set Clock Instruction (Opcode 001)
-task set_clock(logic[3:0] clock_id, logic[1:0] rate, logic[15:0] time_val, string client);
-	// Check for which client is setting the clock and set fields accordingly:
-	// - [1][12:9] Clock #
-	// - [1][7:6] Rate
-	// - [1][5:0] Unused
-	// - [0][15:0] Unused
-	if (client == "a") begin
-		// Clear Buffers
-		a_first = '0;
-		a_second = '0;
-		// Set Fields
-		a_first[15:13] = 3'b001;
-		a_first[12:9] = clock_id;
-		a_first[7:6] = rate;
-		a_second = time_val;
-		// Assign Output
-		a = {a_first, a_second};
-	end else begin
-		// Clear Buffers
-		b_first = '0;
-		b_second = '0;
-		// Set Fields
-		b_first[15:13] = 3'b001;
-		b_first[12:9] = clock_id;
-		b_first[7:6] = rate;
-		b_second = time_val;
-		// Assign Output
-		b = {b_first, b_second};
-	end
-endtask
-
-// Enable / Disable Clock (Opcode 010)
-task toggle_BCs(logic[3:0] clock_id, logic toggle, string client);
-	// Check for which client is setting the clock and set fields accordingly:
-	// - [1][12:9] Clock #
-	// - [1][7] Enable/Disable
-	// - [1][6:0] Unused
-	// - [0][15:0] Unused
-	if (client == "a") begin
-		// Clear Buffers
-		a_first = '0;
-		a_second = '0;
-		// Set Fields
-		a_first[15:13] = 3'b010;
-		a_first[12:9] = clock_id;
-		a_first[7] = toggle;
-		// Assign Output
-		a = {a_first, a_second};
-	end else begin
-		// Clear Buffers
-		b_first = '0;
-		b_second = '0;
-		// Set Fields
-		b_first[15:13] = 3'b010;
-		b_first[12:9] = clock_id;
-		b_first[7] = toggle;
-		// Assign Output
-		b = {b_first, b_second};
-	end
-endtask
-
-// Set Alarm (Opcode 101)
-task set_alarm(logic[4:0] alarm_id, logic loop, logic[3:0] clock_id, logic[15:0] alarm_time, string client);
-	// Check for which client is setting the clock and set fields accordingly:
-	// - [1][12:8] Alarm/Timer #
-	// - [1][7] Repeat
-	// - [1][6:4] Unused
-	// - [1][3:0] Clock #
-	// - [0][15:0] Alarm Time
-	if (client == "a") begin
-		// Clear Buffers
-		a_first = '0;
-		a_second = '0;
-		// Set Fields
-		a_first[15:13] = 3'b101;
-		a_first[12:8] = alarm_id;
-		a_first[7] = loop;
-		a_first[3:0] = clock_id;
-		a_second = alarm_time;
-		// Assign Output
-		a = {a_first, a_second};
-	end else begin
-		// Clear Buffers
-		b_first = '0;
-		b_second = '0;
-		// Set Fields
-		b_first[15:13] = 3'b101;
-		b_first[12:8] = alarm_id;
-		b_first[7] = loop;
-		b_first[3:0] = clock_id;
-		b_second = alarm_time;
-		// Assign Output
-		b = {b_first, b_second};
-	end
-endtask
-
-// Set Countdown Timer (Opcode 110)
-task set_countdown(logic[4:0] alarm_id, logic[3:0] clock_id, logic[15:0] interval, string client);
-	// Check for which client is setting the clock and set fields accordingly:
-	// - [1][12:8] Alarm/Timer #
-	// - [1][7:4] Unused
-	// - [1][3:0] Clock #
-	// - [0][15:0] Interval
-	if (client == "a") begin
-		// Clear Buffers
-		a_first = '0;
-		a_second = '0;
-		// Set Fields
-		a_first[15:13] = 3'b110;
-		a_first[12:8] = alarm_id;
-		a_first[3:0] = clock_id;
-		a_second = interval;
-		// Assign Output
-		a = {a_first, a_second};
-	end else begin
-		// Clear Buffers
-		b_first = '0;
-		b_second = '0;
-		// Set Fields
-		b_first[15:13] = 3'b110;
-		b_first[12:8] = alarm_id;
-		b_first[3:0] = clock_id;
-		b_second = interval;
-		// Assign Output
-		b = {b_first, b_second};
-	end
-endtask
-
-// Enable / Disable Alarm/Timer (Opcode 111)
-task toggle_ATs(logic[4:0] alarm_id, logic toggle, string client);
-	// Check for which client is setting the clock and set fields accordingly:
-	// - [1][12:8] Alarm/Timer #
-	// - [1][7] Enable/Disable
-	// - [1][6:0] Unused
-	// - [0][15:0] Unused
-	if (client == "a") begin
-		// Clear Buffers
-		a_first = '0;
-		a_second = '0;
-		// Set Fields
-		a_first[15:13] = 3'b111;
-		a_first[12:8] = alarm_id;
-		a_first[7] = toggle;
-		// Assign Output
-		a = {a_first, a_second};
-	end else begin
-		// Clear Buffers
-		b_first = '0;
-		b_second = '0;
-		// Set Fields
-		b_first[15:13] = 3'b111;
-		b_first[12:8] = alarm_id;
-		b_first[7] = toggle;
-		// Assign Output
-		b = {b_first, b_second};
-	end
-endtask
-
-// Set ATS21 Mode (Opcode 011)
-task set_ATS21_Mode(logic active, logic[1:0] AT_permissions, logic[1:0] BC_permissions, string client);
-	// Check for which client is setting the clock and set fields accordingly:
-	// - [1][12] Active
-	// - [1][11:10] Allow Timer/Alarm Change
-	// - [1][9:8] Allow Clock Change
-	// - [1][7:0] Unused
-	// - [0][15:0] Unused
-	if (client == "a") begin
-		// Clear Buffers
-		a_first = '0;
-		a_second = '0;
-		// Set Fields
-		a_first[15:13] = 3'b011;
-		a_first[12] = active;
-		a_first[11:10] = AT_permissions;
-		a_first[9:8] = BC_permissions;
-		// Assign Output
-		a = {a_first, a_second};
-	end else begin
-		// Clear Buffers
-		b_first = '0;
-		b_second = '0;
-		// Set Fields
-		b_first[15:13] = 3'b011;
-		b_first[12] = active;
-		b_first[11:10] = AT_permissions;
-		b_first[9:8] = BC_permissions;
-		// Assign Output
-		b = {b_first, b_second};
-	end
-endtask
-
-// Send Instruction Task
-task send_instruction(logic[31:0] a, logic[31:0] b);
-
-	// NOTE FOR TESTING: According to v0.4 of the design document, the same cycle
-	// req is asserted is when the design should bring in the top 16 bits, second 16 bits
-	// the next cycle. The following cycle, bits [15:12] of the client need to go to '000'
-	// to distinguish which client is requesting. If req is high for two cycles, it is an
-	// indication a request is coming from the other client the cycle after.
-
-	// Assert 'req' for 1 clock cycle and then send ctrlA and ctrlB
-	// words one cycle after another. Then finally wait one cycle for
-	// the second word to latch and DUT to respond before sending anything more.
-
-	// If we're only sending one instruction, be sure to set the other input to a Nop.
-
-	req = 1;
-	ctrlA = a[31:16];
-	ctrlB = b[31:16];
-	wait_cycles(1);
-	req = 0;
-	ctrlA = a[15:0];
-	ctrlB = b[15:0];
-	wait_cycles(1);
-
-endtask
-
-// Send Staggered Instructions Task
-task send_staggered_instructions(logic[31:0] a, logic[31:0] b);
-
-	// Testing when 'req' is high for two cycles. Design should take in the first 16 bits on the first
-	// instruction while req is high for the first cycle, then the second 16 bits the second cycle while
-	// also capturing the first 16 bits from the second instruction then the second 16 bits the next cycle.
-
-	req = 1;
-	ctrlA = a[31:16];
-	ctrlB[15:12] = 3'b000;
-	wait_cycles(1);
-	ctrlA = a[15:0];
-	ctrlB = b[31:16];
-	wait_cycles(1);
-	req = 0;
-	ctrlA[15:12] = 3'b000;
-	ctrlB = b[15:0];
-	wait_cycles(1);
-
-endtask
 
 endmodule
