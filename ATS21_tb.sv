@@ -49,6 +49,12 @@ timeunit 1ns/1ns;
 
 module ATS21_tb ();
 
+// Parameters
+parameter clock_width = 16;
+parameter num_alarms = 24;
+parameter num_clocks = 16;
+parameter num_clocks_bits = $clog2(num_clocks);
+
 // DUT Signals
 logic clk, reset, req, ready;
 logic [1:0] stat;
@@ -56,6 +62,15 @@ logic [15:0] ctrlA, ctrlB;
 logic [ 2:0] opcodeA, opcodeB;
 logic [23:0] data;
 
+// Testbench Signals
+logic BC_enable [num_clocks-1:0];
+logic [1:0] BC_rate [num_clocks-1:0];
+logic alarm_enable [num_alarms-1:0];
+logic alarm_countdown [num_alarms-1:0];
+logic alarm_loop [num_alarms-1:0];
+logic [num_clocks_bits-1:0] alarm_assigned_clock [num_alarms-1:0];
+logic alarm_finished [num_alarms-1:0];
+logic [num_alarms-1:0] all_alarms;
 
 // Instantiate DUT
 ATS21 dut(.clk(clk), .reset(reset), .req(req), .ctrlA(ctrlA), .ctrlB(ctrlB),
@@ -66,35 +81,42 @@ always begin
 	#1 clk = ~clk;
 end
 
+always_ff @(posedge clk) begin : add_alarms
+	all_alarms <= data[0] + data[1] + data[2] + data[3] + data[4] + data[5] + data[6] + data[7] + data[8] + data[9] + data[10]
+				+ data[11] + data[12] + data[13] + data[14] + data[15] + data[16] + data[17] + data[18] + data[19] + data[20] 
+				+ data[21] + data[22] + data[23];
+end
+
 ///////////////////////////////////////
 ////////// Testbench Simulus //////////
 ///////////////////////////////////////
 assign sameOpcode = opcodeA == opcodeB;
 assign ABsameTime = opcodeA != 3'b000 && opcodeB != 3'b000;
-//
-// genvar j;
-// generate
-// 	for (j = 0; j < num_clock; j++)
-// 	 begin
-// 		assign BC_enable[j] = dut.base_clocks[j].enable;
-// 		assign BC_rate[j] = dut.base_clocks[j].rate;
-// 	 end
-// endgenerate
-//
-// genvar k;
-// generate
-// 	for (k = 0; k < num_alarms; k++)
-// 	 begin
-// 		assign alarm_enable[k] = dut.alarms[k].enable;
-// 		assign alarm_countdown[k] = dut.alarms[k].countdown;
-// 		assign alarm_loop[k] = dut.alarms[k].loop;
-// 		assign alarm_
-// 		assign alarm_finished[k] = dut.alarms[k].finished;
-// 	 end
-// endgenerate
+
+ genvar j;
+ generate
+ 	for (j = 0; j < num_clocks; j++)
+ 	 begin
+ 		assign BC_enable[j] = dut.base_clocks[j].enable;
+ 		assign BC_rate[j] = dut.base_clocks[j].rate;
+ 	 end
+ endgenerate
+
+ genvar k;
+ generate
+ 	for (k = 0; k < num_alarms; k++)
+ 	 begin
+ 		assign alarm_enable[k] = dut.alarms[k].enable;
+ 		assign alarm_countdown[k] = dut.alarms[k].countdown;
+ 		assign alarm_loop[k] = dut.alarms[k].loop;
+ 		assign alarm_assigned_clock[k] = dut.alarms[k].assigned_clock;
+ 		assign alarm_finished[k] = dut.alarms[k].finished;
+ 	 end
+ endgenerate
 
 covergroup ats21 @(posedge clk);
 	option.at_least =2;
+
 	coverpoint opcodeA {
 		bins a0[1] = {3'b001};
 		bins a1[1] = {3'b010};
@@ -103,6 +125,7 @@ covergroup ats21 @(posedge clk);
 		bins a4[1] = {3'b111};
 		bins a5[1] = default;
 	}
+
 	coverpoint opcodeB {
 		bins a0[1] = {3'b001};
 		bins a1[1] = {3'b010};
@@ -111,15 +134,22 @@ covergroup ats21 @(posedge clk);
 		bins a4[1] = {3'b111};
 		bins a5[1] = default;
 	}
-	coverpoint sameOpcode;
-	coverpoint ABsameTime;
 
-	coverpoint dut.checkInst.ctrlA;
-	coverpoint dut.checkInst.ctrlB;
 	coverpoint dut.cr_bits;
+
 	coverpoint dut.base_clocks;
+
 	coverpoint dut.alarms;
 
+	coverpoint all_alarms {
+		bins a0[1] = {24'd0};
+		bins a1[1] = {24'd1};
+		bins a2[1] = {24'd2};
+		bins a3[1] = default;
+	}
+
+	coverpoint sameOpcode;
+	coverpoint ABsameTime;
 
 	coverpoint data[0];
 	coverpoint data[1];
@@ -152,15 +182,16 @@ covergroup ats21 @(posedge clk);
 		bins a2[1] = {2'b10};
 		bins a3[1] = {2'b11};
 	}
+
 endgroup // instructions
 
 ats21 fcover = new;
 
-
+// Random Input Class
 class RandomInput;
 	rand bit[15:0] rand_ctrlA;
 	rand bit[15:0] rand_ctrlB;
-	rand bit			 rand_req;
+	rand bit	   rand_req;
 endclass
 
 // Simulation
