@@ -14,28 +14,28 @@ writer. A seperate send_instruction() task asserts the 'req' signal to the desig
 sends the ctrlA and ctrlB inputs to the desired instructions to send. After the exit_simulation()
 task is called, the tool exits after 20 clock cycles.
 
-Current Tests : 
+Current Tests :
 
-	Test Reset 
-		- All clocks and alarms set to 0, control bits set to 1. 
+	Test Reset
+		- All clocks and alarms set to 0, control bits set to 1.
 	Test setting BCs and ATs
 		- Correct rates and clocks specified by the instructions are set
 	Test sending simultaneous and staggered instructions
 		- Verified all forms of instruction input layed out in the v0.4 design document can be
-		  handled by the design and testbench feeds the design accordingly. 
-		  	- When one client makes a request a Nop() is called for the other client. 
-		  	- When both clients make a request, they are both handled. 
+		  handled by the design and testbench feeds the design accordingly.
+		  	- When one client makes a request a Nop() is called for the other client.
+		  	- When both clients make a request, they are both handled.
 		  	- When one client makes a request the cycle after another (i.e. req is high two cycles)
-		  	  they are both handled properly. 
+		  	  they are both handled properly.
 	Test AT function
 		- Alarm goes off when 'n' count is reached on one of the 16 specified clocks
 		- Countdown goes off 'n' cycles after the client req is asserted
 		- Multiple data bits are able to be asserted simulatenously
 
-Future Tests : 
+Future Tests :
 
 	Test ATS21 Modes more thoroughly
-	Clock start values 
+	Clock start values
 	Repeating Alarms (longer simulations)
 	Disabling / Reenabling alarms and clocks
 
@@ -63,7 +63,7 @@ logic[15:0] a_first, a_second, b_first, b_second;
 ATS21 dut(.clk(clk), .reset(reset), .req(req), .ctrlA(ctrlA), .ctrlB(ctrlB),
 			.ready(ready), .stat(stat), .data(data));
 
-// Reference Clock Generator 
+// Reference Clock Generator
 always begin
 	#1 clk = ~clk;
 end
@@ -72,51 +72,52 @@ end
 ////////// Testbench Simulus //////////
 ///////////////////////////////////////
 
+assign opcode_A = ctrlA[31:29];
+assign opcode_B = ctrlB[31:29];
+
+covergroup instructions @(posedge clk);
+	option.at_least =2;
+	coverpoint opcode_A (
+		bins a1 = 3'b001;
+		bins a2 = 3'b010;
+		bins a3 = 3'b101;
+		bins a4 = 3'b110;
+		bins a5 = 3'b111;
+		bins a6 = default;
+	)
+	coverpoint opcode_B (
+		bins a1 = 3'b001;
+		bins a2 = 3'b010;
+		bins a3 = 3'b101;
+		bins a4 = 3'b110;
+		bins a5 = 3'b111;
+		bins a6 = default;
+	)
+endgroup // instructions
+
+instructions fcover = new;
+
+
+class InputTwiddle;
+	rand bit[15:0] rand_ctrlA;
+	rand bit[15:0] rand_ctrlB;
+	rand bit			 rand_req;
+endclass
+
 // Simulation
 initial begin
 	// Initialize Design
 	initialize();
 
-	// Set clock 0 to 1X from A
-	set_clock(4'b0000, 2'b00, 16'h0000, "a");
-	// Set clock 1 to 2X from B
-	set_clock(4'b0001, 2'b01, 16'h0000, "b");
-	// Simulatenous Instructions
-	send_instruction(a, b);
+	InputTwiddle i = new;
 
-	wait_cycles(10);
-
-	// Set clock 1 to 4X from A
-	set_clock(4'b0001, 2'b10, 16'h0000, "a");
-	// Set clock 2 to 1X from B
-	set_clock(4'b0010, 2'b00, 16'h0000, "b");
-	// Simulatenous Instructions
-	send_instruction(a, b);
-
-	wait_cycles(10);
-
-	// Set alarm 0 to reference clock 0, loop, and go off at count 50 cycles
-	set_alarm(5'b00000, 1'b1, 4'b0000, 16'd50, "a");
-	// Set alarm 23 to reference clock 0, don't loop, and go off at count 50 cycles
-	set_alarm(5'b10111, 1'b0, 4'b0000, 16'd50, "b");
-	// Staggered Instructions Testing
-	send_staggered_instructions(a,b);
-
-	wait_cycles(15);
-
-	// Set alarm 1 to reference clock 1, and go off after 10 cycles (countdown)
-	set_countdown(5'b00001, 4'b0001, 16'd10, "a");
-	Nop("b");
-	send_instruction(a, b);
-
-	wait_cycles(30);
-
-	// Set clock 3 to 1X from A
-	set_clock(4'b0011, 2'b00, 16'h0000, "a");
-	// Set clock 4 to 2X from B
-	set_clock(4'b0100, 2'b01, 16'h0000, "b");
-	// Staggered Instructions Testing
-	send_staggered_instructions(a,b);
+	while (fcover.get_coverage()<100) begin
+		assert(i.randomize());
+		req <= i.rand_req;
+		ctrlA <= i.rand_ctrlA;
+		ctrlB <= i.rand_ctrlB;
+		@(posedge clk);
+	end
 
 	// End Simulation
 	exit_simulation();
@@ -384,7 +385,7 @@ task send_staggered_instructions(logic[31:0] a, logic[31:0] b);
 
 	// Testing when 'req' is high for two cycles. Design should take in the first 16 bits on the first
 	// instruction while req is high for the first cycle, then the second 16 bits the second cycle while
-	// also capturing the first 16 bits from the second instruction then the second 16 bits the next cycle. 
+	// also capturing the first 16 bits from the second instruction then the second 16 bits the next cycle.
 
 	req = 1;
 	ctrlA = a[31:16];
