@@ -77,22 +77,22 @@ assign opcode_B = ctrlB[31:29];
 
 covergroup instructions @(posedge clk);
 	option.at_least =2;
-	coverpoint opcode_A (
+	coverpoint opcode_A {
 		bins a1 = 3'b001;
 		bins a2 = 3'b010;
 		bins a3 = 3'b101;
 		bins a4 = 3'b110;
 		bins a5 = 3'b111;
 		bins a6 = default;
-	)
-	coverpoint opcode_B (
+	}
+	coverpoint opcode_B {
 		bins a1 = 3'b001;
 		bins a2 = 3'b010;
 		bins a3 = 3'b101;
 		bins a4 = 3'b110;
 		bins a5 = 3'b111;
 		bins a6 = default;
-	)
+	}
 endgroup // instructions
 
 instructions fcover = new;
