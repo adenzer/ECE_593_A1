@@ -8,15 +8,15 @@ help:
 compile:
 	vlib work
 	vmap work work
+	vopt +cover=bcesxf ATS21_tb -o ATS21_tb_opt
 	vlog ATS21.sv
 	vlog ATS21_tb.sv
 
 sim_c:
-	vsim -c ATS21_tb -do "run -all;quit"
+	vsim -c ATS21_tb_opt -do "run -all;quit"
 
 sim_gui:
-	vopt +cover=bcesxf ATS21_tb -o ATS21_tb_opt
-	vsim -coverage -voptargs="+acc" ATS21_tb -do "wave_simple.do" -do "run -all;"
+	vsim -coverage -voptargs="+acc" ATS21_tb_opt -do "wave_simple.do" -do "run -all;"
 
 clean:
 	rm -rf work modelsim.ini *.wlf *.log replay* transcript *.db
