@@ -15,8 +15,8 @@ sim_c:
 	vsim -c ATS21_tb -do "run -all;quit"
 
 sim_gui:
-	vopt +cover=bcesxf test_sm -o test_sm_opt
-	vsim -coverage test_sm_opt -voptargs="+acc" ATS21_tb -do "wave_simple.do" -do "run -all;"
+	vopt +cover=bcesxf ATS21_tb -o ATS21_tb_opt
+	vsim -coverage -voptargs="+acc" ATS21_tb -do "wave_simple.do" -do "run -all;"
 
 clean:
 	rm -rf work modelsim.ini *.wlf *.log replay* transcript *.db
