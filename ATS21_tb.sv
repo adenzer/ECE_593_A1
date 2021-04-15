@@ -141,8 +141,8 @@ covergroup ats21 @(posedge clk);
 	coverpoint dut.checkInst.ctrlA;
 	coverpoint dut.checkInst.ctrlB;
 
-	coverpoint dut.procInst.ctrlA;
-	coverpoint dut.procInst.ctrlB;
+	coverpoint dut.processInst.ctrlA;
+	coverpoint dut.processInst.ctrlB;
 
 	coverpoint dut.cr_bits;
 
