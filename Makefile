@@ -5,7 +5,7 @@ help:
 	@echo "Targets: compile  sim_c  sim_gui  clean"
 	@echo " "
 
-compile: 
+compile:
 	vlib work
 	vmap work work
 	vlog ATS21.sv
@@ -15,7 +15,8 @@ sim_c:
 	vsim -c ATS21_tb -do "run -all;quit"
 
 sim_gui:
-	vsim -voptargs="+acc" ATS21_tb -do "wave_simple.do" -do "run -all;"
+	vopt +cover=bcesxf test_sm -o test_sm_opt
+	vsim -coverage test_sm_opt -voptargs="+acc" ATS21_tb -do "wave_simple.do" -do "run -all;"
 
 clean:
 	rm -rf work modelsim.ini *.wlf *.log replay* transcript *.db

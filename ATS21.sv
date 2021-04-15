@@ -76,7 +76,9 @@ module ATS21 (
   output logic [ 1:0] stat,
   output logic [23:0] data,
   output logic [15:0] ctrlA_top,
-  output logic [15:0] ctrlB_top
+  output logic [15:0] ctrlB_top,
+  output logic [ 2:0] opcodeA_proc,
+  output logic [ 2:0] opcodeB_proc
 );
 
 ////////////////////////////////////////////////////////////////////
@@ -279,6 +281,10 @@ task checkInst(input logic [31:0] ctrlA, input logic [31:0] ctrlB);
 endtask
 
 task processInst(input logic [31:0] ctrlA, input logic [31:0] ctrlB);
+
+    opcodeA_proc <= ctrlA[31:29];   // for coverage
+    opcodeB_proc <= ctrlB[31:29];   // for coverage
+
     // process ctrlA instruction
     case (ctrlA[31:29])   // opcode
       3'b001:   // set clock
@@ -443,46 +449,48 @@ end
 
 // Behaviorial Block
 always_ff @(posedge clk or posedge reset) begin : module_behavior
-	// Reset Detection
-	if(reset)
-		Reset();
-	// Normal Operation
-  else begin
-    if (req && cr_bits.active) begin    // if device is active and request signal received
-       // read first 16-bits of ctrlA instruction
-      if ((ctrlA[15:13] != 3'b000) && (inCountA == 1'b0)) begin    // if not NOP and top half of instruction not yet received
-        ctrlA_top <= ctrlA;
-        inCountA <= 1'b1;   // on next cycle, read second half of ctrlA instruction
+  if (cr_bits.active) begin
+    // Reset Detection
+  	if(reset)
+  		Reset();
+  	// Normal Operation
+    else begin
+      if (req) begin    // if device is active and request signal received
+         // read first 16-bits of ctrlA instruction
+        if ((ctrlA[15:13] != 3'b000) && (inCountA == 1'b0)) begin    // if not NOP and top half of instruction not yet received
+          ctrlA_top <= ctrlA;
+          inCountA <= 1'b1;   // on next cycle, read second half of ctrlA instruction
+        end
+        else begin
+          inCountA <= 1'b0;
+        end
+        // read first 16-bits of ctrlB instruction
+        if ((ctrlB[15:13] != 3'b000) && (inCountB == 1'b0)) begin    // if not NOP and top half of instruction not yet received
+          ctrlB_top <= ctrlB;
+          inCountB <= 1'b1;   // on next cycle, read second half of ctrlB instruction
+        end
+        else begin
+          inCountB <= 1'b0;
+        end
       end
       else begin
         inCountA <= 1'b0;
-      end
-      // read first 16-bits of ctrlB instruction
-      if ((ctrlB[15:13] != 3'b000) && (inCountB == 1'b0)) begin    // if not NOP and top half of instruction not yet received
-        ctrlB_top <= ctrlB;
-        inCountB <= 1'b1;   // on next cycle, read second half of ctrlB instruction
-      end
-      else begin
         inCountB <= 1'b0;
       end
-    end
-    else begin
-      inCountA <= 1'b0;
-      inCountB <= 1'b0;
-    end
 
-    // read second 16-bits of new instruction(s) and call instruction procedure
-    if ((inCountA == 1'b1) && (inCountB == 1'b1)) begin    // if both ctrlA and ctrlB have received first half, append second half and send to decode
-      checkInst({ctrlA_top, ctrlA}, {ctrlB_top, ctrlB});
-    end
-    else if ((inCountA == 1'b1) && (inCountB == 1'b0)) begin   // if ctrlA is ready for second half of instruction but ctrlB is not, send ctrlA to decode and send NOP for ctrlB
-      checkInst({ctrlA_top, ctrlA}, 32'h00000000);
-    end
-    else if ((inCountA == 1'b0) && (inCountB == 1'b1)) begin    // if ctrlB is ready for second half of instruction but ctrlA is not, send ctrlB to decode and send NOP for ctrlA
-      checkInst(32'h00000000, {ctrlB_top, ctrlB});
-    end
-    else begin    // if neither instruction is ready, send NOPs for both
-      checkInst(32'h00000000, 32'h00000000);
+      // read second 16-bits of new instruction(s) and call instruction procedure
+      if ((inCountA == 1'b1) && (inCountB == 1'b1)) begin    // if both ctrlA and ctrlB have received first half, append second half and send to decode
+        checkInst({ctrlA_top, ctrlA}, {ctrlB_top, ctrlB});
+      end
+      else if ((inCountA == 1'b1) && (inCountB == 1'b0)) begin   // if ctrlA is ready for second half of instruction but ctrlB is not, send ctrlA to decode and send NOP for ctrlB
+        checkInst({ctrlA_top, ctrlA}, 32'h00000000);
+      end
+      else if ((inCountA == 1'b0) && (inCountB == 1'b1)) begin    // if ctrlB is ready for second half of instruction but ctrlA is not, send ctrlB to decode and send NOP for ctrlA
+        checkInst(32'h00000000, {ctrlB_top, ctrlB});
+      end
+      else begin    // if neither instruction is ready, send NOPs for both
+        checkInst(32'h00000000, 32'h00000000);
+      end
     end
   end
 end
@@ -490,10 +498,12 @@ end
 // increment 1x base clocks
 always_ff @(posedge clk_1x) begin
   int i;
-  for (i = 0; i < num_clocks; i = i + 1) begin
-    if (base_clocks[i].enable) begin
-      if (base_clocks[i].rate == 2'b00) begin
-        base_clocks[i].count <= base_clocks[i].count + 1;
+  if (cr_bits.active) begin
+    for (i = 0; i < num_clocks; i = i + 1) begin
+      if (base_clocks[i].enable) begin
+        if (base_clocks[i].rate == 2'b00) begin
+          base_clocks[i].count <= base_clocks[i].count + 1;
+        end
       end
     end
   end
@@ -502,10 +512,12 @@ end
 // increment 2x base clocks
 always_ff @(posedge clk_2x) begin
   int i;
-  for (i = 0; i < num_clocks; i = i + 1) begin
-    if (base_clocks[i].enable) begin
-      if (base_clocks[i].rate == 2'b01) begin
-        base_clocks[i].count <= base_clocks[i].count + 1;
+  if (cr_bits.active) begin
+    for (i = 0; i < num_clocks; i = i + 1) begin
+      if (base_clocks[i].enable) begin
+        if (base_clocks[i].rate == 2'b01) begin
+          base_clocks[i].count <= base_clocks[i].count + 1;
+        end
       end
     end
   end
@@ -514,10 +526,12 @@ end
 // increment 4x base clocks
 always_ff @(posedge clk_4x) begin
   int i;
-  for (i = 0; i < num_clocks; i = i + 1) begin
-    if (base_clocks[i].enable) begin
-      if (base_clocks[i].rate == 2'b10) begin
-        base_clocks[i].count <= base_clocks[i].count + 1;
+  if (cr_bits.active) begin
+    for (i = 0; i < num_clocks; i = i + 1) begin
+      if (base_clocks[i].enable) begin
+        if (base_clocks[i].rate == 2'b10) begin
+          base_clocks[i].count <= base_clocks[i].count + 1;
+        end
       end
     end
   end
@@ -526,11 +540,13 @@ end
 // check alarms on 1x clocks
 always_ff @(posedge clk_1x) begin
   int i;
-  for (i = 0; i < num_alarms; i = i + 1) begin
-    if ((base_clocks[alarms[i].assigned_clock].count + 1 == alarms[i].value) && alarms[i].enable && (base_clocks[alarms[i].assigned_clock].rate == 2'b00)) begin
-      alarms[i].finished <= 1'b1;
-      if (~alarms[i].loop) begin
-        alarms[i].enable <= 1'b0;   // disable alarm if not set to repeat
+  if (cr_bits.active) begin
+    for (i = 0; i < num_alarms; i = i + 1) begin
+      if ((base_clocks[alarms[i].assigned_clock].count + 1 == alarms[i].value) && alarms[i].enable && (base_clocks[alarms[i].assigned_clock].rate == 2'b00)) begin
+        alarms[i].finished <= 1'b1;
+        if (~alarms[i].loop) begin
+          alarms[i].enable <= 1'b0;   // disable alarm if not set to repeat
+        end
       end
     end
   end
@@ -539,11 +555,13 @@ end
 // check alarms on 2x clocks
 always_ff @(posedge clk_2x) begin
   int i;
-  for (i = 0; i < num_alarms; i = i + 1) begin
-    if ((base_clocks[alarms[i].assigned_clock].count + 1 == alarms[i].value) && alarms[i].enable && (base_clocks[alarms[i].assigned_clock].rate == 2'b01)) begin
-      alarms[i].finished <= 1'b1;
-      if (~alarms[i].loop) begin
-        alarms[i].enable <= 1'b0;   // disable alarm if not set to repeat
+  if (cr_bits.active) begin
+    for (i = 0; i < num_alarms; i = i + 1) begin
+      if ((base_clocks[alarms[i].assigned_clock].count + 1 == alarms[i].value) && alarms[i].enable && (base_clocks[alarms[i].assigned_clock].rate == 2'b01)) begin
+        alarms[i].finished <= 1'b1;
+        if (~alarms[i].loop) begin
+          alarms[i].enable <= 1'b0;   // disable alarm if not set to repeat
+        end
       end
     end
   end
@@ -552,11 +570,13 @@ end
 // check alarms on 4x clocks
 always_ff @(posedge clk_4x) begin
   int i;
-  for (i = 0; i < num_alarms; i = i + 1) begin
-    if ((base_clocks[alarms[i].assigned_clock].count + 1 == alarms[i].value) && alarms[i].enable && (base_clocks[alarms[i].assigned_clock].rate == 2'b10)) begin
-      alarms[i].finished <= 1'b1;
-      if (~alarms[i].loop) begin
-        alarms[i].enable <= 1'b0;   // disable alarm if not set to repeat
+  if (cr_bits.active) begin
+    for (i = 0; i < num_alarms; i = i + 1) begin
+      if ((base_clocks[alarms[i].assigned_clock].count + 1 == alarms[i].value) && alarms[i].enable && (base_clocks[alarms[i].assigned_clock].rate == 2'b10)) begin
+        alarms[i].finished <= 1'b1;
+        if (~alarms[i].loop) begin
+          alarms[i].enable <= 1'b0;   // disable alarm if not set to repeat
+        end
       end
     end
   end

@@ -53,7 +53,7 @@ module ATS21_tb ();
 logic clk, reset, req, ready;
 logic [1:0] stat;
 logic [15:0] ctrlA, ctrlB;
-logic [15:0] ctrlA_top, ctrlB_top;
+logic [ 2:0] opcodeA, opcodeB;
 logic [23:0] data;
 
 // Testbench Input Signals
@@ -62,7 +62,7 @@ logic[15:0] a_first, a_second, b_first, b_second;
 
 // Instantiate DUT
 ATS21 dut(.clk(clk), .reset(reset), .req(req), .ctrlA(ctrlA), .ctrlB(ctrlB),
-			.ready(ready), .stat(stat), .data(data), .ctrlA_top(ctrlA_top), .ctrlB_top(ctrlB_top));
+			.ready(ready), .stat(stat), .data(data), .opcodeA_proc(opcodeA), .opcodeB_proc(opcodeB));
 
 // Reference Clock Generator
 always begin
@@ -72,13 +72,10 @@ end
 ///////////////////////////////////////
 ////////// Testbench Simulus //////////
 ///////////////////////////////////////
-assign opcode_A = ctrlA_top[15:13];
-assign opcode_B = ctrlB_top[15:13];
-
 
 covergroup instructions @(posedge clk);
-	option.at_least =2;
-	coverpoint opcode_A iff req {
+	// option.at_least =2;
+	coverpoint opcodeA {
 		bins a0[1] = {3'b001};
 		bins a1[1] = {3'b010};
 		bins a2[1] = {3'b101};
@@ -86,7 +83,7 @@ covergroup instructions @(posedge clk);
 		bins a4[1] = {3'b111};
 		bins a5[1] = default;
 	}
-	coverpoint opcode_B iff req {
+	coverpoint opcodeB {
 		bins a0[1] = {3'b001};
 		bins a1[1] = {3'b010};
 		bins a2[1] = {3'b101};
@@ -120,7 +117,7 @@ initial begin
 	// Initialize Design
 	initialize();
 
-	while (fcover.get_coverage()<100) begin
+	while (fcover.get_coverage()<5) begin
 		assert(i.randomize());
 		req <= i.rand_req;
 		ctrlA <= i.rand_ctrlA;
