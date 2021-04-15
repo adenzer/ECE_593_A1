@@ -56,16 +56,39 @@ logic [15:0] ctrlA, ctrlB;
 logic [ 2:0] opcodeA, opcodeB;
 logic [23:0] data;
 
-logic [15:0] BC_enable;
-logic [15:0] BC_rate;
-logic [15:0] BC_count;
+typedef struct packed {
+	logic enable;
+	logic [clock_width-1:0] count;
+	logic [1:0] rate;
+} Clock;
 
-logic [23:0] alarm_enable;
-logic [23:0] alarm_countdown;
-logic [23:0] alarm_loop;
-logic [23:0] [3:0] alarm_bc;
-logic [23:0] [15:0] alarm_value;
-logic [23:0] alarm_finished;
+// Array of Clocks
+Clock [num_clocks-1:0] base_clocks;
+assign base_clocks = dut.base_clocks;
+
+typedef struct packed {
+	logic enable;
+  logic countdown;
+	logic loop;
+	logic [num_clocks_bits-1:0] assigned_clock;
+	logic [clock_width-1:0] value;
+	logic finished;
+} Alarm;
+
+Alarm [num_alarms-1:0] alarms;
+assign alarms = dut.alarms;
+
+
+typedef struct packed {
+	logic active;
+	logic clientA_clock;
+	logic clientB_clock;
+	logic clientA_alarm;
+	logic clientB_alarm;
+} ControlRegisters;
+
+ControlRegisters cr_bits;
+assign cr_bits = dut.cr_bits;
 
 
 // Instantiate DUT
@@ -84,28 +107,28 @@ end
 assign sameOpcode = opcodeA == opcodeB;
 assign ABsameTime = opcodeA != 3'b000 && opcodeB != 3'b000;
 
-genvar j;
-generate
-	for (j = 0; j < 16; j++)
-	 begin
-		assign BC_enable[j] = dut.base_clocks[j].enable;
-		assign BC_rate[j] = dut.base_clocks[j].rate;
-		assign BC_count[j] = dut.base_clocks[j].count;
-	 end
-endgenerate
-
-genvar k;
-generate
-	for (k = 0; k < 24; k++)
-	 begin
-		assign alarm_enable[k] = dut.alarms[k].enable;
-		assign alarm_countdown[k] = dut.alarms[k].countdown;
-		assign alarm_loop[k] = dut.alarms[k].loop;
-		assign alarm_bc[k] = dut.alarms[k].assigned_clock;
-		assign alarm_value[k] = dut.alarms[k].value;
-		assign alarm_finished[k] = dut.alarms[k].finished;
-	 end
-endgenerate
+// genvar j;
+// generate
+// 	for (j = 0; j < 16; j++)
+// 	 begin
+// 		assign BC_enable[j] = dut.base_clocks[j].enable;
+// 		assign BC_rate[j] = dut.base_clocks[j].rate;
+// 		assign BC_count[j] = dut.base_clocks[j].count;
+// 	 end
+// endgenerate
+//
+// genvar k;
+// generate
+// 	for (k = 0; k < 24; k++)
+// 	 begin
+// 		assign alarm_enable[k] = dut.alarms[k].enable;
+// 		assign alarm_countdown[k] = dut.alarms[k].countdown;
+// 		assign alarm_loop[k] = dut.alarms[k].loop;
+// 		assign alarm_bc[k] = dut.alarms[k].assigned_clock;
+// 		assign alarm_value[k] = dut.alarms[k].value;
+// 		assign alarm_finished[k] = dut.alarms[k].finished;
+// 	 end
+// endgenerate
 
 covergroup ats21 @(posedge clk);
 	option.at_least =2;
@@ -128,18 +151,34 @@ covergroup ats21 @(posedge clk);
 	coverpoint sameOpcode;
 	coverpoint ABsameTime;
 
-	coverpoint BC_rate;
-	coverpoint BC_count;
-	coverpoint BC_enable;
-	coverpoint alarm_enable;
-	coverpoint alarm_countdown;
-	coverpoint alarm_loop;
-	coverpoint alarm_bc;
-	coverpoint alarm_value[0];
-	coverpoint alarm_value[1];
-	coverpoint alarm_value[2];
-	coverpoint alarm_value[3];
-	coverpoint alarm_finished;
+	// coverpoint BC_rate;
+	// coverpoint BC_count;
+	// coverpoint BC_enable;
+	// coverpoint alarm_enable;
+	// coverpoint alarm_countdown;
+	// coverpoint alarm_loop;
+	// coverpoint alarm_bc;
+	// coverpoint alarm_value;
+	// coverpoint alarm_finished;
+
+	coverpoint base_clocks.rate;
+	coverpoint base_clocks.enable;
+	coverpoint base_clocks.count;
+
+	coverpoint alarms.enable;
+	coverpoint alarms.countdown;
+	coverpoint alarms.loop;
+	coverpoint alarms.assigned_clock;
+	coverpoint alarms.value;
+	coverpoint alarms.finished;
+
+
+	coverpoint cr_bits.active;
+	coverpoint cr_bits.clientA_clock;
+	coverpoint cr_bits.clientB_clock;
+	coverpoint cr_bits.clientA_alarm;
+	coverpoint cr_bits.clientB_alarm;
+
 
 	coverpoint dut.checkInst.ctrlA;
 	coverpoint dut.checkInst.ctrlB;
@@ -147,7 +186,7 @@ covergroup ats21 @(posedge clk);
 	coverpoint dut.processInst.ctrlA;
 	coverpoint dut.processInst.ctrlB;
 
-	coverpoint dut.cr_bits;
+
 
 
 	coverpoint data[0];
