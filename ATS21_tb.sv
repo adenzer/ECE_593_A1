@@ -106,10 +106,11 @@ endclass
 
 // Simulation
 initial begin
+	
+	InputTwiddle i = new;
+
 	// Initialize Design
 	initialize();
-
-	InputTwiddle i = new;
 
 	while (fcover.get_coverage()<100) begin
 		assert(i.randomize());
