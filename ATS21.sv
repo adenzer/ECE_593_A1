@@ -75,8 +75,6 @@ module ATS21 (
   output logic        ready,
   output logic [ 1:0] stat,
   output logic [23:0] data,
-  output logic [15:0] ctrlA_top,
-  output logic [15:0] ctrlB_top,
   output logic [ 2:0] opcodeA_proc,
   output logic [ 2:0] opcodeB_proc
 );
