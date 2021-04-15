@@ -111,11 +111,16 @@ covergroup ats21 @(posedge clk);
 		bins a4[1] = {3'b111};
 		bins a5[1] = default;
 	}
+	coverpoint sameOpcode;
+	coverpoint ABsameTime;
+
+	coverpoint dut.checkInst.ctrlA;
+	coverpoint dut.checkInst.ctrlB;
 	coverpoint dut.cr_bits;
 	coverpoint dut.base_clocks;
 	coverpoint dut.alarms;
-	coverpoint sameOpcode;
-	coverpoint ABsameTime;
+
+
 	coverpoint data[0];
 	coverpoint data[1];
 	coverpoint data[2];
