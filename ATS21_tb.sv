@@ -56,6 +56,12 @@ logic [15:0] ctrlA, ctrlB;
 logic [ 2:0] opcodeA, opcodeB;
 logic [23:0] data;
 
+// Parameters
+parameter clock_width = 16;
+parameter num_alarms = 24;
+parameter num_clocks = 16;
+parameter num_clocks_bits = $clog2(num_clocks);
+
 typedef struct packed {
 	logic enable;
 	logic [clock_width-1:0] count;
