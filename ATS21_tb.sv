@@ -84,7 +84,7 @@ assign base_clocks = dut.base_clocks;
 
 typedef struct packed {
 	logic enable;
-  logic countdown;
+ 	logic countdown;
 	logic loop;
 	logic [num_clocks_bits-1:0] assigned_clock;
 	logic [clock_width-1:0] value;
@@ -93,7 +93,6 @@ typedef struct packed {
 
 Alarm [num_alarms-1:0] alarms;
 assign alarms = dut.alarms;
-
 
 typedef struct packed {
 	logic active;
@@ -153,21 +152,23 @@ covergroup ats21 @(posedge clk);
 	option.at_least =2;
 
 	coverpoint opcodeA {
-		bins a0[1] = {3'b001};
-		bins a1[1] = {3'b010};
-		bins a2[1] = {3'b101};
-		bins a3[1] = {3'b110};
-		bins a4[1] = {3'b111};
-		bins a5[1] = default;
+		bins set_BC[1] = {3'b001};
+		bins toggle_BC[1] = {3'b010};
+		bins set_AT[1] = {3'b101};
+		bins set_Countdown[1] = {3'b110};
+		bins toggle_AT[1] = {3'b111};
+		bins set_ATS21_mode[1] = {3'b011};
+		bins invalid_instruction[1] = default;
 	}
 
 	coverpoint opcodeB {
-		bins a0[1] = {3'b001};
-		bins a1[1] = {3'b010};
-		bins a2[1] = {3'b101};
-		bins a3[1] = {3'b110};
-		bins a4[1] = {3'b111};
-		bins a5[1] = default;
+		bins set_BC[1] = {3'b001};
+		bins toggle_BC[1] = {3'b010};
+		bins set_AT[1] = {3'b101};
+		bins set_Countdown[1] = {3'b110};
+		bins toggle_AT[1] = {3'b111};
+		bins set_ATS21_mode[1] = {3'b011};
+		bins invalid_instruction[1] = default;
 	}
 
 	coverpoint dut.base_clocks;
@@ -197,10 +198,10 @@ covergroup ats21 @(posedge clk);
 	coverpoint dut.processInst.ctrlB;
 
 	coverpoint all_alarms {
-		bins a0[1] = {24'd0};
-		bins a1[1] = {24'd1};
-		bins a2[1] = {24'd2};
-		bins a3[1] = default;
+		bins no_alarms[1] = {24'd0};
+		bins one_alarm[1] = {24'd1};
+		bins two_alarms[1] = {24'd2};
+		bins many_alarms[1] = default;
 	}
 
 	coverpoint sameOpcode;
@@ -232,10 +233,10 @@ covergroup ats21 @(posedge clk);
 	coverpoint data[23];
 
 	coverpoint stat {
-		bins a0[1] = {2'b00};
-		bins a1[1] = {2'b01};
-		bins a2[1] = {2'b10};
-		bins a3[1] = {2'b11};
+		bins Nack[1] = {2'b00};
+		bins Ack_A[1] = {2'b01};
+		bins Ack_B[1] = {2'b10};
+		bins Ack_AB[1] = {2'b11};
 	}
 
 endgroup // instructions
