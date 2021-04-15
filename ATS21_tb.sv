@@ -91,7 +91,31 @@ covergroup instructions @(posedge clk);
 		bins a4[1] = {3'b111};
 		bins a5[1] = default;
 	}
-	coverpoint data;
+	coverpoint data[0];
+	coverpoint data[1];
+	coverpoint data[2];
+	coverpoint data[3];
+	coverpoint data[4];
+	coverpoint data[5];
+	coverpoint data[6];
+	coverpoint data[7];
+	coverpoint data[8];
+	coverpoint data[9];
+	coverpoint data[10];
+	coverpoint data[11];
+	coverpoint data[12];
+	coverpoint data[13];
+	coverpoint data[14];
+	coverpoint data[15];
+	coverpoint data[16];
+	coverpoint data[17];
+	coverpoint data[18];
+	coverpoint data[19];
+	coverpoint data[20];
+	coverpoint data[21];
+	coverpoint data[22];
+	coverpoint data[23];
+
 	coverpoint stat {
 		bins a0[1] = {2'b00};
 		bins a1[1] = {2'b01};
