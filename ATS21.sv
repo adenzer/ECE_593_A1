@@ -94,7 +94,7 @@ enum logic {Nack = 1'b0, Ack = 1'b1} statusA, statusB;
 assign stat = {statusB, statusA};
 
 // temp regs for top 16-bits of input instruction
-// logic [15:0] ctrlA_top, ctrlB_top;
+logic [15:0] ctrlA_top, ctrlB_top;
 
 logic inCountA, inCountB;    // keep track of input instruction
 
