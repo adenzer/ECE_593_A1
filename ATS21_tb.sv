@@ -65,6 +65,7 @@ logic [23:0] alarm_countdown;
 logic [23:0] alarm_loop;
 logic [23:0] alarm_bc[3:0];
 logic [23:0] alarm_value[15:0];
+logic [23:0] alarm_finished;
 
 
 // Instantiate DUT
@@ -85,7 +86,7 @@ assign ABsameTime = opcodeA != 3'b000 && opcodeB != 3'b000;
 
 genvar j;
 generate
-	for (j = 0; j < num_clock; j++)
+	for (j = 0; j < 16; j++)
 	 begin
 		assign BC_enable[j] = dut.base_clocks[j].enable;
 		assign BC_rate[j] = dut.base_clocks[j].rate;
@@ -95,7 +96,7 @@ endgenerate
 
 genvar k;
 generate
-	for (k = 0; k < num_alarms; k++)
+	for (k = 0; k < 24; k++)
 	 begin
 		assign alarm_enable[k] = dut.alarms[k].enable;
 		assign alarm_countdown[k] = dut.alarms[k].countdown;
