@@ -127,7 +127,7 @@ endgroup // instructions
 ats21 fcover = new;
 
 
-class InputTwiddle;
+class RandomInput;
 	rand bit[15:0] rand_ctrlA;
 	rand bit[15:0] rand_ctrlB;
 	rand bit			 rand_req;
@@ -136,7 +136,7 @@ endclass
 // Simulation
 initial begin
 
-	InputTwiddle i;
+	RandomInput i;
 	i = new;
 
 	// Initialize Design
