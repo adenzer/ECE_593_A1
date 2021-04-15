@@ -447,12 +447,12 @@ end
 
 // Behaviorial Block
 always_ff @(posedge clk or posedge reset) begin : module_behavior
-  if (cr_bits.active) begin
-    // Reset Detection
-  	if(reset)
-  		Reset();
-  	// Normal Operation
-    else begin
+  // Reset Detection
+	if(reset)
+		Reset();
+	// Normal Operation
+  else begin
+    if (cr_bits.active) begin
       if (req) begin    // if device is active and request signal received
          // read first 16-bits of ctrlA instruction
         if ((ctrlA[15:13] != 3'b000) && (inCountA == 1'b0)) begin    // if not NOP and top half of instruction not yet received
