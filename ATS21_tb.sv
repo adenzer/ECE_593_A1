@@ -72,6 +72,40 @@ logic [num_clocks_bits-1:0] alarm_assigned_clock [num_alarms-1:0];
 logic alarm_finished [num_alarms-1:0];
 logic [num_alarms-1:0] all_alarms;
 
+typedef struct packed {
+	logic enable;
+	logic [clock_width-1:0] count;
+	logic [1:0] rate;
+} Clock;
+
+// Array of Clocks
+Clock [num_clocks-1:0] base_clocks;
+assign base_clocks = dut.base_clocks;
+
+typedef struct packed {
+	logic enable;
+  logic countdown;
+	logic loop;
+	logic [num_clocks_bits-1:0] assigned_clock;
+	logic [clock_width-1:0] value;
+	logic finished;
+} Alarm;
+
+Alarm [num_alarms-1:0] alarms;
+assign alarms = dut.alarms;
+
+
+typedef struct packed {
+	logic active;
+	logic clientA_clock;
+	logic clientB_clock;
+	logic clientA_alarm;
+	logic clientB_alarm;
+} ControlRegisters;
+
+ControlRegisters cr_bits;
+assign cr_bits = dut.cr_bits;
+
 // Instantiate DUT
 ATS21 dut(.clk(clk), .reset(reset), .req(req), .ctrlA(ctrlA), .ctrlB(ctrlB),
 			.ready(ready), .stat(stat), .data(data), .opcodeA_proc(opcodeA), .opcodeB_proc(opcodeB));
@@ -90,6 +124,7 @@ end
 ///////////////////////////////////////
 ////////// Testbench Simulus //////////
 ///////////////////////////////////////
+
 assign sameOpcode = opcodeA == opcodeB;
 assign ABsameTime = opcodeA != 3'b000 && opcodeB != 3'b000;
 
@@ -135,11 +170,31 @@ covergroup ats21 @(posedge clk);
 		bins a5[1] = default;
 	}
 
-	coverpoint dut.cr_bits;
-
 	coverpoint dut.base_clocks;
+	coverpoint base_clocks[0].rate;
+	coverpoint base_clocks[0].enable;
+	coverpoint base_clocks[0].count;
 
 	coverpoint dut.alarms;
+	coverpoint alarms[0].enable;
+	coverpoint alarms[0].countdown;
+	coverpoint alarms[0].loop;
+	coverpoint alarms[0].assigned_clock;
+	coverpoint alarms[0].value;
+	coverpoint alarms[0].finished;
+
+	coverpoint dut.cr_bits;
+	coverpoint cr_bits.active;
+	coverpoint cr_bits.clientA_clock;
+	coverpoint cr_bits.clientB_clock;
+	coverpoint cr_bits.clientA_alarm;
+	coverpoint cr_bits.clientB_alarm;
+
+	coverpoint dut.checkInst.ctrlA;
+	coverpoint dut.checkInst.ctrlB;
+
+	coverpoint dut.processInst.ctrlA;
+	coverpoint dut.processInst.ctrlB;
 
 	coverpoint all_alarms {
 		bins a0[1] = {24'd0};
