@@ -53,6 +53,7 @@ module ATS21_tb ();
 logic clk, reset, req, ready;
 logic [1:0] stat;
 logic [15:0] ctrlA, ctrlB;
+logic [15:0] ctrlA_top, ctrlB_top;
 logic [23:0] data;
 
 // Testbench Input Signals
