@@ -56,6 +56,16 @@ logic [15:0] ctrlA, ctrlB;
 logic [ 2:0] opcodeA, opcodeB;
 logic [23:0] data;
 
+logic [15:0] BC_enable;
+logic [15:0] BC_rate;
+logic [15:0] BC_count;
+
+logic [23:0] alarm_enable;
+logic [23:0] alarm_countdown;
+logic [23:0] alarm_loop;
+logic [23:0] alarm_bc[3:0];
+logic [23:0] alarm_value[15:0];
+
 
 // Instantiate DUT
 ATS21 dut(.clk(clk), .reset(reset), .req(req), .ctrlA(ctrlA), .ctrlB(ctrlB),
@@ -69,6 +79,7 @@ end
 ///////////////////////////////////////
 ////////// Testbench Simulus //////////
 ///////////////////////////////////////
+
 assign sameOpcode = opcodeA == opcodeB;
 assign ABsameTime = opcodeA != 3'b000 && opcodeB != 3'b000;
 
