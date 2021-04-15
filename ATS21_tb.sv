@@ -69,6 +69,8 @@ end
 ///////////////////////////////////////
 ////////// Testbench Simulus //////////
 ///////////////////////////////////////
+assign sameOpcode = opcodeA == opcodeB;
+assign ABsameTime = opcodeA != 3'b000 && opcodeB != 3'b000;
 
 covergroup ats21 @(posedge clk);
 	option.at_least =2;
@@ -88,6 +90,8 @@ covergroup ats21 @(posedge clk);
 		bins a4[1] = {3'b111};
 		bins a5[1] = default;
 	}
+	coverpoint sameOpcode;
+	coverpoint ABsameTime;
 	coverpoint data[0];
 	coverpoint data[1];
 	coverpoint data[2];
