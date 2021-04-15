@@ -135,7 +135,10 @@ covergroup ats21 @(posedge clk);
 	coverpoint alarm_countdown;
 	coverpoint alarm_loop;
 	coverpoint alarm_bc;
-	coverpoint alarm_value;
+	coverpoint alarm_value[0];
+	coverpoint alarm_value[1];
+	coverpoint alarm_value[2];
+	coverpoint alarm_value[3];
 	coverpoint alarm_finished;
 
 	coverpoint dut.checkInst.ctrlA;
