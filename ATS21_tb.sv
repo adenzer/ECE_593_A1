@@ -61,7 +61,7 @@ logic[15:0] a_first, a_second, b_first, b_second;
 
 // Instantiate DUT
 ATS21 dut(.clk(clk), .reset(reset), .req(req), .ctrlA(ctrlA), .ctrlB(ctrlB),
-			.ready(ready), .stat(stat), .data(data));
+			.ready(ready), .stat(stat), .data(data), .ctrlA_top(ctrlA_top), .ctrlB_top(ctrlB_top));
 
 // Reference Clock Generator
 always begin
@@ -71,27 +71,34 @@ end
 ///////////////////////////////////////
 ////////// Testbench Simulus //////////
 ///////////////////////////////////////
+assign opcode_A = ctrlA_top[15:13];
+assign opcode_B = ctrlB_top[15:13];
 
-assign opcode_A = ctrlA[31:29];
-assign opcode_B = ctrlB[31:29];
 
 covergroup instructions @(posedge clk);
 	option.at_least =2;
-	coverpoint opcode_A {
-		bins a1 = 3'b001;
-		bins a2 = 3'b010;
-		bins a3 = 3'b101;
-		bins a4 = 3'b110;
-		bins a5 = 3'b111;
-		bins a6 = default;
+	coverpoint opcode_A iff req {
+		bins a0[1] = {3'b001};
+		bins a1[1] = {3'b010};
+		bins a2[1] = {3'b101};
+		bins a3[1] = {3'b110};
+		bins a4[1] = {3'b111};
+		bins a5[1] = default;
 	}
-	coverpoint opcode_B {
-		bins a1 = 3'b001;
-		bins a2 = 3'b010;
-		bins a3 = 3'b101;
-		bins a4 = 3'b110;
-		bins a5 = 3'b111;
-		bins a6 = default;
+	coverpoint opcode_B iff req {
+		bins a0[1] = {3'b001};
+		bins a1[1] = {3'b010};
+		bins a2[1] = {3'b101};
+		bins a3[1] = {3'b110};
+		bins a4[1] = {3'b111};
+		bins a5[1] = default;
+	}
+	coverpoint data;
+	coverpoint stat {
+		bins a0[1] = {2'b00};
+		bins a1[1] = {2'b01};
+		bins a2[1] = {2'b10};
+		bins a3[1] = {2'b11};
 	}
 endgroup // instructions
 
@@ -106,7 +113,7 @@ endclass
 
 // Simulation
 initial begin
-	
+
 	InputTwiddle i = new;
 
 	// Initialize Design
