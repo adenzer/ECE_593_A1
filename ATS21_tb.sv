@@ -63,8 +63,8 @@ logic [15:0] BC_count;
 logic [23:0] alarm_enable;
 logic [23:0] alarm_countdown;
 logic [23:0] alarm_loop;
-logic [23:0] alarm_bc[3:0];
-logic [23:0] alarm_value[15:0];
+logic [23:0] [3:0] alarm_bc;
+logic [23:0] [15:0] alarm_value;
 logic [23:0] alarm_finished;
 
 
