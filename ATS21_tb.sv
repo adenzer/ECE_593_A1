@@ -117,7 +117,7 @@ initial begin
 	// Initialize Design
 	initialize();
 
-	while (fcover.get_coverage()<5) begin
+	while (fcover.get_coverage()<100) begin
 		assert(i.randomize());
 		req <= i.rand_req;
 		ctrlA <= i.rand_ctrlA;
