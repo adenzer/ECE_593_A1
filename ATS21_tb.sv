@@ -72,6 +72,7 @@ logic [num_clocks_bits-1:0] alarm_assigned_clock [num_alarms-1:0];
 logic alarm_finished [num_alarms-1:0];
 logic [num_alarms-1:0] all_alarms;
 
+/*
 typedef struct packed {
 	logic enable;
 	logic [clock_width-1:0] count;
@@ -104,6 +105,7 @@ typedef struct packed {
 
 ControlRegisters cr_bits;
 assign cr_bits = dut.cr_bits;
+*/
 
 // Instantiate DUT
 ATS21 dut(.clk(clk), .reset(reset), .req(req), .ctrlA(ctrlA), .ctrlB(ctrlB),
@@ -127,6 +129,7 @@ end
 assign sameOpcode = opcodeA == opcodeB;
 assign ABsameTime = opcodeA != 3'b000 && opcodeB != 3'b000;
 
+/*
  genvar j;
  generate
  	for (j = 0; j < num_clocks; j++)
@@ -146,7 +149,7 @@ assign ABsameTime = opcodeA != 3'b000 && opcodeB != 3'b000;
  		assign alarm_assigned_clock[k] = dut.alarms[k].assigned_clock;
  		assign alarm_finished[k] = dut.alarms[k].finished;
  	 end
- endgenerate
+ endgenerate*/
 
 covergroup ats21 @(posedge clk);
 	option.at_least =2;
@@ -172,24 +175,24 @@ covergroup ats21 @(posedge clk);
 	}
 
 	coverpoint dut.base_clocks;
-	coverpoint base_clocks[0].rate;
+	/*coverpoint base_clocks[0].rate;
 	coverpoint base_clocks[0].enable;
-	coverpoint base_clocks[0].count;
+	coverpoint base_clocks[0].count;*/
 
 	coverpoint dut.alarms;
-	coverpoint alarms[0].enable;
+	/*coverpoint alarms[0].enable;
 	coverpoint alarms[0].countdown;
 	coverpoint alarms[0].loop;
 	coverpoint alarms[0].assigned_clock;
 	coverpoint alarms[0].value;
-	coverpoint alarms[0].finished;
+	coverpoint alarms[0].finished;*/
 
 	coverpoint dut.cr_bits;
-	coverpoint cr_bits.active;
+	/*coverpoint cr_bits.active;
 	coverpoint cr_bits.clientA_clock;
 	coverpoint cr_bits.clientB_clock;
 	coverpoint cr_bits.clientA_alarm;
-	coverpoint cr_bits.clientB_alarm;
+	coverpoint cr_bits.clientB_alarm;*/
 
 	coverpoint dut.checkInst.ctrlA;
 	coverpoint dut.checkInst.ctrlB;
@@ -207,7 +210,35 @@ covergroup ats21 @(posedge clk);
 	coverpoint sameOpcode;
 	coverpoint ABsameTime;
 
-	coverpoint data[0];
+	coverpoint data {
+		bins alarm_0[1] = {24'b000000000000000000000001};
+		bins alarm_1[1] = {24'b000000000000000000000010};
+		bins alarm_2[1] = {24'b000000000000000000000100};
+		bins alarm_3[1] = {24'b000000000000000000001000};
+		bins alarm_4[1] = {24'b000000000000000000010000};
+		bins alarm_5[1] = {24'b000000000000000000100000};
+		bins alarm_6[1] = {24'b000000000000000001000000};
+		bins alarm_7[1] = {24'b000000000000000010000000};
+		bins alarm_8[1] = {24'b000000000000000100000000};
+		bins alarm_9[1] = {24'b000000000000001000000000};
+		bins alarm_10[1] = {24'b000000000000010000000000};
+		bins alarm_11[1] = {24'b000000000000100000000000};
+		bins alarm_12[1] = {24'b000000000001000000000000};
+		bins alarm_13[1] = {24'b000000000010000000000000};
+		bins alarm_14[1] = {24'b000000000100000000000000};
+		bins alarm_15[1] = {24'b000000001000000000000000};
+		bins alarm_16[1] = {24'b000000010000000000000000};
+		bins alarm_17[1] = {24'b000000100000000000000000};
+		bins alarm_18[1] = {24'b000001000000000000000000};
+		bins alarm_19[1] = {24'b000010000000000000000000};
+		bins alarm_20[1] = {24'b000100000000000000000000};
+		bins alarm_21[1] = {24'b001000000000000000000000};
+		bins alarm_22[1] = {24'b010000000000000000000000};
+		bins alarm_23[1] = {24'b100000000000000000000000};
+		bins other[1] = default;
+	}
+
+	/*coverpoint data[0];
 	coverpoint data[1];
 	coverpoint data[2];
 	coverpoint data[3];
@@ -230,7 +261,7 @@ covergroup ats21 @(posedge clk);
 	coverpoint data[20];
 	coverpoint data[21];
 	coverpoint data[22];
-	coverpoint data[23];
+	coverpoint data[23];*/
 
 	coverpoint stat {
 		bins Nack[1] = {2'b00};
