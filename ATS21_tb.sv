@@ -63,13 +63,13 @@ logic [ 2:0] opcodeA, opcodeB;
 logic [23:0] data;
 
 // Testbench Signals
-logic BC_enable [num_clocks-1:0];
-logic [1:0] BC_rate [num_clocks-1:0];
-logic alarm_enable [num_alarms-1:0];
-logic alarm_countdown [num_alarms-1:0];
-logic alarm_loop [num_alarms-1:0];
-logic [num_clocks_bits-1:0] alarm_assigned_clock [num_alarms-1:0];
-logic alarm_finished [num_alarms-1:0];
+//logic BC_enable [num_clocks-1:0];
+//logic [1:0] BC_rate [num_clocks-1:0];
+//logic alarm_enable [num_alarms-1:0];
+//logic alarm_countdown [num_alarms-1:0];
+//logic alarm_loop [num_alarms-1:0];
+//logic [num_clocks_bits-1:0] alarm_assigned_clock [num_alarms-1:0];
+//logic alarm_finished [num_alarms-1:0];
 logic [num_alarms-1:0] all_alarms;
 
 /*
@@ -211,16 +211,16 @@ covergroup ats21 @(posedge clk);
 	coverpoint ABsameTime;
 
 	coverpoint data {
-		bins alarm_0[1] = {24'b000000000000000000000001};
-		bins alarm_1[1] = {24'b000000000000000000000010};
-		bins alarm_2[1] = {24'b000000000000000000000100};
-		bins alarm_3[1] = {24'b000000000000000000001000};
-		bins alarm_4[1] = {24'b000000000000000000010000};
-		bins alarm_5[1] = {24'b000000000000000000100000};
-		bins alarm_6[1] = {24'b000000000000000001000000};
-		bins alarm_7[1] = {24'b000000000000000010000000};
-		bins alarm_8[1] = {24'b000000000000000100000000};
-		bins alarm_9[1] = {24'b000000000000001000000000};
+		bins alarm_0[1]  = {24'b000000000000000000000001};
+		bins alarm_1[1]  = {24'b000000000000000000000010};
+		bins alarm_2[1]  = {24'b000000000000000000000100};
+		bins alarm_3[1]  = {24'b000000000000000000001000};
+		bins alarm_4[1]  = {24'b000000000000000000010000};
+		bins alarm_5[1]  = {24'b000000000000000000100000};
+		bins alarm_6[1]  = {24'b000000000000000001000000};
+		bins alarm_7[1]  = {24'b000000000000000010000000};
+		bins alarm_8[1]  = {24'b000000000000000100000000};
+		bins alarm_9[1]  = {24'b000000000000001000000000};
 		bins alarm_10[1] = {24'b000000000000010000000000};
 		bins alarm_11[1] = {24'b000000000000100000000000};
 		bins alarm_12[1] = {24'b000000000001000000000000};
