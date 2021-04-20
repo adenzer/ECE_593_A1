@@ -75,8 +75,6 @@ module ATS21 (
   output logic        ready,
   output logic [ 1:0] stat,
   output logic [23:0] data,
-  output logic [ 2:0] opcodeA_proc,
-  output logic [ 2:0] opcodeB_proc
 );
 
 ////////////////////////////////////////////////////////////////////
@@ -203,6 +201,7 @@ endtask
 // also, if both are trying to write to control register, disregard instruction (Nack)
 // if all is in order, call processInst task
 task checkInst(input logic [31:0] ctrlA, input logic [31:0] ctrlB);
+
   if (ctrlA[31:29] == ctrlB[31:29]) begin
     case (ctrlA[31:29])
       3'b001:
@@ -279,10 +278,6 @@ task checkInst(input logic [31:0] ctrlA, input logic [31:0] ctrlB);
 endtask
 
 task processInst(input logic [31:0] ctrlA, input logic [31:0] ctrlB);
-
-    opcodeA_proc <= ctrlA[31:29];   // for coverage
-    opcodeB_proc <= ctrlB[31:29];   // for coverage
-
     // process ctrlA instruction
     case (ctrlA[31:29])   // opcode
       3'b001:   // set clock

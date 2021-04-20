@@ -109,7 +109,7 @@ assign cr_bits = dut.cr_bits;
 
 // Instantiate DUT
 ATS21 dut(.clk(clk), .reset(reset), .req(req), .ctrlA(ctrlA), .ctrlB(ctrlB),
-			.ready(ready), .stat(stat), .data(data), .opcodeA_proc(opcodeA), .opcodeB_proc(opcodeB));
+			.ready(ready), .stat(stat), .data(data), .opcodeA_cover(opcodeA), .opcodeB_cover(opcodeB));
 
 // Reference Clock Generator
 always begin
@@ -154,23 +154,23 @@ assign ABsameTime = opcodeA != 3'b000 && opcodeB != 3'b000;
 covergroup ats21 @(posedge clk);
 	option.at_least =2;
 
-	coverpoint opcodeA {
-		bins set_BC[1] = {3'b001};
-		bins toggle_BC[1] = {3'b010};
-		bins set_AT[1] = {3'b101};
-		bins set_Countdown[1] = {3'b110};
-		bins toggle_AT[1] = {3'b111};
-		bins set_ATS21_mode[1] = {3'b011};
+	// Cover Opcodes
+	coverpoint dut.ctrlA[31:29]{
+		bins set_BC[1] = {32'b001};
+		bins toggle_BC[1] = {32'b010};
+		bins set_AT[1] = {32'b101};
+		bins set_Countdown[1] = {32'b110};
+		bins toggle_AT[1] = {32'b111};
+		bins set_ATS21_mode[1] = {32'b011};
 		bins invalid_instruction[1] = default;
 	}
-
-	coverpoint opcodeB {
-		bins set_BC[1] = {3'b001};
-		bins toggle_BC[1] = {3'b010};
-		bins set_AT[1] = {3'b101};
-		bins set_Countdown[1] = {3'b110};
-		bins toggle_AT[1] = {3'b111};
-		bins set_ATS21_mode[1] = {3'b011};
+	coverpoint dut.ctrlB[31:29]{
+		bins set_BC[1] = {32'b001};
+		bins toggle_BC[1] = {32'b010};
+		bins set_AT[1] = {32'b101};
+		bins set_Countdown[1] = {32'b110};
+		bins toggle_AT[1] = {32'b111};
+		bins set_ATS21_mode[1] = {32'b011};
 		bins invalid_instruction[1] = default;
 	}
 
@@ -194,9 +194,11 @@ covergroup ats21 @(posedge clk);
 	coverpoint cr_bits.clientA_alarm;
 	coverpoint cr_bits.clientB_alarm;*/
 
+	// Check opcodes being processed in checkInst task
 	coverpoint dut.checkInst.ctrlA;
 	coverpoint dut.checkInst.ctrlB;
 
+	// Coverage is missing when Opcode is 000, but not all the time
 	coverpoint dut.processInst.ctrlA;
 	coverpoint dut.processInst.ctrlB;
 
