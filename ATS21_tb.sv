@@ -154,23 +154,23 @@ assign ABsameTime = opcodeA != 3'b000 && opcodeB != 3'b000;
 covergroup ats21 @(posedge clk);
 	option.at_least =2;
 
-	// Cover Opcodes
-	coverpoint dut.ctrlA[31:29]{
-		bins set_BC[1] = {32'b001};
-		bins toggle_BC[1] = {32'b010};
-		bins set_AT[1] = {32'b101};
-		bins set_Countdown[1] = {32'b110};
-		bins toggle_AT[1] = {32'b111};
-		bins set_ATS21_mode[1] = {32'b011};
+	coverpoint opcodeA {
+		bins set_BC[1] = {3'b001};
+		bins toggle_BC[1] = {3'b010};
+		bins set_AT[1] = {3'b101};
+		bins set_Countdown[1] = {3'b110};
+		bins toggle_AT[1] = {3'b111};
+		bins set_ATS21_mode[1] = {3'b011};
 		bins invalid_instruction[1] = default;
 	}
-	coverpoint dut.ctrlB[31:29]{
-		bins set_BC[1] = {32'b001};
-		bins toggle_BC[1] = {32'b010};
-		bins set_AT[1] = {32'b101};
-		bins set_Countdown[1] = {32'b110};
-		bins toggle_AT[1] = {32'b111};
-		bins set_ATS21_mode[1] = {32'b011};
+
+	coverpoint opcodeB {
+		bins set_BC[1] = {3'b001};
+		bins toggle_BC[1] = {3'b010};
+		bins set_AT[1] = {3'b101};
+		bins set_Countdown[1] = {3'b110};
+		bins toggle_AT[1] = {3'b111};
+		bins set_ATS21_mode[1] = {3'b011};
 		bins invalid_instruction[1] = default;
 	}
 
@@ -194,10 +194,26 @@ covergroup ats21 @(posedge clk);
 	coverpoint cr_bits.clientA_alarm;
 	coverpoint cr_bits.clientB_alarm;*/
 
-	// Check opcodes being processed in checkInst task
-	coverpoint dut.checkInst.ctrlA;
-	coverpoint dut.checkInst.ctrlB;
-
+	// Coverage is missing when Opcode is 000, but not all the time
+	coverpoint dut.checkInst.ctrlA[31:29]{
+		bins set_BC[1] = {32'b001};
+		bins toggle_BC[1] = {32'b010};
+		bins set_AT[1] = {32'b101};
+		bins set_Countdown[1] = {32'b110};
+		bins toggle_AT[1] = {32'b111};
+		bins set_ATS21_mode[1] = {32'b011};
+		bins invalid_instruction[1] = default;
+	}
+	coverpoint dut.checkInst.ctrlB[31:29]{
+		bins set_BC[1] = {32'b001};
+		bins toggle_BC[1] = {32'b010};
+		bins set_AT[1] = {32'b101};
+		bins set_Countdown[1] = {32'b110};
+		bins toggle_AT[1] = {32'b111};
+		bins set_ATS21_mode[1] = {32'b011};
+		bins invalid_instruction[1] = default;
+	}
+	
 	// Coverage is missing when Opcode is 000, but not all the time
 	coverpoint dut.processInst.ctrlA;
 	coverpoint dut.processInst.ctrlB;
