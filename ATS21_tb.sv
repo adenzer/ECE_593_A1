@@ -174,6 +174,11 @@ covergroup ats21 @(posedge clk);
 		bins invalid_instruction[1] = default;
 	}
 
+	coverpoint req{
+		bins active = 1'b1;
+		bins inactive = default; 
+	}
+
 	coverpoint dut.base_clocks;
 	/*coverpoint base_clocks[0].rate;
 	coverpoint base_clocks[0].enable;
