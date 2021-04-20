@@ -117,7 +117,7 @@ always begin
 end
 
 always_ff @(posedge clk) begin : add_alarms
-	all_alarms <= data[0] + data[1] + data[2] + data[3] + data[4] + data[5] + data[6] + data[7] + data[8] + data[9] + data[10]
+	all_alarms <= data[0] + data + data[2] + data[3] + data[4] + data[5] + data[6] + data[7] + data[8] + data[9] + data[10]
 				+ data[11] + data[12] + data[13] + data[14] + data[15] + data[16] + data[17] + data[18] + data[19] + data[20] 
 				+ data[21] + data[22] + data[23];
 end
@@ -155,27 +155,29 @@ covergroup ats21 @(posedge clk);
 	option.at_least =2;
 
 	coverpoint opcodeA {
-		bins set_BC[1] = {3'b001};
-		bins toggle_BC[1] = {3'b010};
-		bins set_AT[1] = {3'b101};
-		bins set_Countdown[1] = {3'b110};
-		bins toggle_AT[1] = {3'b111};
-		bins set_ATS21_mode[1] = {3'b011};
-		bins invalid_instruction[1] = default;
+		bins set_BC = {3'b001};
+		bins toggle_BC = {3'b010};
+		bins set_AT = {3'b101};
+		bins set_Countdown = {3'b110};
+		bins toggle_AT = {3'b111};
+		bins set_ATS21_mode = {3'b011};
+		bins invalid_instruction = default;
 	}
 
 	coverpoint opcodeB {
-		bins set_BC[1] = {3'b001};
-		bins toggle_BC[1] = {3'b010};
-		bins set_AT[1] = {3'b101};
-		bins set_Countdown[1] = {3'b110};
-		bins toggle_AT[1] = {3'b111};
-		bins set_ATS21_mode[1] = {3'b011};
-		bins invalid_instruction[1] = default;
+		bins set_BC = {3'b001};
+		bins toggle_BC = {3'b010};
+		bins set_AT = {3'b101};
+		bins set_Countdown = {3'b110};
+		bins toggle_AT = {3'b111};
+		bins set_ATS21_mode = {3'b011};
+		bins invalid_instruction = default;
 	}
 
-	coverpoint req{
-		bins active = 1'b1;
+	coverpoint req {
+		bins recieve_instruction[] = (1'b0 => 1'b1);
+		bins active = {1'b1};
+		bins active_two_or_more_cycles[] = (1'b0 => 1'b1[*2]);
 		bins inactive = default; 
 	}
 
@@ -201,22 +203,22 @@ covergroup ats21 @(posedge clk);
 
 	// Coverage is missing when Opcode is 000, but not all the time
 	coverpoint dut.checkInst.ctrlA[31:29]{
-		bins set_BC[1] = {32'b001};
-		bins toggle_BC[1] = {32'b010};
-		bins set_AT[1] = {32'b101};
-		bins set_Countdown[1] = {32'b110};
-		bins toggle_AT[1] = {32'b111};
-		bins set_ATS21_mode[1] = {32'b011};
-		bins invalid_instruction[1] = default;
+		bins set_BC = {32'b001};
+		bins toggle_BC = {32'b010};
+		bins set_AT = {32'b101};
+		bins set_Countdown = {32'b110};
+		bins toggle_AT = {32'b111};
+		bins set_ATS21_mode = {32'b011};
+		bins invalid_instruction = default;
 	}
 	coverpoint dut.checkInst.ctrlB[31:29]{
-		bins set_BC[1] = {32'b001};
-		bins toggle_BC[1] = {32'b010};
-		bins set_AT[1] = {32'b101};
-		bins set_Countdown[1] = {32'b110};
-		bins toggle_AT[1] = {32'b111};
-		bins set_ATS21_mode[1] = {32'b011};
-		bins invalid_instruction[1] = default;
+		bins set_BC = {32'b001};
+		bins toggle_BC = {32'b010};
+		bins set_AT = {32'b101};
+		bins set_Countdown = {32'b110};
+		bins toggle_AT = {32'b111};
+		bins set_ATS21_mode = {32'b011};
+		bins invalid_instruction = default;
 	}
 	
 	// Coverage is missing when Opcode is 000, but not all the time
@@ -224,41 +226,41 @@ covergroup ats21 @(posedge clk);
 	coverpoint dut.processInst.ctrlB;
 
 	coverpoint all_alarms {
-		bins no_alarms[1] = {24'd0};
-		bins one_alarm[1] = {24'd1};
-		bins two_alarms[1] = {24'd2};
-		bins many_alarms[1] = default;
+		bins no_alarms = {24'd0};
+		bins one_alarm = {24'd1};
+		bins two_alarms = {24'd2};
+		bins many_alarms = default;
 	}
 
 	coverpoint sameOpcode;
 	coverpoint ABsameTime;
 
 	coverpoint data {
-		bins alarm_0[1]  = {24'b000000000000000000000001};
-		bins alarm_1[1]  = {24'b000000000000000000000010};
-		bins alarm_2[1]  = {24'b000000000000000000000100};
-		bins alarm_3[1]  = {24'b000000000000000000001000};
-		bins alarm_4[1]  = {24'b000000000000000000010000};
-		bins alarm_5[1]  = {24'b000000000000000000100000};
-		bins alarm_6[1]  = {24'b000000000000000001000000};
-		bins alarm_7[1]  = {24'b000000000000000010000000};
-		bins alarm_8[1]  = {24'b000000000000000100000000};
-		bins alarm_9[1]  = {24'b000000000000001000000000};
-		bins alarm_10[1] = {24'b000000000000010000000000};
-		bins alarm_11[1] = {24'b000000000000100000000000};
-		bins alarm_12[1] = {24'b000000000001000000000000};
-		bins alarm_13[1] = {24'b000000000010000000000000};
-		bins alarm_14[1] = {24'b000000000100000000000000};
-		bins alarm_15[1] = {24'b000000001000000000000000};
-		bins alarm_16[1] = {24'b000000010000000000000000};
-		bins alarm_17[1] = {24'b000000100000000000000000};
-		bins alarm_18[1] = {24'b000001000000000000000000};
-		bins alarm_19[1] = {24'b000010000000000000000000};
-		bins alarm_20[1] = {24'b000100000000000000000000};
-		bins alarm_21[1] = {24'b001000000000000000000000};
-		bins alarm_22[1] = {24'b010000000000000000000000};
-		bins alarm_23[1] = {24'b100000000000000000000000};
-		bins other[1] = default;
+		bins alarm_0  = {24'b000000000000000000000001};
+		bins alarm_1  = {24'b000000000000000000000010};
+		bins alarm_2  = {24'b000000000000000000000100};
+		bins alarm_3  = {24'b000000000000000000001000};
+		bins alarm_4  = {24'b000000000000000000010000};
+		bins alarm_5  = {24'b000000000000000000100000};
+		bins alarm_6  = {24'b000000000000000001000000};
+		bins alarm_7  = {24'b000000000000000010000000};
+		bins alarm_8  = {24'b000000000000000100000000};
+		bins alarm_9  = {24'b000000000000001000000000};
+		bins alarm_10 = {24'b000000000000010000000000};
+		bins alarm_11 = {24'b000000000000100000000000};
+		bins alarm_12 = {24'b000000000001000000000000};
+		bins alarm_13 = {24'b000000000010000000000000};
+		bins alarm_14 = {24'b000000000100000000000000};
+		bins alarm_15 = {24'b000000001000000000000000};
+		bins alarm_16 = {24'b000000010000000000000000};
+		bins alarm_17 = {24'b000000100000000000000000};
+		bins alarm_18 = {24'b000001000000000000000000};
+		bins alarm_19 = {24'b000010000000000000000000};
+		bins alarm_20 = {24'b000100000000000000000000};
+		bins alarm_21 = {24'b001000000000000000000000};
+		bins alarm_22 = {24'b010000000000000000000000};
+		bins alarm_23 = {24'b100000000000000000000000};
+		bins other = default;
 	}
 
 	/*coverpoint data[0];
@@ -287,10 +289,10 @@ covergroup ats21 @(posedge clk);
 	coverpoint data[23];*/
 
 	coverpoint stat {
-		bins Nack[1] = {2'b00};
-		bins Ack_A[1] = {2'b01};
-		bins Ack_B[1] = {2'b10};
-		bins Ack_AB[1] = {2'b11};
+		bins Nack = {2'b00};
+		bins Ack_A = {2'b01};
+		bins Ack_B = {2'b10};
+		bins Ack_AB = {2'b11};
 	}
 
 endgroup // instructions
