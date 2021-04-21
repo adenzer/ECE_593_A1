@@ -470,7 +470,8 @@ covergroup ats21_output @(posedge clk);
 		bins no_alarms   = {24'd0};
 		bins one_alarm   = {24'd1};
 		bins two_alarms  = {24'd2};
-		bins many_alarms = default;
+		bins many_alarms = { [24'd3:24'd23] };
+		bins unknown_alarms = default;
 	}
 
 	coverpoint data {
