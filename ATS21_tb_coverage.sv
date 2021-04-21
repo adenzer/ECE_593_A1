@@ -35,23 +35,6 @@ logic [23:0] data;
 // Testbench Signals
 logic [num_alarms-1:0] all_alarms;
 
-logic alarm0_enable;
-logic alarm0_countdown;
-logic alarm0_loop;
-logic [3:0] alarm0_assigned_clock;
-logic [15:0] alarm0_value;
-logic alarm0_finished;
-
-logic [2:0] checkInst_opcodeA;
-logic [2:0] checkInst_opcodeB;
-logic [31:0] processInst_ctrlA;
-logic [31:0] processInst_ctrlB;
-
-logic [15:0][17:0] base_clocks;
-logic [23:0][23:0] alarms;
-logic [4:0] cr_bits;
-
-
 // Instantiate DUT
 ATS21 dut(.clk(clk), .reset(reset), .req(req), .ctrlA(ctrlA), .ctrlB(ctrlB),
 			.ready(ready), .stat(stat), .data(data));
@@ -75,23 +58,6 @@ assign ctrlA_opcode_in = ctrlA[15:13];
 assign ctrlB_opcode_in = ctrlB[15:13];
 assign sameOpcode = (ctrlA_opcode_in == ctrlB_opcode_in) && req;
 assign ABsameTime = (ctrlA_opcode_in != 3'b000 && ctrlB_opcode_in != 3'b000) && req;
-assign alarm0_enable = dut.alarms[0].enable;
-assign alarm0_countdown = dut.alarms[0].countdown;
-assign alarm0_loop = dut.alarms[0].loop;
-assign alarm0_assigned_clock = dut.alarms[0].assigned_clock;
-assign alarm0_value = dut.alarms[0].value;
-assign alarm0_finished = dut.alarms[0].finished;
-
-assign base_clocks = dut.base_clocks;
-assign alarms = dut.alarms;
-assign cr_bits = dut.cr_bits;
-
-assign checkInst_opcodeA = dut.checkInst.ctrlA[31:29];
-assign checkInst_opcodeB = dut.checkInst.ctrlB[31:29];
-
-assign processInst_ctrlA = dut.processInst.ctrlA;
-assign processInst_ctrlB = dut.processInst.ctrlB;
-
 
 
 covergroup ats21 @(posedge clk);
@@ -125,23 +91,27 @@ covergroup ats21 @(posedge clk);
 		bins inactive                    = default;
 	}
 
-	coverpoint base_clocks;
+	base_clocks: coverpoint dut.base_clocks;
 
-	coverpoint alarms;
+	alarms: coverpoint dut.alarms;
 
-	coverpoint alarm0_enable;
-	coverpoint alarm0_countdown;
-	coverpoint alarm0_loop;
-	coverpoint alarm0_assigned_clock;
-	coverpoint alarm0_value;
-	coverpoint alarm0_finished;
+	alarm0_enable: coverpoint dut.alarms[0].enable;
+	alarm0_countdown: coverpoint dut.alarms[0].countdown;
+	alarm0_loop: coverpoint dut.alarms[0].loop;
+	alarm0_assigned_clock: coverpoint dut.alarms[0].assigned_clock;
+	alarm0_value: coverpoint dut.alarms[0].value;
+	alarm0_finished: coverpoint dut.alarms[0].finished;
+	alarm0_cross : cross alarm0_enable, alarm0_countdown, alarm0_loop, alarm0_assigned_clock, alarm0_value, alarm0_finished;
 
-	cross alarm0_enable, alarm0_countdown, alarm0_loop, alarm0_assigned_clock, alarm0_value, alarm0_finished;
-
-	coverpoint cr_bits;
+	cr_device_enable: coverpoint dut.cr_bits.active;
+	cr_clientA_clock: coverpoint dut.cr_bits.clientA_clock;
+	cr_clientB_clock: coverpoint dut.cr_bits.clientB_clock;
+	cr_clientA_alarm: coverpoint dut.cr_bits.clientA_alarm;
+	cr_clientB_alarm: coverpoint dut.cr_bits.clientB_alarm;
+	cr_bits_cross: cross cr_device_enable, cr_clientA_clock, cr_clientB_clock, cr_clientA_alarm, cr_clientB_alarm;
 
 	// Coverage is missing when Opcode is 000, but not all the time
-	coverpoint checkInst_opcodeA{
+	checkInst_opcodeA: coverpoint dut.checkInst.ctrlA[31:29]{
 		bins set_BC              = {32'b001};
 		bins toggle_BC           = {32'b010};
 		bins set_AT              = {32'b101};
@@ -150,7 +120,7 @@ covergroup ats21 @(posedge clk);
 		bins set_ATS21_mode      = {32'b011};
 		bins invalid_instruction = default;
 	}
-	coverpoint checkInst_opcodeB{
+	checkInst_opcodeB: coverpoint dut.checkInst.ctrlB[31:29]{
 		bins set_BC              = {32'b001};
 		bins toggle_BC           = {32'b010};
 		bins set_AT              = {32'b101};
@@ -161,8 +131,8 @@ covergroup ats21 @(posedge clk);
 	}
 
 	// Coverage is missing when Opcode is 000, but not all the time
-	coverpoint processInst_ctrlA;
-	coverpoint processInst_ctrlB;
+	processInst_ctrlA: coverpoint dut.processInst.ctrlA;
+	processInst_ctrlB: coverpoint dut.processInst.ctrlB;
 
 	coverpoint all_alarms {
 		bins no_alarms   = {24'd0};
