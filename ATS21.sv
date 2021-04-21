@@ -606,6 +606,6 @@ generate
 	 end
 endgenerate
 
-assign data = data_out;
+always_comb data = data_out;
 
 endmodule
