@@ -1,4 +1,4 @@
-/*
+alarm_enable[1]/*
 
 Andrew Denzer and Zack Fravel
 ECE593 Assignment 1
@@ -67,6 +67,16 @@ generate
 	 end
 endgenerate
 
+
+logic cr_device_enable;
+logic cr_clientA_clock, cr_clientB_clock;
+logic cr_clientA_alarm, cr_clientB_alarm;
+
+assign cr_device_enable = dut.cr_bits.active;
+assign cr_clientA_clock = dut.cr_bits.clientA_clock
+assign cr_clientB_clock = dut.cr_bits.clientB_clock
+assign cr_clientA_alarm = dut.cr_bits.clientA_alarm
+assign cr_clientB_alarm = dut.cr_bits.clientB_alarm
 
 
 // Testbench Signals
@@ -228,7 +238,7 @@ covergroup ats21_BCs @(posedge clk);
 	BC12_cross : cross BC12_enable, BC12_count, BC12_rate;
 
 	BC13_enable: coverpoint BC_enable[13];
-	BC13_count: coverpoint dut.base_clocks[13].count;
+	BC13_count: coverpoint BC_count[13];
 	BC13_rate: coverpoint BC_rate[13];
 	BC13_cross : cross BC13_enable, BC13_count, BC13_rate;
 
@@ -245,207 +255,207 @@ endgroup	// ats21_BCs
 
 
 covergroup ats21_alarms @(posedge clk);
-	alarm0_enable: coverpoint dut.alarms[0].enable;
-	alarm0_countdown: coverpoint dut.alarms[0].countdown;
-	alarm0_loop: coverpoint dut.alarms[0].loop;
-	alarm0_assigned_clock: coverpoint dut.alarms[0].assigned_clock;
-	alarm0_value: coverpoint dut.alarms[0].value;
-	alarm0_finished: coverpoint dut.alarms[0].finished;
+	alarm0_enable: coverpoint alarm_enable[0];
+	alarm0_countdown: coverpoint alarm_countdown[0];
+	alarm0_loop: coverpoint alarm_loop[0];
+	alarm0_assigned_clock: coverpoint alarm_assigned_clock[0];
+	alarm0_value: coverpoint alarm_value[0];
+	alarm0_finished: coverpoint alarm_finished[0];
 	alarm0_cross : cross alarm0_enable, alarm0_countdown, alarm0_loop, alarm0_assigned_clock, alarm0_value, alarm0_finished;
 
-	alarm1_enable: coverpoint dut.alarms[1].enable;
-	alarm1_countdown: coverpoint dut.alarms[1].countdown;
-	alarm1_loop: coverpoint dut.alarms[1].loop;
-	alarm1_assigned_clock: coverpoint dut.alarms[1].assigned_clock;
-	alarm1_value: coverpoint dut.alarms[1].value;
-	alarm1_finished: coverpoint dut.alarms[1].finished;
+	alarm1_enable: coverpoint alarm_enable[1];
+	alarm1_countdown: coverpoint alarm_countdown[1];
+	alarm1_loop: coverpoint alarm_loop[1];
+	alarm1_assigned_clock: coverpoint alarm_assigned_clock[1];
+	alarm1_value: coverpoint alarm_value[1];
+	alarm1_finished: coverpoint alarm_finished[1];
 	alarm1_cross : cross alarm1_enable, alarm1_countdown, alarm1_loop, alarm1_assigned_clock, alarm1_value, alarm1_finished;
 
-	alarm2_enable: coverpoint dut.alarms[2].enable;
-	alarm2_countdown: coverpoint dut.alarms[2].countdown;
-	alarm2_loop: coverpoint dut.alarms[2].loop;
-	alarm2_assigned_clock: coverpoint dut.alarms[2].assigned_clock;
-	alarm2_value: coverpoint dut.alarms[2].value;
-	alarm2_finished: coverpoint dut.alarms[2].finished;
+	alarm2_enable: coverpoint alarm_enable[2];
+	alarm2_countdown: coverpoint alarm_countdown[2];
+	alarm2_loop: coverpoint alarm_loop[2];
+	alarm2_assigned_clock: coverpoint alarm_assigned_clock[2];
+	alarm2_value: coverpoint alarm_value[2];
+	alarm2_finished: coverpoint alarm_finished[2];
 	alarm2_cross : cross alarm2_enable, alarm2_countdown, alarm2_loop, alarm2_assigned_clock, alarm2_value, alarm2_finished;
 
-	alarm3_enable: coverpoint dut.alarms[3].enable;
-	alarm3_countdown: coverpoint dut.alarms[3].countdown;
-	alarm3_loop: coverpoint dut.alarms[3].loop;
-	alarm3_assigned_clock: coverpoint dut.alarms[3].assigned_clock;
-	alarm3_value: coverpoint dut.alarms[3].value;
-	alarm3_finished: coverpoint dut.alarms[3].finished;
+	alarm3_enable: coverpoint alarm_enable[3];
+	alarm3_countdown: coverpoint alarm_countdown[3];
+	alarm3_loop: coverpoint alarm_loop[3];
+	alarm3_assigned_clock: coverpoint alarm_assigned_clock[3];
+	alarm3_value: coverpoint alarm_value[3];
+	alarm3_finished: coverpoint alarm_finished[3];
 	alarm3_cross : cross alarm3_enable, alarm3_countdown, alarm3_loop, alarm3_assigned_clock, alarm3_value, alarm3_finished;
 
-	alarm4_enable: coverpoint dut.alarms[4].enable;
-	alarm4_countdown: coverpoint dut.alarms[4].countdown;
-	alarm4_loop: coverpoint dut.alarms[4].loop;
-	alarm4_assigned_clock: coverpoint dut.alarms[4].assigned_clock;
-	alarm4_value: coverpoint dut.alarms[4].value;
-	alarm4_finished: coverpoint dut.alarms[4].finished;
+	alarm4_enable: coverpoint alarm_enable[4];
+	alarm4_countdown: coverpoint alarm_countdown[4];
+	alarm4_loop: coverpoint alarm_loop[4];
+	alarm4_assigned_clock: coverpoint alarm_assigned_clock[4];
+	alarm4_value: coverpoint alarm_value[4];
+	alarm4_finished: coverpoint alarm_finished[4];
 	alarm4_cross : cross alarm4_enable, alarm4_countdown, alarm4_loop, alarm4_assigned_clock, alarm4_value, alarm4_finished;
 
-	alarm5_enable: coverpoint dut.alarms[5].enable;
-	alarm5_countdown: coverpoint dut.alarms[5].countdown;
-	alarm5_loop: coverpoint dut.alarms[5].loop;
-	alarm5_assigned_clock: coverpoint dut.alarms[5].assigned_clock;
-	alarm5_value: coverpoint dut.alarms[5].value;
-	alarm5_finished: coverpoint dut.alarms[5].finished;
+	alarm5_enable: coverpoint alarm_enable[5];
+	alarm5_countdown: coverpoint alarm_countdown[5];
+	alarm5_loop: coverpoint alarm_loop[5];
+	alarm5_assigned_clock: coverpoint alarm_assigned_clock[5];
+	alarm5_value: coverpoint alarm_value[5];
+	alarm5_finished: coverpoint alarm_finished[5];
 	alarm5_cross : cross alarm5_enable, alarm5_countdown, alarm5_loop, alarm5_assigned_clock, alarm5_value, alarm5_finished;
 
-	alarm6_enable: coverpoint dut.alarms[6].enable;
-	alarm6_countdown: coverpoint dut.alarms[6].countdown;
-	alarm6_loop: coverpoint dut.alarms[6].loop;
-	alarm6_assigned_clock: coverpoint dut.alarms[6].assigned_clock;
-	alarm6_value: coverpoint dut.alarms[6].value;
-	alarm6_finished: coverpoint dut.alarms[6].finished;
+	alarm6_enable: coverpoint alarm_enable[6];
+	alarm6_countdown: coverpoint alarm_countdown[6];
+	alarm6_loop: coverpoint alarm_loop[6];
+	alarm6_assigned_clock: coverpoint alarm_assigned_clock[6];
+	alarm6_value: coverpoint alarm_value[6];
+	alarm6_finished: coverpoint alarm_finished[6];
 	alarm6_cross : cross alarm6_enable, alarm6_countdown, alarm6_loop, alarm6_assigned_clock, alarm6_value, alarm6_finished;
 
-	alarm7_enable: coverpoint dut.alarms[7].enable;
-	alarm7_countdown: coverpoint dut.alarms[7].countdown;
-	alarm7_loop: coverpoint dut.alarms[7].loop;
-	alarm7_assigned_clock: coverpoint dut.alarms[7].assigned_clock;
-	alarm7_value: coverpoint dut.alarms[7].value;
-	alarm7_finished: coverpoint dut.alarms[7].finished;
+	alarm7_enable: coverpoint alarm_enable[7];
+	alarm7_countdown: coverpoint alarm_countdown[7];
+	alarm7_loop: coverpoint alarm_loop[7];
+	alarm7_assigned_clock: coverpoint alarm_assigned_clock[7];
+	alarm7_value: coverpoint alarm_value[7];
+	alarm7_finished: coverpoint alarm_finished[7];
 	alarm7_cross : cross alarm7_enable, alarm7_countdown, alarm7_loop, alarm7_assigned_clock, alarm7_value, alarm7_finished;
 
-	alarm8_enable: coverpoint dut.alarms[8].enable;
-	alarm8_countdown: coverpoint dut.alarms[8].countdown;
-	alarm8_loop: coverpoint dut.alarms[8].loop;
-	alarm8_assigned_clock: coverpoint dut.alarms[8].assigned_clock;
-	alarm8_value: coverpoint dut.alarms[8].value;
-	alarm8_finished: coverpoint dut.alarms[8].finished;
+	alarm8_enable: coverpoint alarm_enable[8];
+	alarm8_countdown: coverpoint alarm_countdown[8];
+	alarm8_loop: coverpoint alarm_loop[8];
+	alarm8_assigned_clock: coverpoint alarm_assigned_clock[8];
+	alarm8_value: coverpoint alarm_value[8];
+	alarm8_finished: coverpoint alarm_finished[8];
 	alarm8_cross : cross alarm8_enable, alarm8_countdown, alarm8_loop, alarm8_assigned_clock, alarm8_value, alarm8_finished;
 
-	alarm9_enable: coverpoint dut.alarms[9].enable;
-	alarm9_countdown: coverpoint dut.alarms[9].countdown;
-	alarm9_loop: coverpoint dut.alarms[9].loop;
-	alarm9_assigned_clock: coverpoint dut.alarms[9].assigned_clock;
-	alarm9_value: coverpoint dut.alarms[9].value;
-	alarm9_finished: coverpoint dut.alarms[9].finished;
+	alarm9_enable: coverpoint alarm_enable[9];
+	alarm9_countdown: coverpoint alarm_countdown[9];
+	alarm9_loop: coverpoint alarm_loop[9];
+	alarm9_assigned_clock: coverpoint alarm_assigned_clock[9];
+	alarm9_value: coverpoint alarm_value[9];
+	alarm9_finished: coverpoint alarm_finished[9];
 	alarm9_cross : cross alarm9_enable, alarm9_countdown, alarm9_loop, alarm9_assigned_clock, alarm9_value, alarm9_finished;
 
-	alarm10_enable: coverpoint dut.alarms[10].enable;
-	alarm10_countdown: coverpoint dut.alarms[10].countdown;
-	alarm10_loop: coverpoint dut.alarms[10].loop;
-	alarm10_assigned_clock: coverpoint dut.alarms[10].assigned_clock;
-	alarm10_value: coverpoint dut.alarms[10].value;
-	alarm10_finished: coverpoint dut.alarms[10].finished;
+	alarm10_enable: coverpoint alarm_enable[10];
+	alarm10_countdown: coverpoint alarm_countdown[10];
+	alarm10_loop: coverpoint alarm_loop[10];
+	alarm10_assigned_clock: coverpoint alarm_assigned_clock[10];
+	alarm10_value: coverpoint alarm_value[10];
+	alarm10_finished: coverpoint alarm_finished[10];
 	alarm10_cross : cross alarm10_enable, alarm10_countdown, alarm10_loop, alarm10_assigned_clock, alarm10_value, alarm10_finished;
 
-	alarm11_enable: coverpoint dut.alarms[11].enable;
-	alarm11_countdown: coverpoint dut.alarms[11].countdown;
-	alarm11_loop: coverpoint dut.alarms[11].loop;
-	alarm11_assigned_clock: coverpoint dut.alarms[11].assigned_clock;
-	alarm11_value: coverpoint dut.alarms[11].value;
-	alarm11_finished: coverpoint dut.alarms[11].finished;
+	alarm11_enable: coverpoint alarm_enable[11];
+	alarm11_countdown: coverpoint alarm_countdown[11];
+	alarm11_loop: coverpoint alarm_loop[11];
+	alarm11_assigned_clock: coverpoint alarm_assigned_clock[11];
+	alarm11_value: coverpoint alarm_value[11];
+	alarm11_finished: coverpoint alarm_finished[11];
 	alarm11_cross : cross alarm11_enable, alarm11_countdown, alarm11_loop, alarm11_assigned_clock, alarm11_value, alarm11_finished;
 
-	alarm12_enable: coverpoint dut.alarms[12].enable;
-	alarm12_countdown: coverpoint dut.alarms[12].countdown;
-	alarm12_loop: coverpoint dut.alarms[12].loop;
-	alarm12_assigned_clock: coverpoint dut.alarms[12].assigned_clock;
-	alarm12_value: coverpoint dut.alarms[12].value;
-	alarm12_finished: coverpoint dut.alarms[12].finished;
+	alarm12_enable: coverpoint alarm_enable[12];
+	alarm12_countdown: coverpoint alarm_countdown[12];
+	alarm12_loop: coverpoint alarm_loop[12];
+	alarm12_assigned_clock: coverpoint alarm_assigned_clock[12];
+	alarm12_value: coverpoint alarm_value[12];
+	alarm12_finished: coverpoint alarm_finished[12];
 	alarm12_cross : cross alarm12_enable, alarm12_countdown, alarm12_loop, alarm12_assigned_clock, alarm12_value, alarm12_finished;
 
-	alarm13_enable: coverpoint dut.alarms[13].enable;
-	alarm13_countdown: coverpoint dut.alarms[13].countdown;
-	alarm13_loop: coverpoint dut.alarms[13].loop;
-	alarm13_assigned_clock: coverpoint dut.alarms[13].assigned_clock;
-	alarm13_value: coverpoint dut.alarms[13].value;
-	alarm13_finished: coverpoint dut.alarms[13].finished;
+	alarm13_enable: coverpoint alarm_enable[13];
+	alarm13_countdown: coverpoint alarm_countdown[13];
+	alarm13_loop: coverpoint alarm_loop[13];
+	alarm13_assigned_clock: coverpoint alarm_assigned_clock[13];
+	alarm13_value: coverpoint alarm_value[13];
+	alarm13_finished: coverpoint alarm_finished[13];
 	alarm13_cross : cross alarm13_enable, alarm13_countdown, alarm13_loop, alarm13_assigned_clock, alarm13_value, alarm13_finished;
 
-	alarm14_enable: coverpoint dut.alarms[14].enable;
-	alarm14_countdown: coverpoint dut.alarms[14].countdown;
-	alarm14_loop: coverpoint dut.alarms[14].loop;
-	alarm14_assigned_clock: coverpoint dut.alarms[14].assigned_clock;
-	alarm14_value: coverpoint dut.alarms[14].value;
-	alarm14_finished: coverpoint dut.alarms[14].finished;
+	alarm14_enable: coverpoint alarm_enable[14];
+	alarm14_countdown: coverpoint alarm_countdown[14];
+	alarm14_loop: coverpoint alarm_loop[14];
+	alarm14_assigned_clock: coverpoint alarm_assigned_clock[14];
+	alarm14_value: coverpoint alarm_value[14];
+	alarm14_finished: coverpoint alarm_finished[14];
 	alarm14_cross : cross alarm14_enable, alarm14_countdown, alarm14_loop, alarm14_assigned_clock, alarm14_value, alarm14_finished;
 
-	alarm15_enable: coverpoint dut.alarms[15].enable;
-	alarm15_countdown: coverpoint dut.alarms[15].countdown;
-	alarm15_loop: coverpoint dut.alarms[15].loop;
-	alarm15_assigned_clock: coverpoint dut.alarms[15].assigned_clock;
-	alarm15_value: coverpoint dut.alarms[15].value;
-	alarm15_finished: coverpoint dut.alarms[15].finished;
+	alarm15_enable: coverpoint alarm_enable[15];
+	alarm15_countdown: coverpoint alarm_countdown[15];
+	alarm15_loop: coverpoint alarm_loop[15];
+	alarm15_assigned_clock: coverpoint alarm_assigned_clock[15];
+	alarm15_value: coverpoint alarm_value[15];
+	alarm15_finished: coverpoint alarm_finished[15];
 	alarm15_cross : cross alarm15_enable, alarm15_countdown, alarm15_loop, alarm15_assigned_clock, alarm15_value, alarm15_finished;
 
-	alarm16_enable: coverpoint dut.alarms[16].enable;
-	alarm16_countdown: coverpoint dut.alarms[16].countdown;
-	alarm16_loop: coverpoint dut.alarms[16].loop;
-	alarm16_assigned_clock: coverpoint dut.alarms[16].assigned_clock;
-	alarm16_value: coverpoint dut.alarms[16].value;
-	alarm16_finished: coverpoint dut.alarms[16].finished;
+	alarm16_enable: coverpoint alarm_enable[16];
+	alarm16_countdown: coverpoint alarm_countdown[16];
+	alarm16_loop: coverpoint alarm_loop[16];
+	alarm16_assigned_clock: coverpoint alarm_assigned_clock[16];
+	alarm16_value: coverpoint alarm_value[16];
+	alarm16_finished: coverpoint alarm_finished[16];
 	alarm16_cross : cross alarm16_enable, alarm16_countdown, alarm16_loop, alarm16_assigned_clock, alarm16_value, alarm16_finished;
 
-	alarm17_enable: coverpoint dut.alarms[17].enable;
-	alarm17_countdown: coverpoint dut.alarms[17].countdown;
-	alarm17_loop: coverpoint dut.alarms[17].loop;
-	alarm17_assigned_clock: coverpoint dut.alarms[17].assigned_clock;
-	alarm17_value: coverpoint dut.alarms[17].value;
-	alarm17_finished: coverpoint dut.alarms[17].finished;
+	alarm17_enable: coverpoint alarm_enable[17];
+	alarm17_countdown: coverpoint alarm_countdown[17];
+	alarm17_loop: coverpoint alarm_loop[17];
+	alarm17_assigned_clock: coverpoint alarm_assigned_clock[17];
+	alarm17_value: coverpoint alarm_value[17];
+	alarm17_finished: coverpoint alarm_finished[17];
 	alarm17_cross : cross alarm17_enable, alarm17_countdown, alarm17_loop, alarm17_assigned_clock, alarm17_value, alarm17_finished;
 
-	alarm18_enable: coverpoint dut.alarms[18].enable;
-	alarm18_countdown: coverpoint dut.alarms[18].countdown;
-	alarm18_loop: coverpoint dut.alarms[18].loop;
-	alarm18_assigned_clock: coverpoint dut.alarms[18].assigned_clock;
-	alarm18_value: coverpoint dut.alarms[18].value;
-	alarm18_finished: coverpoint dut.alarms[18].finished;
+	alarm18_enable: coverpoint alarm_enable[18];
+	alarm18_countdown: coverpoint alarm_countdown[18];
+	alarm18_loop: coverpoint alarm_loop[18];
+	alarm18_assigned_clock: coverpoint alarm_assigned_clock[18];
+	alarm18_value: coverpoint alarm_value[18];
+	alarm18_finished: coverpoint alarm_finished[18];
 	alarm18_cross : cross alarm18_enable, alarm18_countdown, alarm18_loop, alarm18_assigned_clock, alarm18_value, alarm18_finished;
 
-	alarm19_enable: coverpoint dut.alarms[19].enable;
-	alarm19_countdown: coverpoint dut.alarms[19].countdown;
-	alarm19_loop: coverpoint dut.alarms[19].loop;
-	alarm19_assigned_clock: coverpoint dut.alarms[19].assigned_clock;
-	alarm19_value: coverpoint dut.alarms[19].value;
-	alarm19_finished: coverpoint dut.alarms[19].finished;
+	alarm19_enable: coverpoint alarm_enable[19];
+	alarm19_countdown: coverpoint alarm_countdown[19];
+	alarm19_loop: coverpoint alarm_loop[19];
+	alarm19_assigned_clock: coverpoint alarm_assigned_clock[19];
+	alarm19_value: coverpoint alarm_value[19];
+	alarm19_finished: coverpoint alarm_finished[19];
 	alarm19_cross : cross alarm19_enable, alarm19_countdown, alarm19_loop, alarm19_assigned_clock, alarm19_value, alarm19_finished;
 
-	alarm20_enable: coverpoint dut.alarms[20].enable;
-	alarm20_countdown: coverpoint dut.alarms[20].countdown;
-	alarm20_loop: coverpoint dut.alarms[20].loop;
-	alarm20_assigned_clock: coverpoint dut.alarms[20].assigned_clock;
-	alarm20_value: coverpoint dut.alarms[20].value;
-	alarm20_finished: coverpoint dut.alarms[20].finished;
+	alarm20_enable: coverpoint alarm_enable[20];
+	alarm20_countdown: coverpoint alarm_countdown[20];
+	alarm20_loop: coverpoint alarm_loop[20];
+	alarm20_assigned_clock: coverpoint alarm_assigned_clock[20];
+	alarm20_value: coverpoint alarm_value[20];
+	alarm20_finished: coverpoint alarm_finished[20];
 	alarm20_cross : cross alarm20_enable, alarm20_countdown, alarm20_loop, alarm20_assigned_clock, alarm20_value, alarm20_finished;
 
-	alarm21_enable: coverpoint dut.alarms[21].enable;
-	alarm21_countdown: coverpoint dut.alarms[21].countdown;
-	alarm21_loop: coverpoint dut.alarms[21].loop;
-	alarm21_assigned_clock: coverpoint dut.alarms[21].assigned_clock;
-	alarm21_value: coverpoint dut.alarms[21].value;
-	alarm21_finished: coverpoint dut.alarms[21].finished;
+	alarm21_enable: coverpoint alarm_enable[21];
+	alarm21_countdown: coverpoint alarm_countdown[21];
+	alarm21_loop: coverpoint alarm_loop[21];
+	alarm21_assigned_clock: coverpoint alarm_assigned_clock[21];
+	alarm21_value: coverpoint alarm_value[21];
+	alarm21_finished: coverpoint alarm_finished[21];
 	alarm21_cross : cross alarm21_enable, alarm21_countdown, alarm21_loop, alarm21_assigned_clock, alarm21_value, alarm21_finished;
 
-	alarm22_enable: coverpoint dut.alarms[22].enable;
-	alarm22_countdown: coverpoint dut.alarms[22].countdown;
-	alarm22_loop: coverpoint dut.alarms[22].loop;
-	alarm22_assigned_clock: coverpoint dut.alarms[22].assigned_clock;
-	alarm22_value: coverpoint dut.alarms[22].value;
-	alarm22_finished: coverpoint dut.alarms[22].finished;
+	alarm22_enable: coverpoint alarm_enable[22];
+	alarm22_countdown: coverpoint alarm_countdown[22];
+	alarm22_loop: coverpoint alarm_loop[22];
+	alarm22_assigned_clock: coverpoint alarm_assigned_clock[22];
+	alarm22_value: coverpoint alarm_value[22];
+	alarm22_finished: coverpoint alarm_finished[22];
 	alarm22_cross : cross alarm22_enable, alarm22_countdown, alarm22_loop, alarm22_assigned_clock, alarm22_value, alarm22_finished;
 
-	alarm23_enable: coverpoint dut.alarms[23].enable;
-	alarm23_countdown: coverpoint dut.alarms[23].countdown;
-	alarm23_loop: coverpoint dut.alarms[23].loop;
-	alarm23_assigned_clock: coverpoint dut.alarms[23].assigned_clock;
-	alarm23_value: coverpoint dut.alarms[23].value;
-	alarm23_finished: coverpoint dut.alarms[23].finished;
+	alarm23_enable: coverpoint alarm_enable[23];
+	alarm23_countdown: coverpoint alarm_countdown[23];
+	alarm23_loop: coverpoint alarm_loop[23];
+	alarm23_assigned_clock: coverpoint alarm_assigned_clock[23];
+	alarm23_value: coverpoint alarm_value[23];
+	alarm23_finished: coverpoint alarm_finished[23];
 	alarm23_cross : cross alarm23_enable, alarm23_countdown, alarm23_loop, alarm23_assigned_clock, alarm23_value, alarm23_finished;
 endgroup	// ats21_alarms
 
 
 covergroup ats21_control_register @(posedge clk);
-	cr_device_enable: coverpoint dut.cr_bits.active;
-	cr_clientA_clock: coverpoint dut.cr_bits.clientA_clock;
-	cr_clientB_clock: coverpoint dut.cr_bits.clientB_clock;
-	cr_clientA_alarm: coverpoint dut.cr_bits.clientA_alarm;
-	cr_clientB_alarm: coverpoint dut.cr_bits.clientB_alarm;
-	cr_bits_cross: cross cr_device_enable, cr_clientA_clock, cr_clientB_clock, cr_clientA_alarm, cr_clientB_alarm;
+	device_enable: coverpoint cr_device_enable;
+	clientA_clock: coverpoint cr_clientA_clock;
+	clientB_clock: coverpoint cr_clientB_clock;
+	clientA_alarm: coverpoint cr_clientA_alarm;
+	clientB_alarm: coverpoint cr_clientB_alarm;
+	cr_bits_cross: cross device_enable, clientA_clock, clientB_clock, clientA_alarm, clientB_alarm;
 endgroup	// ats21_control_register
 
 
