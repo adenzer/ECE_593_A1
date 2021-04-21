@@ -91,6 +91,8 @@ parameter num_clocks_bits = $clog2(num_clocks);
 enum logic {Nack = 1'b0, Ack = 1'b1} statusA, statusB;
 assign stat = {statusB, statusA};
 
+logic [23:0] data_out = 24'd0;
+
 // temp regs for top 16-bits of input instruction
 logic [15:0] ctrlA_top, ctrlB_top;
 
@@ -600,8 +602,10 @@ genvar i;
 generate
 	for (i = 0; i < num_alarms; i++)
 	 begin
-		assign data[i] = alarms[i].finished;
+		assign data_out[i] = alarms[i].finished;
 	 end
 endgenerate
+
+assign data = data_out;
 
 endmodule
