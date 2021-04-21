@@ -80,7 +80,7 @@ assign cr_clientB_alarm = dut.cr_bits.clientB_alarm;
 
 
 // Testbench Signals
-logic [num_alarms-1:0] all_alarms;
+logic [$clog2(num_alarms):0] all_alarms;
 
 // Instantiate DUT
 ATS21 dut(.clk(clk), .reset(reset), .req(req), .ctrlA(ctrlA), .ctrlB(ctrlB),
@@ -467,11 +467,10 @@ endgroup	// ats21_control_register
 
 covergroup ats21_output @(posedge clk);
 	coverpoint all_alarms {
-		bins no_alarms   = {24'd0};
-		bins one_alarm   = {24'd1};
-		bins two_alarms  = {24'd2};
-		bins many_alarms = { [24'd3:24'd23] };
-		bins unknown_alarms = default;
+		bins no_alarms   = {0};
+		bins one_alarm   = {1};
+		bins two_alarms  = {2};
+		bins many_alarms = { [3:25] };
 	}
 
 	coverpoint data {
