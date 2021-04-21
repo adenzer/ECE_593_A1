@@ -225,7 +225,7 @@ initial begin
 				base_clocks_cover.get_coverage()<100 &&
 				alarms_cover.get_coverage()<100 &&
 				cr_cover.get_coverage()<100 &&
-				output_cover.getcoverage()<100) begin
+				output_cover.get_coverage()<100) begin
 		assert(i.randomize());
 		req <= i.rand_req;
 		ctrlA <= i.rand_ctrlA;
