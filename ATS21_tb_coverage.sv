@@ -220,11 +220,11 @@ initial begin
 	// Initialize Design
 	initialize();
 
-	while (input_cover.get_coverage()<100 &&
-				internal_cover.get_coverage()<100 &&
-				base_clocks_cover.get_coverage()<100 &&
-				alarms_cover.get_coverage()<100 &&
-				cr_cover.get_coverage()<100 &&
+	while (input_cover.get_coverage()<100 ||
+				internal_cover.get_coverage()<100 ||
+				base_clocks_cover.get_coverage()<100 ||
+				alarms_cover.get_coverage()<100 ||
+				cr_cover.get_coverage()<100 ||
 				output_cover.get_coverage()<100) begin
 		assert(i.randomize());
 		req <= i.rand_req;
