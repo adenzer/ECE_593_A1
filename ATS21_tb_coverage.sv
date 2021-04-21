@@ -166,8 +166,14 @@ covergroup ats21_internal @(posedge clk);
 	}
 
 	// Coverage is missing when Opcode is 000, but not all the time
-	processInst_ctrlA: coverpoint dut.processInst.ctrlA;
-	processInst_ctrlB: coverpoint dut.processInst.ctrlB;
+	processInst_ctrlA: coverpoint dut.processInst.ctrlA{
+		bins valid = {32'b001000000000000000000000:32'hFFFF}
+		bins nop = default;
+	}
+	processInst_ctrlB: coverpoint dut.processInst.ctrlB{
+		bins valid = {32'b001000000000000000000000:32'hFFFF}
+		bins nop = default;
+	}
 endgroup // ats21_internal
 
 
