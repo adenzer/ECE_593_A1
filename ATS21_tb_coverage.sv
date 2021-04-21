@@ -33,12 +33,41 @@ logic [ 2:0] ctrlA_opcode_in, ctrlB_opcode_in;
 logic [23:0] data;
 
 
-logic BC0_enable_;
-logic [15:0] BC0_count_;
-logic [1:0] BC0_rate_;
-assign BC0_enable_ = dut.base_clocks[0].enable;
-assign BC0_count_ = dut.base_clocks[0].count;
-assign BC0_rate_ = dut.base_clocks[0].rate;
+logic [15:0]				BC_enable;
+logic [15:0][15:0]	BC_count;
+logic [15:0][1:0] 	BC_rate;
+
+genvar i;
+generate
+	for (i = 0; i < num_clocks; i++)
+	 begin
+		 assign BC_enable[i] = dut.base_clocks[i].enable;
+		 assign BC_count[i] = dut.base_clocks[i].count;
+		 assign BC_rate[i] = dut.base_clocks[i].rate;
+	 end
+endgenerate
+
+logic [23:0] alarm_enable;
+logic [23:0] alarm_countdown;
+logic [23:0] alarm_loop;
+logic [23:0][3:0] alarm_assigned_clock;
+logic [23:0][15:0] alarm_value;
+logic [23:0] alarm_finished;
+
+genvar k;
+generate
+	for (k = 0; k < num_clocks; k++)
+	 begin
+		 assign alarm_enable[k] = dut.alarms[k].enable;
+		 assign alarm_countdown[k] = dut.alarms[k].countdown;
+		 assign alarm_loop[k] = dut.base_clocks[k].loop;
+		 assign alarm_assigned_clock[k] = dut.base_clocks[k].assigned_clock;
+		 assign alarm_value[k] = dut.base_clocks[k].value;
+		 assign alarm_finished[k] = dut.base_clocks[k].finished;
+	 end
+endgenerate
+
+
 
 // Testbench Signals
 logic [num_alarms-1:0] all_alarms;
@@ -133,84 +162,84 @@ endgroup // ats21_internal
 
 
 covergroup ats21_BCs @(posedge clk);
-	BC0_enable: coverpoint BC0_enable_;
-	BC0_count: coverpoint BC0_count_;
-	BC0_rate: coverpoint BC0_rate_;
+	BC0_enable: coverpoint BC_enable[0];
+	BC0_count: coverpoint BC_count[0];
+	BC0_rate: coverpoint BC_rate[0];
 	BC0_cross : cross BC0_enable, BC0_count, BC0_rate;
 
-	BC1_enable: coverpoint dut.base_clocks[1].enable;
-	BC1_count: coverpoint dut.base_clocks[1].count;
-	BC1_rate: coverpoint dut.base_clocks[1].rate;
+	BC1_enable: coverpoint BC_enable[1];
+	BC1_count: coverpoint BC_count[1];
+	BC1_rate: coverpoint BC_rate[1];
 	BC1_cross : cross BC1_enable, BC1_count, BC1_rate;
 
-	BC2_enable: coverpoint dut.base_clocks[2].enable;
-	BC2_count: coverpoint dut.base_clocks[2].count;
-	BC2_rate: coverpoint dut.base_clocks[2].rate;
+	BC2_enable: coverpoint BC_enable[2];
+	BC2_count: coverpoint BC_count[2];
+	BC2_rate: coverpoint BC_rate[2];
 	BC2_cross : cross BC2_enable, BC2_count, BC2_rate;
 
-	BC3_enable: coverpoint dut.base_clocks[3].enable;
-	BC3_count: coverpoint dut.base_clocks[3].count;
-	BC3_rate: coverpoint dut.base_clocks[3].rate;
+	BC3_enable: coverpoint BC_enable[3];
+	BC3_count: coverpoint BC_count[3];
+	BC3_rate: coverpoint BC_rate[3];
 	BC3_cross : cross BC3_enable, BC3_count, BC3_rate;
 
-	BC4_enable: coverpoint dut.base_clocks[4].enable;
-	BC4_count: coverpoint dut.base_clocks[4].count;
+	BC4_enable: coverpoint BC_enable[4];
+	BC4_count: coverpoint BC_count[4];
 	BC4_rate: coverpoint dut.base_clocks[4].rate;
 	BC4_cross : cross BC4_enable, BC4_count, BC4_rate;
 
-	BC5_enable: coverpoint dut.base_clocks[5].enable;
-	BC5_count: coverpoint dut.base_clocks[5].count;
-	BC5_rate: coverpoint dut.base_clocks[5].rate;
+	BC5_enable: coverpoint BC_enable[5];
+	BC5_count: coverpoint BC_count[5];
+	BC5_rate: coverpoint BC_rate[5];
 	BC5_cross : cross BC5_enable, BC5_count, BC5_rate;
 
-	BC6_enable: coverpoint dut.base_clocks[6].enable;
-	BC6_count: coverpoint dut.base_clocks[6].count;
-	BC6_rate: coverpoint dut.base_clocks[6].rate;
+	BC6_enable: coverpoint BC_enable[6];
+	BC6_count: coverpoint BC_count[6];
+	BC6_rate: coverpoint BC_rate[6];
 	BC6_cross : cross BC6_enable, BC6_count, BC6_rate;
 
-	BC7_enable: coverpoint dut.base_clocks[7].enable;
-	BC7_count: coverpoint dut.base_clocks[7].count;
-	BC7_rate: coverpoint dut.base_clocks[7].rate;
+	BC7_enable: coverpoint BC_enable[7];
+	BC7_count: coverpoint BC_count[7];
+	BC7_rate: coverpoint BC_rate[7];
 	BC7_cross : cross BC7_enable, BC7_count, BC7_rate;
 
-	BC8_enable: coverpoint dut.base_clocks[8].enable;
-	BC8_count: coverpoint dut.base_clocks[8].count;
-	BC8_rate: coverpoint dut.base_clocks[8].rate;
+	BC8_enable: coverpoint BC_enable[8];
+	BC8_count: coverpoint BC_count[8];
+	BC8_rate: coverpoint BC_rate[8];
 	BC8_cross : cross BC8_enable, BC8_count, BC8_rate;
 
-	BC9_enable: coverpoint dut.base_clocks[9].enable;
-	BC9_count: coverpoint dut.base_clocks[9].count;
-	BC9_rate: coverpoint dut.base_clocks[9].rate;
+	BC9_enable: coverpoint BC_enable[9];
+	BC9_count: coverpoint BC_count[9];
+	BC9_rate: coverpoint BC_rate[9];
 	BC9_cross : cross BC9_enable, BC9_count, BC9_rate;
 
-	BC10_enable: coverpoint dut.base_clocks[10].enable;
-	BC10_count: coverpoint dut.base_clocks[10].count;
-	BC10_rate: coverpoint dut.base_clocks[10].rate;
+	BC10_enable: coverpoint BC_enable[10];
+	BC10_count: coverpoint BC_count[10];
+	BC10_rate: coverpoint BC_rate[10];
 	BC10_cross : cross BC10_enable, BC10_count, BC10_rate;
 
-	BC11_enable: coverpoint dut.base_clocks[11].enable;
-	BC11_count: coverpoint dut.base_clocks[11].count;
-	BC11_rate: coverpoint dut.base_clocks[11].rate;
+	BC11_enable: coverpoint BC_enable[11];
+	BC11_count: coverpoint BC_count[11];
+	BC11_rate: coverpoint BC_rate[11];
 	BC11_cross : cross BC11_enable, BC11_count, BC11_rate;
 
-	BC12_enable: coverpoint dut.base_clocks[12].enable;
-	BC12_count: coverpoint dut.base_clocks[12].count;
-	BC12_rate: coverpoint dut.base_clocks[12].rate;
+	BC12_enable: coverpoint BC_enable[12];
+	BC12_count: coverpoint BC_count[12];
+	BC12_rate: coverpoint BC_rate[12];
 	BC12_cross : cross BC12_enable, BC12_count, BC12_rate;
 
-	BC13_enable: coverpoint dut.base_clocks[13].enable;
+	BC13_enable: coverpoint BC_enable[13];
 	BC13_count: coverpoint dut.base_clocks[13].count;
-	BC13_rate: coverpoint dut.base_clocks[13].rate;
+	BC13_rate: coverpoint BC_rate[13];
 	BC13_cross : cross BC13_enable, BC13_count, BC13_rate;
 
-	BC14_enable: coverpoint dut.base_clocks[14].enable;
-	BC14_count: coverpoint dut.base_clocks[14].count;
-	BC14_rate: coverpoint dut.base_clocks[14].rate;
+	BC14_enable: coverpoint BC_enable[14];
+	BC14_count: coverpoint BC_count[14];
+	BC14_rate: coverpoint BC_rate[14];
 	BC14_cross : cross BC14_enable, BC14_count, BC14_rate;
 
-	BC15_enable: coverpoint dut.base_clocks[15].enable;
-	BC15_count: coverpoint dut.base_clocks[15].count;
-	BC15_rate: coverpoint dut.base_clocks[15].rate;
+	BC15_enable: coverpoint BC_enable[15];
+	BC15_count: coverpoint BC_count[15];
+	BC15_rate: coverpoint BC_rate[15];
 	BC15_cross : cross BC15_enable, BC15_count, BC15_rate;
 endgroup	// ats21_BCs
 
