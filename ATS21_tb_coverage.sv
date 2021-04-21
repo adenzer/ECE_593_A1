@@ -1,4 +1,4 @@
-alarm_enable[1]/*
+/*
 
 Andrew Denzer and Zack Fravel
 ECE593 Assignment 1
