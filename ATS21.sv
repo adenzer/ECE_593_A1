@@ -488,15 +488,26 @@ always_ff @(posedge clk or posedge reset) begin : module_behavior
   end
 end
 
+always_comb begin
+  int i;
+  int k;
+  if (!cr_bits.active) begin
+      for (i=0; i < num_clocks; i=i+1) begin
+        base_clocks[i].enable <= 1'b0;
+      end
+      for (k=0; k < num_alarms; k=k+1) begin
+        alarms[k].enable <= 1'b0;
+      end
+  end
+end
+
 // increment 1x base clocks
 always_ff @(posedge clk_1x) begin
   int i;
-  if (cr_bits.active) begin
-    for (i = 0; i < num_clocks; i = i + 1) begin
-      if (base_clocks[i].enable) begin
-        if (base_clocks[i].rate == 2'b00) begin
-          base_clocks[i].count <= base_clocks[i].count + 1;
-        end
+  for (i = 0; i < num_clocks; i = i + 1) begin
+    if (base_clocks[i].enable) begin
+      if (base_clocks[i].rate == 2'b00) begin
+        base_clocks[i].count <= base_clocks[i].count + 1;
       end
     end
   end
@@ -505,12 +516,10 @@ end
 // increment 2x base clocks
 always_ff @(posedge clk_2x) begin
   int i;
-  if (cr_bits.active) begin
-    for (i = 0; i < num_clocks; i = i + 1) begin
-      if (base_clocks[i].enable) begin
-        if (base_clocks[i].rate == 2'b01) begin
-          base_clocks[i].count <= base_clocks[i].count + 1;
-        end
+  for (i = 0; i < num_clocks; i = i + 1) begin
+    if (base_clocks[i].enable) begin
+      if (base_clocks[i].rate == 2'b01) begin
+        base_clocks[i].count <= base_clocks[i].count + 1;
       end
     end
   end
@@ -519,12 +528,10 @@ end
 // increment 4x base clocks
 always_ff @(posedge clk_4x) begin
   int i;
-  if (cr_bits.active) begin
-    for (i = 0; i < num_clocks; i = i + 1) begin
-      if (base_clocks[i].enable) begin
-        if (base_clocks[i].rate == 2'b10) begin
-          base_clocks[i].count <= base_clocks[i].count + 1;
-        end
+  for (i = 0; i < num_clocks; i = i + 1) begin
+    if (base_clocks[i].enable) begin
+      if (base_clocks[i].rate == 2'b10) begin
+        base_clocks[i].count <= base_clocks[i].count + 1;
       end
     end
   end

@@ -33,9 +33,9 @@ logic [ 2:0] ctrlA_opcode_in, ctrlB_opcode_in;
 logic [23:0] data;
 
 
-logic [15:0]				BC_enable;
-logic [15:0][15:0]	BC_count;
-logic [15:0][1:0] 	BC_rate;
+logic [num_clocks-1:0]				BC_enable;
+logic [num_clocks-1:0][15:0]	BC_count;
+logic [num_clocks-1:0][1:0] 	BC_rate;
 
 genvar i;
 generate
@@ -47,12 +47,12 @@ generate
 	 end
 endgenerate
 
-logic [23:0] alarm_enable;
-logic [23:0] alarm_countdown;
-logic [23:0] alarm_loop;
-logic [23:0][3:0] alarm_assigned_clock;
-logic [23:0][15:0] alarm_value;
-logic [23:0] alarm_finished;
+logic [num_alarms-1:0] alarm_enable;
+logic [num_alarms-1:0] alarm_countdown;
+logic [num_alarms-1:0] alarm_loop;
+logic [num_alarms-1:0][num_clocks_bits-1:0] alarm_assigned_clock;
+logic [num_alarms-1:0][15:0] alarm_value;
+logic [num_alarms-1:0] alarm_finished;
 
 genvar k;
 generate
@@ -147,21 +147,21 @@ endgroup	// ats21_input
 covergroup ats21_internal @(posedge clk);
 	// Coverage is missing when Opcode is 000, but not all the time
 	checkInst_opcodeA: coverpoint dut.checkInst.ctrlA[31:29]{
-		bins set_BC              = {32'b001};
-		bins toggle_BC           = {32'b010};
-		bins set_AT              = {32'b101};
-		bins set_Countdown       = {32'b110};
-		bins toggle_AT           = {32'b111};
-		bins set_ATS21_mode      = {32'b011};
+		bins set_BC              = {3'b001};
+		bins toggle_BC           = {3'b010};
+		bins set_AT              = {3'b101};
+		bins set_Countdown       = {3'b110};
+		bins toggle_AT           = {3'b111};
+		bins set_ATS21_mode      = {3'b011};
 		bins invalid_instruction = default;
 	}
 	checkInst_opcodeB: coverpoint dut.checkInst.ctrlB[31:29]{
-		bins set_BC              = {32'b001};
-		bins toggle_BC           = {32'b010};
-		bins set_AT              = {32'b101};
-		bins set_Countdown       = {32'b110};
-		bins toggle_AT           = {32'b111};
-		bins set_ATS21_mode      = {32'b011};
+		bins set_BC              = {3'b001};
+		bins toggle_BC           = {3'b010};
+		bins set_AT              = {3'b101};
+		bins set_Countdown       = {3'b110};
+		bins toggle_AT           = {3'b111};
+		bins set_ATS21_mode      = {3'b011};
 		bins invalid_instruction = default;
 	}
 
