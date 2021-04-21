@@ -55,17 +55,17 @@ end
 ////////// Testbench Simulus //////////
 ///////////////////////////////////////
 
-assign ctrlA_opcode_in = ctrlA[31:29];
-assign ctrlB_opcode_in = ctrlB[31:29];
-assign sameOpcode = ctrlA_opcode_in == ctrlB_opcode_in;
-assign ABsameTime = ctrlA_opcode_in != 3'b000 && ctrlB_opcode_in != 3'b000;
+assign ctrlA_opcode_in = ctrlA[15:13];
+assign ctrlB_opcode_in = ctrlB[15:13];
+assign sameOpcode = (ctrlA_opcode_in == ctrlB_opcode_in) && req;
+assign ABsameTime = (ctrlA_opcode_in != 3'b000 && ctrlB_opcode_in != 3'b000) && req;
 
 
 covergroup ats21 @(posedge clk);
 	option.at_least =2;
 
 	// opcode input
-	coverpoint ctrlA_opcode_in {
+	coverpoint ctrlA_opcode_in iff req {
 		bins set_BC              = {3'b001};
 		bins toggle_BC           = {3'b010};
 		bins set_AT              = {3'b101};
@@ -75,7 +75,7 @@ covergroup ats21 @(posedge clk);
 		bins invalid_instruction = default;
 	}
 
-	coverpoint ctrlB_opcode_in {
+	coverpoint ctrlB_opcode_in iff req {
 		bins set_BC              = {3'b001};
 		bins toggle_BC           = {3'b010};
 		bins set_AT              = {3'b101};
