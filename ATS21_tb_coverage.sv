@@ -60,9 +60,10 @@ assign sameOpcode = (ctrlA_opcode_in == ctrlB_opcode_in) && req;
 assign ABsameTime = (ctrlA_opcode_in != 3'b000 && ctrlB_opcode_in != 3'b000) && req;
 
 
-covergroup ats21 @(posedge clk);
-	option.at_least =2;
-
+///////////////////////////////////////
+///////////// Cover Groups ////////////
+///////////////////////////////////////
+covergroup ats21_input @(posedge clk);
 	// opcode input
 	coverpoint ctrlA_opcode_in iff req {
 		bins set_BC              = {3'b001};
@@ -91,25 +92,12 @@ covergroup ats21 @(posedge clk);
 		bins inactive                    = default;
 	}
 
-	base_clocks: coverpoint dut.base_clocks;
+	coverpoint sameOpcode;		// if ctrlA and ctrlB input instruction have same opcode
+	coverpoint ABsameTime;		// if ctrlA and ctrlB send valid instruction at same time
+endgroup	// ats21_input
 
-	alarms: coverpoint dut.alarms;
 
-	alarm0_enable: coverpoint dut.alarms[0].enable;
-	alarm0_countdown: coverpoint dut.alarms[0].countdown;
-	alarm0_loop: coverpoint dut.alarms[0].loop;
-	alarm0_assigned_clock: coverpoint dut.alarms[0].assigned_clock;
-	alarm0_value: coverpoint dut.alarms[0].value;
-	alarm0_finished: coverpoint dut.alarms[0].finished;
-	alarm0_cross : cross alarm0_enable, alarm0_countdown, alarm0_loop, alarm0_assigned_clock, alarm0_value, alarm0_finished;
-
-	cr_device_enable: coverpoint dut.cr_bits.active;
-	cr_clientA_clock: coverpoint dut.cr_bits.clientA_clock;
-	cr_clientB_clock: coverpoint dut.cr_bits.clientB_clock;
-	cr_clientA_alarm: coverpoint dut.cr_bits.clientA_alarm;
-	cr_clientB_alarm: coverpoint dut.cr_bits.clientB_alarm;
-	cr_bits_cross: cross cr_device_enable, cr_clientA_clock, cr_clientB_clock, cr_clientA_alarm, cr_clientB_alarm;
-
+covergroup ats21_internal @(posedge clk);
 	// Coverage is missing when Opcode is 000, but not all the time
 	checkInst_opcodeA: coverpoint dut.checkInst.ctrlA[31:29]{
 		bins set_BC              = {32'b001};
@@ -133,17 +121,44 @@ covergroup ats21 @(posedge clk);
 	// Coverage is missing when Opcode is 000, but not all the time
 	processInst_ctrlA: coverpoint dut.processInst.ctrlA;
 	processInst_ctrlB: coverpoint dut.processInst.ctrlB;
+endgroup // ats21_internal
 
+
+covergroup ats21_BCs @(posedge clk);
+	base_clocks: coverpoint dut.base_clocks;
+endgroup	// ats21_BCs
+
+
+covergroup ats21_alarms @(posedge clk);
+	alarms: coverpoint dut.alarms;
+
+	alarm0_enable: coverpoint dut.alarms[0].enable;
+	alarm0_countdown: coverpoint dut.alarms[0].countdown;
+	alarm0_loop: coverpoint dut.alarms[0].loop;
+	alarm0_assigned_clock: coverpoint dut.alarms[0].assigned_clock;
+	alarm0_value: coverpoint dut.alarms[0].value;
+	alarm0_finished: coverpoint dut.alarms[0].finished;
+	alarm0_cross : cross alarm0_enable, alarm0_countdown, alarm0_loop, alarm0_assigned_clock, alarm0_value, alarm0_finished;
+endgroup	// ats21_alarms
+
+
+covergroup ats21_control_register @(posedge clk);
+	cr_device_enable: coverpoint dut.cr_bits.active;
+	cr_clientA_clock: coverpoint dut.cr_bits.clientA_clock;
+	cr_clientB_clock: coverpoint dut.cr_bits.clientB_clock;
+	cr_clientA_alarm: coverpoint dut.cr_bits.clientA_alarm;
+	cr_clientB_alarm: coverpoint dut.cr_bits.clientB_alarm;
+	cr_bits_cross: cross cr_device_enable, cr_clientA_clock, cr_clientB_clock, cr_clientA_alarm, cr_clientB_alarm;
+endgroup	// ats21_control_register
+
+
+covergroup ats21_output @(posedge clk);
 	coverpoint all_alarms {
 		bins no_alarms   = {24'd0};
 		bins one_alarm   = {24'd1};
 		bins two_alarms  = {24'd2};
 		bins many_alarms = default;
 	}
-
-	coverpoint sameOpcode;		// if ctrlA and ctrlB input instruction have same opcode
-	coverpoint ABsameTime;		// if ctrlA and ctrlB send valid instruction at same time
-
 
 	coverpoint data {
 		bins alarm_0  = {24'b000000000000000000000001};
@@ -179,10 +194,15 @@ covergroup ats21 @(posedge clk);
 		bins Ack_B  = {2'b10};
 		bins Ack_AB = {2'b11};
 	}
+endgroup	// ats21_output
 
-endgroup // instructions
 
-ats21 fcover = new;
+ats21_input input_cover = new;
+ats21_internal internal_cover = new;
+ats21_BCs base_clocks_cover = new;
+ats21_alarms alarms_cover = new;
+ats21_control_register cr_cover = new;
+ats21_output output_cover = new;
 
 // Random Input Class
 class RandomInput;
@@ -200,7 +220,12 @@ initial begin
 	// Initialize Design
 	initialize();
 
-	while (fcover.get_coverage()<100) begin
+	while (input_cover.get_coverage()<100 &&
+				internal_cover.get_coverage()<100 &&
+				base_clocks_cover.get_coverage()<100 &&
+				alarms_cover.get_coverage()<100 &&
+				cr_cover.get_coverage()<100 &&
+				output_cover.getcoverage()<100) begin
 		assert(i.randomize());
 		req <= i.rand_req;
 		ctrlA <= i.rand_ctrlA;
