@@ -29,7 +29,7 @@ parameter num_clocks_bits = $clog2(num_clocks);
 logic clk, reset, req, ready;
 logic [1:0] stat;
 logic [15:0] ctrlA, ctrlB;
-logic [ 2:0] opcodeA, opcodeB;
+logic [ 2:0] ctrlA_opcode_in, ctrlB_opcode_in;
 logic [23:0] data;
 
 // Testbench Signals
@@ -55,16 +55,17 @@ end
 ////////// Testbench Simulus //////////
 ///////////////////////////////////////
 
-assign opcodeA = dut.checkInst.ctrlA[31:29];
-assign opcodeB = dut.checkInst.ctrlB[31:29];
-assign sameOpcode = opcodeA == opcodeB;
-assign ABsameTime = opcodeA != 3'b000 && opcodeB != 3'b000;
+assign ctrlA_opcode_in = ctrlA[31:29];
+assign ctrlB_opcode_in = ctrlB[31:29];
+assign sameOpcode = ctrlA_opcode_in == ctrlB_opcode_in;
+assign ABsameTime = ctrlA_opcode_in != 3'b000 && ctrlB_opcode_in != 3'b000;
 
 
 covergroup ats21 @(posedge clk);
 	option.at_least =2;
 
-	coverpoint opcodeA {
+	// opcode input
+	coverpoint ctrlA_opcode_in {
 		bins set_BC              = {3'b001};
 		bins toggle_BC           = {3'b010};
 		bins set_AT              = {3'b101};
@@ -74,7 +75,7 @@ covergroup ats21 @(posedge clk);
 		bins invalid_instruction = default;
 	}
 
-	coverpoint opcodeB {
+	coverpoint ctrlB_opcode_in {
 		bins set_BC              = {3'b001};
 		bins toggle_BC           = {3'b010};
 		bins set_AT              = {3'b101};
@@ -128,8 +129,9 @@ covergroup ats21 @(posedge clk);
 		bins many_alarms = default;
 	}
 
-	coverpoint sameOpcode;
-	coverpoint ABsameTime;
+	coverpoint sameOpcode;		// if ctrlA and ctrlB input instruction have same opcode
+	coverpoint ABsameTime;		// if ctrlA and ctrlB send valid instruction at same time
+
 
 	coverpoint data {
 		bins alarm_0  = {24'b000000000000000000000001};
