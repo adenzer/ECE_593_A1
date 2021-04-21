@@ -32,6 +32,14 @@ logic [15:0] ctrlA, ctrlB;
 logic [ 2:0] ctrlA_opcode_in, ctrlB_opcode_in;
 logic [23:0] data;
 
+
+logic BC0_enable_;
+logic [15:0] BC0_count_;
+logic [1:0] BC0_rate_;
+assign BC0_enable_ = dut.base_clocks[0].enable;
+assign BC0_count_ = dut.base_clocks[0].count;
+assign BC0_rate_ = dut.base_clocks[0].rate;
+
 // Testbench Signals
 logic [num_alarms-1:0] all_alarms;
 
@@ -125,9 +133,9 @@ endgroup // ats21_internal
 
 
 covergroup ats21_BCs @(posedge clk);
-	BC0_enable: coverpoint dut.base_clocks[0].enable;
-	BC0_count: coverpoint dut.base_clocks[0].count;
-	BC0_rate: coverpoint dut.base_clocks[0].rate;
+	BC0_enable: coverpoint BC0_enable_;
+	BC0_count: coverpoint BC0_count_;
+	BC0_rate: coverpoint BC0_rate_;
 	BC0_cross : cross BC0_enable, BC0_count, BC0_rate;
 
 	BC1_enable: coverpoint dut.base_clocks[1].enable;
@@ -204,7 +212,6 @@ covergroup ats21_BCs @(posedge clk);
 	BC15_count: coverpoint dut.base_clocks[15].count;
 	BC15_rate: coverpoint dut.base_clocks[15].rate;
 	BC15_cross : cross BC15_enable, BC15_count, BC15_rate;
-
 endgroup	// ats21_BCs
 
 
@@ -456,7 +463,6 @@ covergroup ats21_output @(posedge clk);
 		bins Ack_AB = {2'b11};
 	}
 endgroup	// ats21_output
-
 
 ats21_input input_cover = new;
 ats21_internal internal_cover = new;
