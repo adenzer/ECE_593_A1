@@ -488,16 +488,40 @@ always_ff @(posedge clk or posedge reset) begin : module_behavior
   end
 end
 
-always_ff @(posedge clk) begin
+logic [num_clocks-1:0] paused_clocks = 0;
+logic [num_alarms-1:0] paused_alarms = 0;
+
+// pause clocks and alarms when device is disabled
+always_ff @(negedge cr_bits.active) begin
   int i;
   int k;
-  if (!cr_bits.active) begin
-      for (i=0; i < num_clocks; i=i+1) begin
-        base_clocks[i].enable <= 1'b0;
-      end
-      for (k=0; k < num_alarms; k=k+1) begin
-        alarms[k].enable <= 1'b0;
-      end
+
+  for (i=0; i < num_clocks; i=i+1) begin
+    if (base_clocks[i].enable) begin
+      paused_clocks[i] <= 1'b1;
+      base_clocks[i].enable <= 1'b0;
+    end
+  end
+  for (k=0; k < num_alarms; k=k+1) begin
+    paused_alarms[k] <= 1'b1;
+    alarms[k].enable <= 1'b0;
+  end
+end
+
+// reenable clocks that were paused when device was disabled
+always_ff @(posedge cr_bits.active) begin
+  int i;
+  int k;
+
+  for (i=0; i < num_clocks; i=i+1) begin
+    if (paused_clocks[i]) begin
+      base_clocks[i].enable <= 1'b1;
+    end
+  end
+  for (k=0; k < num_alarms; k=k+1) begin
+    if (paused_alarms[k]) begin
+      alarms[k].enable <= 1'b1;
+    end
   end
 end
 

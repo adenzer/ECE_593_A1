@@ -200,7 +200,7 @@ covergroup ats21_BCs @(posedge clk);
 
 	BC4_enable: coverpoint BC_enable[4];
 	BC4_count: coverpoint BC_count[4];
-	BC4_rate: coverpoint dut.base_clocks[4].rate;
+	BC4_rate: coverpoint BC_rate[4];
 	BC4_cross : cross BC4_enable, BC4_count, BC4_rate;
 
 	BC5_enable: coverpoint BC_enable[5];
