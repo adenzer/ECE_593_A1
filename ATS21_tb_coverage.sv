@@ -139,7 +139,7 @@ covergroup ats21 @(posedge clk);
 	coverpoint cr_bits;
 
 	// Coverage is missing when Opcode is 000, but not all the time
-	coverpoint checkInst_opcodeA[31:29]{
+	coverpoint checkInst_opcodeA{
 		bins set_BC              = {32'b001};
 		bins toggle_BC           = {32'b010};
 		bins set_AT              = {32'b101};
@@ -148,7 +148,7 @@ covergroup ats21 @(posedge clk);
 		bins set_ATS21_mode      = {32'b011};
 		bins invalid_instruction = default;
 	}
-	coverpoint checkInst_opcodeB[31:29]{
+	coverpoint checkInst_opcodeB{
 		bins set_BC              = {32'b001};
 		bins toggle_BC           = {32'b010};
 		bins set_AT              = {32'b101};
