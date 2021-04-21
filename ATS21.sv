@@ -602,10 +602,10 @@ genvar i;
 generate
 	for (i = 0; i < num_alarms; i++)
 	 begin
-		assign data_out[i] = alarms[i].finished;
+		always_comb data_out[i] = alarms[i].finished;
 	 end
 endgenerate
 
-always_comb data = data_out;
+assign data = data_out;
 
 endmodule
