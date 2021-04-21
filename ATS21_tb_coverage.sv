@@ -56,14 +56,14 @@ logic [23:0] alarm_finished;
 
 genvar k;
 generate
-	for (k = 0; k < num_clocks; k++)
+	for (k = 0; k < num_alarms; k++)
 	 begin
 		 assign alarm_enable[k] = dut.alarms[k].enable;
 		 assign alarm_countdown[k] = dut.alarms[k].countdown;
-		 assign alarm_loop[k] = dut.base_clocks[k].loop;
-		 assign alarm_assigned_clock[k] = dut.base_clocks[k].assigned_clock;
-		 assign alarm_value[k] = dut.base_clocks[k].value;
-		 assign alarm_finished[k] = dut.base_clocks[k].finished;
+		 assign alarm_loop[k] = dut.alarms[k].loop;
+		 assign alarm_assigned_clock[k] = dut.alarms[k].assigned_clock;
+		 assign alarm_value[k] = dut.alarms[k].value;
+		 assign alarm_finished[k] = dut.alarms[k].finished;
 	 end
 endgenerate
 
