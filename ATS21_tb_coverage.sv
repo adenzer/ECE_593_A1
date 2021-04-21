@@ -136,7 +136,7 @@ covergroup ats21 @(posedge clk);
 	coverpoint alarm0_value;
 	coverpoint alarm0_finished;
 
-	cross alarm0_enable, alarm0_countdown, alarm0_loop, alarm0_assigned_clock, alarms0_value, alarm0_finished;
+	cross alarm0_enable, alarm0_countdown, alarm0_loop, alarm0_assigned_clock, alarm0_value, alarm0_finished;
 
 	coverpoint cr_bits;
 
