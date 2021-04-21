@@ -493,10 +493,10 @@ always_ff @(posedge clk) begin
   int k;
   if (!cr_bits.active) begin
       for (i=0; i < num_clocks; i=i+1) begin
-        #1 base_clocks[i].enable <= 1'b0;
+        base_clocks[i].enable <= 1'b0;
       end
       for (k=0; k < num_alarms; k=k+1) begin
-        #1 alarms[k].enable <= 1'b0;
+        alarms[k].enable <= 1'b0;
       end
   end
 end
