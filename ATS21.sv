@@ -490,7 +490,7 @@ always_ff @(posedge clk or posedge reset) begin : module_behavior
   end
 end
 
-always_comb begin
+always_ff @(posedge clk) begin
   int i;
   int k;
   if (!cr_bits.active) begin
