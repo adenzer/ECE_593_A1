@@ -74,9 +74,7 @@ module ATS21 (
   input logic  [15:0] ctrlB,
   output logic        ready,
   output logic [ 1:0] stat,
-  output logic [23:0] data,
-  output logic [ 2:0] opcodeA_cover,
-  output logic [ 2:0] opcodeB_cover
+  output logic [23:0] data
 );
 
 ////////////////////////////////////////////////////////////////////
@@ -280,8 +278,6 @@ task checkInst(input logic [31:0] ctrlA, input logic [31:0] ctrlB);
 endtask
 
 task processInst(input logic [31:0] ctrlA, input logic [31:0] ctrlB);
-    opcodeA_cover <= ctrlA[31:29];   // for coverage
-    opcodeB_cover <= ctrlB[31:29];   // for coverage
 
     // process ctrlA instruction
     case (ctrlA[31:29])   // opcode
