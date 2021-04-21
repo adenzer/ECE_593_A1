@@ -73,10 +73,10 @@ logic cr_clientA_clock, cr_clientB_clock;
 logic cr_clientA_alarm, cr_clientB_alarm;
 
 assign cr_device_enable = dut.cr_bits.active;
-assign cr_clientA_clock = dut.cr_bits.clientA_clock
-assign cr_clientB_clock = dut.cr_bits.clientB_clock
-assign cr_clientA_alarm = dut.cr_bits.clientA_alarm
-assign cr_clientB_alarm = dut.cr_bits.clientB_alarm
+assign cr_clientA_clock = dut.cr_bits.clientA_clock;
+assign cr_clientB_clock = dut.cr_bits.clientB_clock;
+assign cr_clientA_alarm = dut.cr_bits.clientA_alarm;
+assign cr_clientB_alarm = dut.cr_bits.clientB_alarm;
 
 
 // Testbench Signals
