@@ -2,7 +2,7 @@ help:
 	@echo " "
 	@echo "Welcome to Assignment 1 for ECE593 (Zack Fravel and Andrew Denzer)"
 	@echo " "
-	@echo "Targets: compile  sim_c  sim_gui  coverage clean"
+	@echo "Targets: compile  sim_c  sim_gui  coverage  clean"
 	@echo " "
 
 compile:

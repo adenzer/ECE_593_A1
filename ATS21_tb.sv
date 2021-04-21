@@ -35,9 +35,13 @@ Current Tests :
 Future Tests : 
 
 	Test ATS21 Modes more thoroughly
-	Clock start values 
+		- List Modes
+	Clock start values
+		- List Cases 
 	Repeating Alarms (longer simulations)
+		- List Cases
 	Disabling / Reenabling alarms and clocks
+		- List Cases
 
 */
 
