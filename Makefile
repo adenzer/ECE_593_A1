@@ -8,9 +8,9 @@ help:
 compile:
 	vlib work
 	vmap work work
-	vlog +cover=bcse ATS21.sv
+	vlog -coveropts 3 +cover=bcse ATS21.sv
 	vlog ATS21_tb.sv
-	vlog ATS21_tb_coverage.sv
+	vlog -coveropts 3 +cover=bsce ATS21_tb_coverage.sv
 
 sim_c:
 	vsim -c ATS21_tb -do "run -all;quit"
