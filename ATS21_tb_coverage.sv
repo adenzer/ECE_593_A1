@@ -486,27 +486,64 @@ covergroup ats21_control_register @(posedge clk);
 endgroup	// ats21_control_register
 
 covergroup ats21_cr_cross @(posedge clk);
-	processInst_opcodeA: coverpoint dut.processInst.ctrlA[31:29]{
-		bins nop								 = {3'b000};
-		bins set_BC              = {3'b001};
-		bins toggle_BC           = {3'b010};
-		bins set_AT              = {3'b101};
-		bins set_Countdown       = {3'b110};
-		bins toggle_AT           = {3'b111};
-		bins set_ATS21_mode      = {3'b011};
-		bins invalid_instruction = default;
+	ctrlA_set_BC: coverpoint dut.processInst.ctrlA[31:29]{
+		bins set_BC = {3'b001};
 	}
 
-	processInst_opcodeB: coverpoint dut.processInst.ctrlB[31:29]{
-		bins nop								 = {3'b000};
-		bins set_BC              = {3'b001};
-		bins toggle_BC           = {3'b010};
-		bins set_AT              = {3'b101};
-		bins set_Countdown       = {3'b110};
-		bins toggle_AT           = {3'b111};
-		bins set_ATS21_mode      = {3'b011};
-		bins invalid_instruction = default;
+	ctrlA_toggle_BC: coverpoint dut.processInst.ctrlA[31:29]{
+		bins toggle_BC = {3'b010};
 	}
+
+	ctrlA_set_AT: coverpoint dut.processInst.ctrlA[31:29]{
+		bins set_AT = {3'b101};
+	}
+
+	ctrlA_set_Countdown: coverpoint dut.processInst.ctrlA[31:29]{
+		bins set_Countdown = {3'b110};
+	}
+
+	ctrlA_toggle_AT: coverpoint dut.processInst.ctrlA[31:29]{
+		bins toggle_AT = {3'b111};
+	}
+
+	ctrlA_set_ATS21_mode: coverpoint dut.processInst.ctrlA[31:29]{
+		bins set_ATS21_mode = {3'b011};
+	}
+
+	ctrlB_set_BC: coverpoint dut.processInst.ctrlB[31:29]{
+		bins set_BC = {3'b001};
+	}
+
+	ctrlB_toggle_BC: coverpoint dut.processInst.ctrlB[31:29]{
+		bins toggle_BC = {3'b010};
+	}
+
+	ctrlB_set_AT: coverpoint dut.processInst.ctrlB[31:29]{
+		bins set_AT = {3'b101};
+	}
+
+	ctrlB_set_Countdown: coverpoint dut.processInst.ctrlB[31:29]{
+		bins set_Countdown = {3'b110};
+	}
+
+	ctrlB_toggle_AT: coverpoint dut.processInst.ctrlB[31:29]{
+		bins toggle_AT = {3'b111};
+	}
+
+	ctrlB_set_ATS21_mode: coverpoint dut.processInst.ctrlB[31:29]{
+		bins set_ATS21_mode = {3'b011};
+	}
+	//
+	// processInst_opcodeB: coverpoint dut.processInst.ctrlB[31:29]{
+	// 	bins nop								 = {3'b000};
+	// 	bins set_BC              = {3'b001};
+	// 	bins toggle_BC           = {3'b010};
+	// 	bins set_AT              = {3'b101};
+	// 	bins set_Countdown       = {3'b110};
+	// 	bins toggle_AT           = {3'b111};
+	// 	bins set_ATS21_mode      = {3'b011};
+	// 	bins invalid_instruction = default;
+	// }
 
 	device_enable: coverpoint cr_device_enable;
 	clientA_clock: coverpoint cr_clientA_clock;
@@ -514,17 +551,17 @@ covergroup ats21_cr_cross @(posedge clk);
 	clientA_alarm: coverpoint cr_clientA_alarm;
 	clientB_alarm: coverpoint cr_clientB_alarm;
 
-	cr_active_X_ctrlA_inst: cross device_enable, processInst_opcodeA.set_BC, processInst_opcodeA.toggle_BC, processInst_opcodeA.set_AT,
-																processInst_opcodeA.set_Countdown, processInst_opcodeA.toggle_AT, processInst_opcodeA.set_ATS21_mode;
+	cr_active_X_ctrlA_inst: cross device_enable, ctrlA_set_BC, ctrlA_toggle_BC, ctrlA_set_AT,
+																ctrlA_set_Countdown, ctrlA_toggle_AT, ctrlA_set_ATS21_mode;
 
-	cr_active_X_ctrlB_inst: cross device_enable, processInst_opcodeB.set_BC, processInst_opcodeB.toggle_BC, processInst_opcodeB.set_AT,
-																processInst_opcodeB.set_Countdown, processInst_opcodeB.toggle_AT, processInst_opcodeB.set_ATS21_mode;
+	cr_active_X_ctrlB_inst: cross device_enable, ctrlB_set_BC, ctrlB_toggle_BC, ctrlB_set_AT,
+																ctrlB_set_Countdown, ctrlB_toggle_AT, ctrlB_set_ATS21_mode;
 
-	cr_clientA_clock_X_set_clock_instA: cross clientA_clock, processInst_opcodeA.set_BC, processInst_opcodeA.toggle_BC;
-	cr_clientB_clock_X_set_clock_instB: cross clientB_clock, processInst_opcodeB.set_BC, processInst_opcodeB.toggle_BC;
+	cr_clientA_clock_X_set_clock_instA: cross clientA_clock, ctrlA_set_BC, ctrlA_toggle_BC;
+	cr_clientB_clock_X_set_clock_instB: cross clientB_clock, ctrlB_set_BC, ctrlB_toggle_BC;
 
-	cr_clientA_alarm_X_set_alarm_instA: cross clientA_alarm, processInst_opcodeA.set_AT, processInst_opcodeA.set_Countdown, processInst_opcodeA.toggle_AT;
-	cr_clientB_alarm_X_set_alarm_instB: cross clientB_alarm, processInst_opcodeB.set_AT, processInst_opcodeB.set_Countdown, processInst_opcodeB.toggle_AT;
+	cr_clientA_alarm_X_set_alarm_instA: cross clientA_alarm, ctrlA_set_AT, ctrlA_set_Countdown, ctrlA_toggle_AT;
+	cr_clientB_alarm_X_set_alarm_instB: cross clientB_alarm, ctrlB_set_AT, ctrlB_set_Countdown, ctrlB_toggle_AT;
 endgroup
 
 
