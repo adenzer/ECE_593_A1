@@ -147,6 +147,7 @@ endgroup	// ats21_input
 covergroup ats21_internal @(posedge clk);
 	// Coverage is missing when Opcode is 000, but not all the time
 	checkInst_opcodeA: coverpoint dut.checkInst.ctrlA[31:29]{
+		bins nop								 = {3'b000};
 		bins set_BC              = {3'b001};
 		bins toggle_BC           = {3'b010};
 		bins set_AT              = {3'b101};
@@ -156,6 +157,7 @@ covergroup ats21_internal @(posedge clk);
 		bins invalid_instruction = default;
 	}
 	checkInst_opcodeB: coverpoint dut.checkInst.ctrlB[31:29]{
+		bins nop								 = {3'b000};
 		bins set_BC              = {3'b001};
 		bins toggle_BC           = {3'b010};
 		bins set_AT              = {3'b101};
@@ -165,10 +167,22 @@ covergroup ats21_internal @(posedge clk);
 		bins invalid_instruction = default;
 	}
 
-	checkInst_crtlA_X_ctrlB: cross dut.checkInst.ctrlA, dut.checkInst.ctrlB;
+	checkInst_ctrlA: coverpoint dut.checkInst.ctrlA{
+		bins nop = {32'h00000000};
+		bins valid_inst = { [32'h00200000:32'hFFFFFFFF]};
+		bins not_gonna_happen = default;
+	}
+
+	checkInst_ctrlB: coverpoint dut.checkInst.ctrlB{
+		bins nop = {32'h00000000};
+		bins valid_inst = { [32'h00200000:32'hFFFFFFFF]};
+		bins not_gonna_happen = default;
+	}
+	checkInst_crtlA_X_ctrlB: cross checkInst_ctrlA, checkInst_ctrlB;
 
 	// Coverage is missing when Opcode is 000, but not all the time
 	processInst_ctrlA: coverpoint dut.processInst.ctrlA[31:29]{
+		bins nop								 = {3'b000};
 		bins set_BC              = {3'b001};
 		bins toggle_BC           = {3'b010};
 		bins set_AT              = {3'b101};
@@ -178,6 +192,7 @@ covergroup ats21_internal @(posedge clk);
 		bins invalid_instruction = default;
 	}
 	processInst_ctrlB: coverpoint dut.processInst.ctrlB[31:29]{
+		bins nop								 = {3'b000};
 		bins set_BC              = {3'b001};
 		bins toggle_BC           = {3'b010};
 		bins set_AT              = {3'b101};
@@ -187,7 +202,19 @@ covergroup ats21_internal @(posedge clk);
 		bins invalid_instruction = default;
 	}
 
-	processInst_crtlA_X_ctrlB: cross dut.processInst.ctrlA, dut.processInst.ctrlB;
+	processInst_ctrlA: coverpoint dut.processInst.ctrlA{
+		bins nop = {32'h00000000};
+		bins valid_inst = { [32'h00200000:32'hFFFFFFFF]};
+		bins not_gonna_happen = default;
+	}
+
+	processInst_ctrlB: coverpoint dut.processInst.ctrlB{
+		bins nop = {32'h00000000};
+		bins valid_inst = { [32'h00200000:32'hFFFFFFFF]};
+		bins not_gonna_happen = default;
+	}
+
+	processInst_crtlA_X_ctrlB: cross processInst_ctrlA, processInst_ctrlB;
 endgroup // ats21_internal
 
 
