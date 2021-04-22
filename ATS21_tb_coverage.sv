@@ -551,17 +551,32 @@ covergroup ats21_cr_cross @(posedge clk);
 	clientA_alarm: coverpoint cr_clientA_alarm;
 	clientB_alarm: coverpoint cr_clientB_alarm;
 
-	cr_active_X_ctrlA_inst: cross device_enable, ctrlA_set_BC, ctrlA_toggle_BC, ctrlA_set_AT,
-																ctrlA_set_Countdown, ctrlA_toggle_AT, ctrlA_set_ATS21_mode;
+	cr_active_X_ctrlA_set_BC: cross device_enable, ctrlA_set_BC;
+	cr_active_X_ctrlA_toggle_BC: cross device_enable, ctrlA_toggle_BC;
+	cr_active_X_ctrlA_set_AT: cross device_enable, ctrlA_set_AT;
+	cr_active_X_ctrlA_set_countdown: cross device_enable, ctrlA_set_Countdown;
+	cr_active_X_ctrlA_toggle_AT: cross device_enable, ctrlA_toggle_AT;
+	cr_active_X_ctrlA_set_ATS21_mode: cross device_enable, ctrlA_set_ATS21_mode;
 
-	cr_active_X_ctrlB_inst: cross device_enable, ctrlB_set_BC, ctrlB_toggle_BC, ctrlB_set_AT,
-																ctrlB_set_Countdown, ctrlB_toggle_AT, ctrlB_set_ATS21_mode;
+	cr_active_X_ctrlB_set_BC: cross device_enable, ctrlB_set_BC;
+	cr_active_X_ctrlB_toggle_BC: cross device_enable, ctrlB_toggle_BC;
+	cr_active_X_ctrlB_set_AT: cross device_enable, ctrlB_set_AT;
+	cr_active_X_ctrlB_set_Countdown: cross device_enable, ctrlB_set_Countdown;
+	cr_active_X_ctrlB_toggle_AT: cross device_enable, ctrlB_toggle_AT;
+	cr_active_X_ctrlB_set_ATS21_mode: cross device_enable, ctrlB_set_ATS21_mode;
 
-	cr_clientA_clock_X_set_clock_instA: cross clientA_clock, ctrlA_set_BC, ctrlA_toggle_BC;
-	cr_clientB_clock_X_set_clock_instB: cross clientB_clock, ctrlB_set_BC, ctrlB_toggle_BC;
+	cr_clientA_clock_X_set_BC: cross clientA_clock, ctrlA_set_BC;
+	cr_clientA_clock_X_toggle_BC: cross clientA_clock, ctrlA_toggle_BC;
+	cr_clientB_clock_X_set_BC: cross clientB_clock, ctrlB_set_BC;
+	cr_clientB_clock_X_set_BC: cross clientB_clock, ctrlB_toggle_BC;
 
-	cr_clientA_alarm_X_set_alarm_instA: cross clientA_alarm, ctrlA_set_AT, ctrlA_set_Countdown, ctrlA_toggle_AT;
-	cr_clientB_alarm_X_set_alarm_instB: cross clientB_alarm, ctrlB_set_AT, ctrlB_set_Countdown, ctrlB_toggle_AT;
+	cr_clientA_alarm_X_set_AT: cross clientA_alarm, ctrlA_set_AT;
+	cr_clientA_alarm_X_set_Countdown: cross clientA_alarm, ctrlA_set_Countdown;
+	cr_clientA_alarm_X_toggle_AT: cross clientA_alarm, ctrlA_toggle_AT;
+
+	cr_clientB_alarm_X_set_AT: cross clientB_alarm, ctrlB_set_AT;
+	cr_clientB_alarm_X_set_Countdown: cross clientB_alarm, ctrlB_set_Countdown;
+	cr_clientB_alarm_X_toggle_AT: cross clientB_alarm, ctrlB_toggle_AT;
 endgroup
 
 
