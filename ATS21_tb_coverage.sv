@@ -507,6 +507,7 @@ covergroup ats21_cr_cross @(posedge clk);
 		bins invalid_instruction = default;
 	}
 
+	cr_active_X_instructions
 	cr_clientA_clock_X_set_clock_instA: cross dut.cr_bits.clientA_clock, processInst_opcodeA.set_BC, processInst_opcodeA.toggle_BC;
 	cr_clientB_clock_X_set_clock_instB: cross dut.cr_bits.clientB_clock, processInst_opcodeB.set_BC, processInst_opcodeB.toggle_BC;
 	cr_clientA_alarm_X_set_alarm_instA: cross dut.cr_bits.clientA_alarm, processInst_opcodeA.set_AT, processInst_opcodeA.toggle_AT;
@@ -563,6 +564,7 @@ ats21_instructions instructions_cover = new;
 ats21_BCs base_clocks_cover = new;
 ats21_alarms alarms_cover = new;
 ats21_control_register cr_cover = new;
+ats21_cr_cross cr_cross_cover = new;
 ats21_output output_cover = new;
 
 // Random Input Class
@@ -586,6 +588,7 @@ initial begin
 				base_clocks_cover.get_coverage()<100 ||
 				alarms_cover.get_coverage()<100 ||
 				cr_cover.get_coverage()<100 ||
+				cr_cross_cover.get_coverage()<100 ||
 				output_cover.get_coverage()<100) begin
 		assert(i.randomize());
 		req <= i.rand_req;
