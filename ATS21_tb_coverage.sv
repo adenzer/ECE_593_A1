@@ -8,12 +8,27 @@ ATS21_tb_coverage.sv
 --------------------
 Description:
 
-Describe signals / tasks being used or functions inhereted from previous testbench
+The following testbench is used for generating random simulus to feed into the ATS21 design
+every clock cycle and generating functional covereage for the design under test.
 
-Describe random generation
+Testbench uses the same parameters the module takes advantage of, as well as declares a number of 
+signals to be used for verification. Struct fields for clocks and alarms are pulled into their own 
+signals for more convenient referral and verification. Finally, an always_ff block runs and checks 
+each output bit and sums them up for verification of how many alarms are active at any given time. 
 
-Describe cover groups
+More detail can be found in our attached report. 
 
+Every clock cycle random inputs are driven for 'req', 'CTRLA', and 'CTRLB'. While each
+cover group is at less than 100%, the simulation keeps running. 
+
+Cover Groups: 
+	Inputs
+	Instruction Decoding
+	BCs
+	ATs
+	Control Registers
+	Control Resgiter Cross Products
+	Outputs
 
 */
 
@@ -38,8 +53,7 @@ logic [15:0] ctrlA, ctrlB;
 logic [ 2:0] ctrlA_opcode_in, ctrlB_opcode_in;
 logic [23:0] data;
 
-
-logic [num_clocks-1:0]				BC_enable;
+logic [num_clocks-1:0]			BC_enable;
 logic [num_clocks-1:0][15:0]	BC_count;
 logic [num_clocks-1:0][1:0] 	BC_rate;
 
@@ -583,6 +597,7 @@ covergroup ats21_output @(posedge clk);
 	}
 
 	coverpoint data {
+		bins none     = {24'b000000000000000000000000};
 		bins alarm_0  = {24'b000000000000000000000001};
 		bins alarm_1  = {24'b000000000000000000000010};
 		bins alarm_2  = {24'b000000000000000000000100};
