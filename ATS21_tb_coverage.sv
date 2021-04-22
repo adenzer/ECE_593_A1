@@ -146,72 +146,73 @@ endgroup	// ats21_input
 
 covergroup ats21_internal @(posedge clk);
 	// Coverage is missing when Opcode is 000, but not all the time
-	checkInst_opcodeA: coverpoint dut.checkInst.ctrlA[31:29]{
-		bins nop								 = {3'b000};
-		bins set_BC              = {3'b001};
-		bins toggle_BC           = {3'b010};
-		bins set_AT              = {3'b101};
-		bins set_Countdown       = {3'b110};
-		bins toggle_AT           = {3'b111};
-		bins set_ATS21_mode      = {3'b011};
-		bins invalid_instruction = default;
-	}
-	checkInst_opcodeB: coverpoint dut.checkInst.ctrlB[31:29]{
-		bins nop								 = {3'b000};
-		bins set_BC              = {3'b001};
-		bins toggle_BC           = {3'b010};
-		bins set_AT              = {3'b101};
-		bins set_Countdown       = {3'b110};
-		bins toggle_AT           = {3'b111};
-		bins set_ATS21_mode      = {3'b011};
-		bins invalid_instruction = default;
-	}
+	// checkInst_opcodeA: coverpoint dut.checkInst.ctrlA[31:29]{
+	// 	bins nop								 = {3'b000};
+	// 	bins set_BC              = {3'b001};
+	// 	bins toggle_BC           = {3'b010};
+	// 	bins set_AT              = {3'b101};
+	// 	bins set_Countdown       = {3'b110};
+	// 	bins toggle_AT           = {3'b111};
+	// 	bins set_ATS21_mode      = {3'b011};
+	// 	bins invalid_instruction = default;
+	// }
+	// checkInst_opcodeB: coverpoint dut.checkInst.ctrlB[31:29]{
+	// 	bins nop								 = {3'b000};
+	// 	bins set_BC              = {3'b001};
+	// 	bins toggle_BC           = {3'b010};
+	// 	bins set_AT              = {3'b101};
+	// 	bins set_Countdown       = {3'b110};
+	// 	bins toggle_AT           = {3'b111};
+	// 	bins set_ATS21_mode      = {3'b011};
+	// 	bins invalid_instruction = default;
+	// }
 
 	checkInst_ctrlA: coverpoint dut.checkInst.ctrlA{
-		bins nop = {32'h00000000};
-		bins valid_inst = { [32'h00200000:32'hFFFFFFFF]};
-		bins not_gonna_happen = default;
+		bins nop								     = { [32'h00000000:32'h1FFFFFFF] };
+		bins set_BC[64]              = { [32'h20000000:32'h3FFFFFFF] };
+		bins toggle_BC[64]           = { [32'h40000000:32'h4FFFFFFF] };
+		bins set_AT[64]              = { [32'hA0000000:32'hAFFFFFFF] };
+		bins set_Countdown[64]       = { [32'hC0000000:32'hCFFFFFFF] };
+		bins toggle_AT[64]           = { [32'hE0000000:32'hEFFFFFFF] };
+		bins set_ATS21_mode[64]      = { [32'h30000000:32'h3FFFFFFF] };
+		bins invalid_instruction     = default;
 	}
 
 	checkInst_ctrlB: coverpoint dut.checkInst.ctrlB{
-		bins nop = {32'h00000000};
-		bins valid_inst = { [32'h00200000:32'hFFFFFFFF]};
-		bins not_gonna_happen = default;
+		bins nop								     = { [32'h00000000:32'h1FFFFFFF] };
+		bins set_BC[64]              = { [32'h20000000:32'h3FFFFFFF] };
+		bins toggle_BC[64]           = { [32'h40000000:32'h4FFFFFFF] };
+		bins set_AT[64]              = { [32'hA0000000:32'hAFFFFFFF] };
+		bins set_Countdown[64]       = { [32'hC0000000:32'hCFFFFFFF] };
+		bins toggle_AT[64]           = { [32'hE0000000:32'hEFFFFFFF] };
+		bins set_ATS21_mode[64]      = { [32'h30000000:32'h3FFFFFFF] };
+		bins invalid_instruction     = default;
 	}
+
 	checkInst_crtlA_X_ctrlB: cross checkInst_ctrlA, checkInst_ctrlB;
 
-	// Coverage is missing when Opcode is 000, but not all the time
-	processInst_opcodeA: coverpoint dut.processInst.ctrlA[31:29]{
-		bins nop								 = {3'b000};
-		bins set_BC              = {3'b001};
-		bins toggle_BC           = {3'b010};
-		bins set_AT              = {3'b101};
-		bins set_Countdown       = {3'b110};
-		bins toggle_AT           = {3'b111};
-		bins set_ATS21_mode      = {3'b011};
-		bins invalid_instruction = default;
-	}
-	processInst_opcodeB: coverpoint dut.processInst.ctrlB[31:29]{
-		bins nop								 = {3'b000};
-		bins set_BC              = {3'b001};
-		bins toggle_BC           = {3'b010};
-		bins set_AT              = {3'b101};
-		bins set_Countdown       = {3'b110};
-		bins toggle_AT           = {3'b111};
-		bins set_ATS21_mode      = {3'b011};
-		bins invalid_instruction = default;
-	}
 
+	// Coverage is missing when Opcode is 000, but not all the time
 	processInst_ctrlA: coverpoint dut.processInst.ctrlA{
-		bins nop = {32'h00000000};
-		bins valid_inst = { [32'h00200000:32'hFFFFFFFF]};
-		bins not_gonna_happen = default;
+		bins nop								     = { [32'h00000000:32'h1FFFFFFF] };
+		bins set_BC[64]              = { [32'h20000000:32'h3FFFFFFF] };
+		bins toggle_BC[64]           = { [32'h40000000:32'h4FFFFFFF] };
+		bins set_AT[64]              = { [32'hA0000000:32'hAFFFFFFF] };
+		bins set_Countdown[64]       = { [32'hC0000000:32'hCFFFFFFF] };
+		bins toggle_AT[64]           = { [32'hE0000000:32'hEFFFFFFF] };
+		bins set_ATS21_mode[64]      = { [32'h30000000:32'h3FFFFFFF] };
+		bins invalid_instruction     = default;
 	}
 
 	processInst_ctrlB: coverpoint dut.processInst.ctrlB{
-		bins nop = {32'h00000000};
-		bins valid_inst = { [32'h00200000:32'hFFFFFFFF]};
-		bins not_gonna_happen = default;
+		bins nop								     = { [32'h00000000:32'h1FFFFFFF] };
+		bins set_BC[64]              = { [32'h20000000:32'h3FFFFFFF] };
+		bins toggle_BC[64]           = { [32'h40000000:32'h4FFFFFFF] };
+		bins set_AT[64]              = { [32'hA0000000:32'hAFFFFFFF] };
+		bins set_Countdown[64]       = { [32'hC0000000:32'hCFFFFFFF] };
+		bins toggle_AT[64]           = { [32'hE0000000:32'hEFFFFFFF] };
+		bins set_ATS21_mode[64]      = { [32'h30000000:32'h3FFFFFFF] };
+		bins invalid_instruction     = default;
 	}
 
 	processInst_crtlA_X_ctrlB: cross processInst_ctrlA, processInst_ctrlB;
