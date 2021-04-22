@@ -533,17 +533,6 @@ covergroup ats21_cr_cross @(posedge clk);
 	ctrlB_set_ATS21_mode: coverpoint dut.processInst.ctrlB[31:29]{
 		bins set_ATS21_mode = {3'b011};
 	}
-	//
-	// processInst_opcodeB: coverpoint dut.processInst.ctrlB[31:29]{
-	// 	bins nop								 = {3'b000};
-	// 	bins set_BC              = {3'b001};
-	// 	bins toggle_BC           = {3'b010};
-	// 	bins set_AT              = {3'b101};
-	// 	bins set_Countdown       = {3'b110};
-	// 	bins toggle_AT           = {3'b111};
-	// 	bins set_ATS21_mode      = {3'b011};
-	// 	bins invalid_instruction = default;
-	// }
 
 	device_enable: coverpoint cr_device_enable;
 	clientA_clock: coverpoint cr_clientA_clock;
@@ -568,7 +557,7 @@ covergroup ats21_cr_cross @(posedge clk);
 	cr_clientA_clock_X_set_BC: cross clientA_clock, ctrlA_set_BC;
 	cr_clientA_clock_X_toggle_BC: cross clientA_clock, ctrlA_toggle_BC;
 	cr_clientB_clock_X_set_BC: cross clientB_clock, ctrlB_set_BC;
-	cr_clientB_clock_X_set_BC: cross clientB_clock, ctrlB_toggle_BC;
+	cr_clientB_clock_X_toggle_BC: cross clientB_clock, ctrlB_toggle_BC;
 
 	cr_clientA_alarm_X_set_AT: cross clientA_alarm, ctrlA_set_AT;
 	cr_clientA_alarm_X_set_Countdown: cross clientA_alarm, ctrlA_set_Countdown;
@@ -578,7 +567,6 @@ covergroup ats21_cr_cross @(posedge clk);
 	cr_clientB_alarm_X_set_Countdown: cross clientB_alarm, ctrlB_set_Countdown;
 	cr_clientB_alarm_X_toggle_AT: cross clientB_alarm, ctrlB_toggle_AT;
 endgroup
-
 
 covergroup ats21_output @(posedge clk);
 	coverpoint all_alarms {
