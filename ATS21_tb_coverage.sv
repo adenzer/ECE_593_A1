@@ -144,28 +144,7 @@ covergroup ats21_input @(posedge clk);
 endgroup	// ats21_input
 
 
-covergroup ats21_internal @(posedge clk);
-	// Coverage is missing when Opcode is 000, but not all the time
-	// checkInst_opcodeA: coverpoint dut.checkInst.ctrlA[31:29]{
-	// 	bins nop								 = {3'b000};
-	// 	bins set_BC              = {3'b001};
-	// 	bins toggle_BC           = {3'b010};
-	// 	bins set_AT              = {3'b101};
-	// 	bins set_Countdown       = {3'b110};
-	// 	bins toggle_AT           = {3'b111};
-	// 	bins set_ATS21_mode      = {3'b011};
-	// 	bins invalid_instruction = default;
-	// }
-	// checkInst_opcodeB: coverpoint dut.checkInst.ctrlB[31:29]{
-	// 	bins nop								 = {3'b000};
-	// 	bins set_BC              = {3'b001};
-	// 	bins toggle_BC           = {3'b010};
-	// 	bins set_AT              = {3'b101};
-	// 	bins set_Countdown       = {3'b110};
-	// 	bins toggle_AT           = {3'b111};
-	// 	bins set_ATS21_mode      = {3'b011};
-	// 	bins invalid_instruction = default;
-	// }
+covergroup ats21_instructions @(posedge clk);
 
 	checkInst_ctrlA: coverpoint dut.checkInst.ctrlA{
 		bins nop								     = { [32'h00000000:32'h1FFFFFFF] };
@@ -216,7 +195,7 @@ covergroup ats21_internal @(posedge clk);
 	}
 
 	processInst_crtlA_X_ctrlB: cross processInst_ctrlA, processInst_ctrlB;
-endgroup // ats21_internal
+endgroup // ats21_instructions
 
 
 covergroup ats21_BCs @(posedge clk);
@@ -506,13 +485,41 @@ covergroup ats21_control_register @(posedge clk);
 	cr_bits_cross: cross device_enable, clientA_clock, clientB_clock, clientA_alarm, clientB_alarm;
 endgroup	// ats21_control_register
 
+covergroup ats21_cr_cross @(posedge clk);
+	processInst_opcodeA: coverpoint dut.processInst.ctrlA[31:29]{
+		bins nop								 = {3'b000};
+		bins set_BC              = {3'b001};
+		bins toggle_BC           = {3'b010};
+		bins set_AT              = {3'b101};
+		bins set_Countdown       = {3'b110};
+		bins toggle_AT           = {3'b111};
+		bins set_ATS21_mode      = {3'b011};
+		bins invalid_instruction = default;
+	}
+	processInst_opcodeB: coverpoint dut.processInst.ctrlB[31:29]{
+		bins nop								 = {3'b000};
+		bins set_BC              = {3'b001};
+		bins toggle_BC           = {3'b010};
+		bins set_AT              = {3'b101};
+		bins set_Countdown       = {3'b110};
+		bins toggle_AT           = {3'b111};
+		bins set_ATS21_mode      = {3'b011};
+		bins invalid_instruction = default;
+	}
+
+	cr_clientA_clock_X_set_clock_instA: cross dut.cr_bits.clientA_clock, processInst_opcodeA.set_BC, processInst_opcodeA.toggle_BC;
+	cr_clientB_clock_X_set_clock_instB: cross dut.cr_bits.clientB_clock, processInst_opcodeB.set_BC, processInst_opcodeB.toggle_BC;
+	cr_clientA_alarm_X_set_alarm_instA: cross dut.cr_bits.clientA_alarm, processInst_opcodeA.set_AT, processInst_opcodeA.toggle_AT;
+	cr_clientB_alarm_X_set_alarm_instB: cross dut.cr_bits.clientB_alarm, processInst_opcodeB.set_AT, processInst_opcodeB.toggle_AT;
+endgroup
+
 
 covergroup ats21_output @(posedge clk);
 	coverpoint all_alarms {
 		bins no_alarms   = {0};
 		bins one_alarm   = {1};
 		bins two_alarms  = {2};
-		bins many_alarms = { [3:25] };
+		bins many_alarms = { [3:24] };
 	}
 
 	coverpoint data {
@@ -552,7 +559,7 @@ covergroup ats21_output @(posedge clk);
 endgroup	// ats21_output
 
 ats21_input input_cover = new;
-ats21_internal internal_cover = new;
+ats21_instructions instructions_cover = new;
 ats21_BCs base_clocks_cover = new;
 ats21_alarms alarms_cover = new;
 ats21_control_register cr_cover = new;
@@ -562,7 +569,7 @@ ats21_output output_cover = new;
 class RandomInput;
 	rand bit[15:0] rand_ctrlA;
 	rand bit[15:0] rand_ctrlB;
-	rand bit	   rand_req;
+	rand bit	   	 rand_req;
 endclass
 
 // Simulation
@@ -575,7 +582,7 @@ initial begin
 	initialize();
 
 	while (input_cover.get_coverage()<100 ||
-				internal_cover.get_coverage()<100 ||
+				instructions_cover.get_coverage()<100 ||
 				base_clocks_cover.get_coverage()<100 ||
 				alarms_cover.get_coverage()<100 ||
 				cr_cover.get_coverage()<100 ||
