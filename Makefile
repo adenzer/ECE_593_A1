@@ -8,7 +8,7 @@ help:
 compile:
 	vlib work
 	vmap work work
-	vlog ATS21.sv
+	vlog +cover=bcse ATS21.sv
 	vlog ATS21_tb.sv
 	vlog ATS21_tb_coverage.sv
 
@@ -19,7 +19,7 @@ sim_gui:
 	vsim -voptargs="+acc" ATS21_tb -do "wave_simple.do" -do "run -all"
 
 coverage:
-	vsim -coverage -voptargs="+acc +cover=bcesxf" ATS21_tb_coverage ATS21.sv -do "run -all;"
+	vsim -coverage -voptargs="+acc +cover=bces" ATS21_tb_coverage -do "run -all;"
 
 clean:
 	rm -rf work modelsim.ini *.wlf *.log replay* transcript *.db
