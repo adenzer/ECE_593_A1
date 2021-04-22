@@ -496,6 +496,7 @@ covergroup ats21_cr_cross @(posedge clk);
 		bins set_ATS21_mode      = {3'b011};
 		bins invalid_instruction = default;
 	}
+	
 	processInst_opcodeB: coverpoint dut.processInst.ctrlB[31:29]{
 		bins nop								 = {3'b000};
 		bins set_BC              = {3'b001};
@@ -509,6 +510,7 @@ covergroup ats21_cr_cross @(posedge clk);
 
 	cr_active_X_ctrlA_inst: cross cr_device_enable, processInst_opcodeA;
 	cr_active_X_ctrlB_inst: cross cr_device_enable, processInst_opcodeB;
+
 	cr_clientA_clock_X_set_clock_instA: cross cr_clientA_clock, processInst_opcodeA.set_BC, processInst_opcodeA.toggle_BC;
 	cr_clientB_clock_X_set_clock_instB: cross cr_clientB_clock, processInst_opcodeB.set_BC, processInst_opcodeB.toggle_BC;
 	cr_clientA_alarm_X_set_alarm_instA: cross cr_clientA_alarm, processInst_opcodeA.set_AT, processInst_opcodeA.toggle_AT;
