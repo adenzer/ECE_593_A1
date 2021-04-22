@@ -35,13 +35,23 @@ Current Tests :
 Future Tests : 
 
 	Test ATS21 Modes more thoroughly
-		- List Modes
+		- Device Active / Insactive
+			- Do clocks stop counting? 
+			- Are inputs still valid?
+		- Clock Enable / Disable for Clients A and B
+		- Alarm Enable / Disable for Clients A and B
 	Clock start values
-		- List Cases 
+		- Test different 'start' values for clocks and alarms
+			- Top and Bottom of 16-bit vector (i.e. 0x0000 and 0xFFFF)
 	Repeating Alarms (longer simulations)
-		- List Cases
+		- Set repeating alarms and run much longer simulations to observe multiple rising edges
 	Disabling / Reenabling alarms and clocks
-		- List Cases
+		- Clocks
+			- Do they stop counting? 
+			- Can they still be manipulated? 
+		- Alarms 
+			- Do they stop outputting? 
+			- Can they still be manipulated?
 
 */
 
