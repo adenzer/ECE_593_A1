@@ -464,7 +464,7 @@ covergroup ats21_alarms @(posedge clk);
 	alarm22_assigned_clock: coverpoint alarm_assigned_clock[22];
 	alarm22_value: coverpoint alarm_value[22];
 	alarm22_finished: coverpoint alarm_finished[22];
-	alarm22_cross : cross alarm22_enable, alarm22_countdown, alarm22_loop, alarm22_assigned_clock, alarm22_value, alarm22_finished;
+	alarm22_cross: cross alarm22_enable, alarm22_countdown, alarm22_loop, alarm22_assigned_clock, alarm22_value, alarm22_finished;
 
 	alarm23_enable: coverpoint alarm_enable[23];
 	alarm23_countdown: coverpoint alarm_countdown[23];
@@ -472,7 +472,7 @@ covergroup ats21_alarms @(posedge clk);
 	alarm23_assigned_clock: coverpoint alarm_assigned_clock[23];
 	alarm23_value: coverpoint alarm_value[23];
 	alarm23_finished: coverpoint alarm_finished[23];
-	alarm23_cross : cross alarm23_enable, alarm23_countdown, alarm23_loop, alarm23_assigned_clock, alarm23_value, alarm23_finished;
+	alarm23_cross: cross alarm23_enable, alarm23_countdown, alarm23_loop, alarm23_assigned_clock, alarm23_value, alarm23_finished;
 endgroup	// ats21_alarms
 
 
@@ -508,17 +508,23 @@ covergroup ats21_cr_cross @(posedge clk);
 		bins invalid_instruction = default;
 	}
 
-	// cr_active_X_ctrlA_inst: cross cr_device_enable, processInst_opcodeA.set_BC, processInst_opcodeA.toggle_BC, processInst_opcodeA.set_AT,
-	// 															processInst_opcodeA.set_Countdown, processInst_opcodeA.toggle_AT, processInst_opcodeA.set_ATS21_mode;
-	//
-	// cr_active_X_ctrlB_inst: cross cr_device_enable, processInst_opcodeB.set_BC, processInst_opcodeB.toggle_BC, processInst_opcodeB.set_AT,
-	// 															processInst_opcodeB.set_Countdown, processInst_opcodeB.toggle_AT, processInst_opcodeB.set_ATS21_mode;
+	device_enable: coverpoint cr_device_enable;
+	clientA_clock: coverpoint cr_clientA_clock;
+	clientB_clock: coverpoint cr_clientB_clock;
+	clientA_alarm: coverpoint cr_clientA_alarm;
+	clientB_alarm: coverpoint cr_clientB_alarm;
 
-	cr_clientA_clock_X_set_clock_instA: cross cr_clientA_clock, processInst_opcodeA.set_BC, processInst_opcodeA.toggle_BC;
-	cr_clientB_clock_X_set_clock_instB: cross cr_clientB_clock, processInst_opcodeB.set_BC, processInst_opcodeB.toggle_BC;
+	cr_active_X_ctrlA_inst: cross device_enable, processInst_opcodeA.set_BC, processInst_opcodeA.toggle_BC, processInst_opcodeA.set_AT,
+																processInst_opcodeA.set_Countdown, processInst_opcodeA.toggle_AT, processInst_opcodeA.set_ATS21_mode;
 
-	cr_clientA_alarm_X_set_alarm_instA: cross cr_clientA_alarm, processInst_opcodeA.set_AT, processInst_opcodeA.set_Countdown, processInst_opcodeA.toggle_AT;
-	cr_clientB_alarm_X_set_alarm_instB: cross cr_clientB_alarm, processInst_opcodeB.set_AT, processInst_opcodeB.set_Countdown, processInst_opcodeB.toggle_AT;
+	cr_active_X_ctrlB_inst: cross device_enable, processInst_opcodeB.set_BC, processInst_opcodeB.toggle_BC, processInst_opcodeB.set_AT,
+																processInst_opcodeB.set_Countdown, processInst_opcodeB.toggle_AT, processInst_opcodeB.set_ATS21_mode;
+
+	cr_clientA_clock_X_set_clock_instA: cross clientA_clock, processInst_opcodeA.set_BC, processInst_opcodeA.toggle_BC;
+	cr_clientB_clock_X_set_clock_instB: cross clientB_clock, processInst_opcodeB.set_BC, processInst_opcodeB.toggle_BC;
+
+	cr_clientA_alarm_X_set_alarm_instA: cross clientA_alarm, processInst_opcodeA.set_AT, processInst_opcodeA.set_Countdown, processInst_opcodeA.toggle_AT;
+	cr_clientB_alarm_X_set_alarm_instB: cross clientB_alarm, processInst_opcodeB.set_AT, processInst_opcodeB.set_Countdown, processInst_opcodeB.toggle_AT;
 endgroup
 
 
